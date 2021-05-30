@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Introduction
 
   English | [简体中文](README_CN.md)
@@ -65,3 +66,6 @@
 ## FAQ
 
   Please refer to [FAQ](docs/faq.md) for frequently asked questions.
+=======
+# MultipleVsiualTasks
+>>>>>>> 5df551aef727585cde19c324b5dd0b59c926ae56
