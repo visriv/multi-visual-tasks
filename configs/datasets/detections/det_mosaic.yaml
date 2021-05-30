@@ -1,0 +1,73 @@
+DATA:
+  NAME: "MosaicDataset"
+  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/MosaicDet"
+  TRAIN_TRANSFORMS:
+    LoadImageFromFile: {to_float32: True}
+    LoadAnnotations: {with_bbox: True}
+    PhotoMetricDistortion: {
+      brightness_delta: 32,
+      contrast_range: [0.5, 1.5],
+      saturation_range: [0.5, 1.5],
+      hue_delta: 18}
+    Expand: {
+      mean: [123.675, 116.28, 103.53],
+      to_rgb: True,
+      ratio_range: [1, 4]}
+    MinIoURandomCrop: {
+      min_ious: [0.1, 0.3, 0.5, 0.7, 0.9],
+      min_crop_size: 0.3}
+    JointResize: {
+      img_scale: [300, 300], 
+      keep_ratio: False}
+    JointRandomFlip: {flip_ratio: 0.5}
+    Normalize: {
+      mean: [123.675, 116.28, 103.53], 
+      std: [1, 1, 1], 
+      to_rgb: True}
+    DefaultFormatBundle: {}
+    Collect: {keys: ['img', 'gt_bboxes', 'gt_labels']}
+  TEST_TRANSFORMS:
+    LoadImageFromFile: {}
+    MultiScaleFlipAug: {
+      img_scale: [300, 300],
+      flip: False,
+      transforms: {
+        JointResize: {keep_ratio: False},
+        Normalize: {
+          mean: [123.675, 116.28, 103.53],
+          std: [1, 1, 1],
+          to_rgb: True},
+        ImageToTensor: {keys: ['img']},
+        Collect: {keys: ['img']}
+        }
+      }
+  TRAIN_DATA:
+    TYPE: "Normal" # "Concat" "Repeat" "Balanced"
+    FLAG: 1
+    IS_TFRECORD: True
+    DATA_INFO: [['tfrecords/train.tfrecord']] # ["metas/train.txt"] # if tfrecord. it should be a list of list
+    DATA_PREFIX: ["images/"]
+    ANNO_PREFIX: ["annotations/"]
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 0
+  VAL_DATA:
+    TYPE: "Normal" # "Concat" "Repeat" "Balanced"
+    FLAG: 1
+    IS_TFRECORD: True
+    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
+    DATA_PREFIX: ["images/"]
+    ANNO_PREFIX: ["annotations/"]
+    TEST_MODE: False
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 0
+  TEST_DATA:
+    TYPE: "Normal" # "Concat" "Repeat" "Balanced"
+    FLAG: 1
+    IS_TFRECORD: True
+    #MIN_SIZE: 100
+    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
+    DATA_PREFIX: ["images/"]
+    ANNO_PREFIX: ["annotations/"]
+    TEST_MODE: True
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 0

@@ -1,0 +1,15 @@
+SCHEDULE:
+  TOTAL_EPOCHS: 12
+  OPTIMIZER:
+    type: "SGD"
+    lr: 0.02
+    momentum: 0.9
+    weight_decay: 0.0005
+  OPTIMIZER_CONFIG:
+    grad_clip: ""
+  LR_POLICY:
+    policy: "step"
+    warmup: "linear"
+    warmup_iters: 500
+    warmup_ratio: 0.001
+    step: [8, 11]

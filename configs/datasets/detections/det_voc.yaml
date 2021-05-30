@@ -1,0 +1,72 @@
+DATA:
+  NAME: "VOCDataset"
+  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/VOC" # /root/datasets
+  TRAIN_TRANSFORMS:
+    LoadImageFromFile: {to_float32: True}
+    LoadAnnotations: {with_bbox: True}
+    PhotoMetricDistortion: {
+      brightness_delta: 32,
+      contrast_range: [0.5, 1.5],
+      saturation_range: [0.5, 1.5],
+      hue_delta: 18}
+    Expand: {
+      mean: [123.675, 116.28, 103.53],
+      to_rgb: True,
+      ratio_range: [1, 4]}
+    MinIoURandomCrop: {
+      min_ious: [0.1, 0.3, 0.5, 0.7, 0.9],
+      min_crop_size: 0.3}
+    JointResize: {
+      img_scale: [300, 300], 
+      keep_ratio: False}
+    JointRandomFlip: {flip_ratio: 0.5}
+    Normalize: {
+      mean: [123.675, 116.28, 103.53], 
+      std: [1, 1, 1], 
+      to_rgb: True}
+    DefaultFormatBundle: {}
+    Collect: {keys: ['img', 'gt_bboxes', 'gt_labels']}
+  TEST_TRANSFORMS:
+    LoadImageFromFile: {}
+    MultiScaleFlipAug: {
+      img_scale: [300, 300],
+      flip: False,
+      transforms: {
+        JointResize: {keep_ratio: False},
+        Normalize: {
+          mean: [123.675, 116.28, 103.53],
+          std: [1, 1, 1],
+          to_rgb: True},
+        ImageToTensor: {keys: ['img']},
+        Collect: {keys: ['img']}
+        }
+      }
+  TRAIN_DATA:
+    TYPE: "Concat" # "Normal" "Repeat" "Balanced"
+    FLAG: 1
+    #IMAGE_SIZE: [300, 300]
+    DATA_INFO: ["VOC2007/ImageSets/Main/train.txt", "VOC2012/ImageSets/Main/train.txt"]
+    DATA_PREFIX: ["VOC2007/", "VOC2012/"]
+    IS_TFRECORD: False
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  VAL_DATA:
+    TYPE: "Concat" # "Normal" "Repeat" "Balanced"
+    FLAG: 1
+    #MIN_SIZE: 100
+    DATA_INFO: ["VOC2007/ImageSets/Main/val.txt", "VOC2012/ImageSets/Main/val.txt"]
+    DATA_PREFIX: ["VOC2007/", "VOC2012/"]
+    IS_TFRECORD: False
+    TEST_MODE: False
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  TEST_DATA:
+    TYPE: "Concat" # "Repeat" "Balanced"
+    FLAG: 1
+    #MIN_SIZE: 100
+    DATA_INFO: ["VOC2007/ImageSets/Main/val.txt", "VOC2012/ImageSets/Main/val.txt"]
+    DATA_PREFIX: ["VOC2007/", "VOC2012/"]
+    IS_TFRECORD: False
+    TEST_MODE: True
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4

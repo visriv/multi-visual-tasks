@@ -1,0 +1,13 @@
+SCHEDULE:
+  TOTAL_EPOCHS: 210
+  OPTIMIZER:
+    type: 'Adam'
+    lr: 0.0005
+  OPTIMIZER_CONFIG:
+    grad_clip: ""
+  LR_POLICY:
+    policy: 'step'
+    warmup: 'linear'
+    warmup_iters: 500
+    warmup_ratio: 0.001
+    step: [170, 200]

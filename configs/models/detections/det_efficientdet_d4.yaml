@@ -1,0 +1,83 @@
+MODEL:
+  TYPE: "det"
+  NAME: "RetinaNet"
+  PRETRAINED_MODEL_PATH: "meta/models/efficientnet-b4-6ed6700e.pth"
+  BACKBONE:
+    type: 'EfficientNet'
+    arch: 'efficientnet-b4'
+    out_indices: [4, 6, 8]
+    norm_cfg: {
+      type: 'BN', 
+      momentum: 0.01, 
+      eps: 0.001, 
+      requires_grad: True}
+    norm_eval: False),
+  NECK:
+    type: 'BiFPN'
+    in_channels: [56, 160, 448]
+    target_size_list: [128, 64, 32, 16, 8]
+    out_channels: 224
+    stack: 7
+    start_level: 0
+    norm_cfg: {
+      type: 'BN', 
+      momentum: 0.01, 
+      eps: 0.001, 
+      requires_grad: True}
+    num_outs: 5
+  BBOX_HEAD:
+    type: 'RetinaSepConvHead'
+    num_classes: 81
+    num_ins: 5
+    in_channels: 224
+    stacked_convs: 4
+    feat_channels: 224
+    octave_base_scale: 4
+    scales_per_octave: 3
+    anchor_generator: {
+      type: 'AnchorGenerator',
+      scales: [8],
+      ratios: [0.5, 1.0, 2.0],
+      strides: [4, 8, 16, 32, 64]}
+    bbox_coder: {
+      type: 'DeltaXYWHBBoxCoder',
+      target_means: [.0, .0, .0, .0],
+      target_stds: [1.0, 1.0, 1.0, 1.0]}
+    norm_cfg: {
+      type: 'BN', 
+      momentum: 0.01, 
+      eps: 0.001, 
+      requires_grad: True}
+    loss_cls: {
+      type: 'SoftFocalLoss',
+      gamma: 1.5,
+      alpha: 0.25,
+      loss_weight: 1.0} # for cpu training 
+    # loss_cls: {
+    #   type: 'FocalLoss',
+    #   use_sigmoid: True,
+    #   gamma: 1.5,
+    #   alpha: 0.25,
+    #   loss_weight: 1.0} # for gpu training
+    loss_bbox: {
+      type: 'SmoothL1Loss', 
+      beta: 0.11, 
+      loss_weight: 1.0}      
+  TRAIN_CFG:
+    assigner: {
+      type: 'MaxIoUAssigner',
+      pos_iou_thr: 0.5,
+      neg_iou_thr: 0.5,
+      min_pos_iou: 0,
+      ignore_iof_thr: -1}
+    allowed_border: -1
+    pos_weight: -1
+    debug: False
+  TEST_CFG:
+    nms_pre: 1000
+    min_bbox_size: 0
+    score_thr: 0.05
+    nms: {
+      type: 'common_nms',
+      iou_thr: 0.5}
+    max_per_img: 100

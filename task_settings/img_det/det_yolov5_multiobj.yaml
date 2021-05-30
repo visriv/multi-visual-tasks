@@ -1,0 +1,17 @@
+MODEL:
+  BASE: "models/detections/det_yolov5.yaml"
+  BBOX_HEAD:
+    num_classes: 65
+DATA:
+  BASE: "datasets/detections/det_multiobj_yolo.yaml"  
+SCHEDULE:
+  BASE: "schedulers/schedule_yolo.yaml"
+  TOTAL_EPOCHS: 100
+  OPTIMIZER:
+    lr: 0.001
+  LR_POLICY:
+    warmup_iters: 5000
+    warmup_ratio: 0.001
+    step: [66, 92]
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"

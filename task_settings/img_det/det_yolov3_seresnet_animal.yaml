@@ -1,0 +1,28 @@
+MODEL:
+  BASE: "models/detections/det_yolov3_seresnet50.yaml"
+  BBOX_HEAD:
+    num_classes: 110
+DATA:
+  BASE: "datasets/detections/det_animal_yolo.yaml"
+  # ROOT_PATH: "/apdcephfs/share_1326378/public_data/cv/det/AnimalDet"
+  TRAIN_DATA:
+    DATA_INFO: [['tfrecords/train.tfrecord']] # ["metas/train.txt"]
+    IS_TFRECORD: True
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  VAL_DATA:
+    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
+    IS_TFRECORD: True
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  TEST_DATA:
+    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
+    IS_TFRECORD: True
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+SCHEDULE:
+  BASE: "schedulers/schedule_yolo.yaml"
+  OPTIMIZER: 
+    lr: 0.001
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"

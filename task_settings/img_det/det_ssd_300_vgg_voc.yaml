@@ -1,0 +1,14 @@
+MODEL:
+  BASE: "models/detections/det_ssd_300_vgg.yaml"
+  BBOX_HEAD:
+    num_classes: 20
+DATA:
+  BASE: "datasets/detections/det_voc.yaml"
+SCHEDULE:
+  BASE: "schedulers/schedule_2x.yaml"
+  OPTIMIZER: 
+    lr: 0.002
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"
+#  EVALUATION:
+#    metric: ['mAP']

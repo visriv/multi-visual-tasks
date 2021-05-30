@@ -1,0 +1,17 @@
+RUNTIME:
+  WORK_DIR: ""
+  LOAD_CHECKPOINT_PATH: ""
+  RESUME_MODEL_PATH: ""
+  CHECKPOINT_CONFIG:
+    interval: 1
+    by_epoch: True
+  LOG_CONFIG:
+    interval: 50
+    hooks: {
+      TextLoggerHook: {},
+      TensorboardLoggerHook: {}
+    }
+  LOG_LEVEL: "INFO"
+  DIST_PARAMS: ["backend", "nccl"]
+  SEED: 7
+  WORKFLOW: [['train', 1]]

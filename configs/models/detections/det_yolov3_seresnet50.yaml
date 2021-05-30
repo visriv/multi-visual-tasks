@@ -1,0 +1,67 @@
+MODEL:
+  TYPE: "det"
+  NAME: "YOLOV3"
+  PRETRAINED_MODEL_PATH: "meta/models/se-resnet50-12345678.pth"
+  BACKBONE:
+    type: "SEResNet"
+    depth: 50
+    se_ratio: 16
+    num_stages: 4
+    out_indices: [3, 2, 1] # 
+    frozen_stages: 1
+    norm_cfg: {
+      type: 'BN', 
+      requires_grad: True}
+    norm_eval: True
+  NECK:
+    type: "YOLOV3Neck"
+    num_scales: 3
+    in_channels: [2048, 1024, 512]
+    out_channels: [1024, 512, 256]
+  BBOX_HEAD:
+    type: 'YOLOV3Head'
+    num_classes: 80
+    in_channels: [1024, 512, 256]
+    out_channels: [2048, 1024, 512]
+    anchor_generator: {
+      type: 'YOLOAnchorGenerator',
+      base_sizes: [[[116, 90], [156, 198], [373, 326]],
+                   [[30, 61], [62, 45], [59, 119]],
+                   [[10, 13], [16, 30], [33, 23]]],
+      strides: [32, 16, 8]}
+    bbox_coder: {type: 'YOLOBBoxCoder'}
+    featmap_strides: [32, 16, 8]
+    loss_cls: {
+      type: 'CrossEntropyLoss',
+      use_sigmoid: True,
+      loss_weight: 1.0,
+      reduction: 'sum'}
+    loss_conf: {
+      type: 'CrossEntropyLoss',
+      use_sigmoid: True,
+      loss_weight: 1.0,
+      reduction: 'sum'}
+    loss_xy: {
+      type: 'CrossEntropyLoss',
+      use_sigmoid: True,
+      loss_weight: 2.0,
+      reduction: 'sum'}
+    loss_wh: {
+      type: 'MSELoss', 
+      loss_weight: 2.0, 
+      reduction: 'sum'}
+  TRAIN_CFG:
+    assigner: {
+      type: 'GridAssigner', 
+      pos_iou_thr: 0.5, 
+      neg_iou_thr: 0.5, 
+      min_pos_iou: 0}
+  TEST_CFG:
+    nms_pre: 1000
+    min_bbox_size: 0
+    score_thr: 0.05
+    conf_thr: 0.005
+    nms: {
+      type: 'common_nms', 
+      iou_threshold: 0.45}
+    max_per_img: 100

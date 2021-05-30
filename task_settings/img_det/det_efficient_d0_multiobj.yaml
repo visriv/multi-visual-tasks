@@ -1,0 +1,56 @@
+MODEL:
+  BASE: "models/detections/det_efficientdet_d0.yaml"
+  BBOX_HEAD:
+    num_classes: 65
+DATA:
+  BASE: "datasets/detections/det_multiobj_efficient.yaml" 
+  TRAIN_TRANSFORMS:
+    JointResize: {
+      img_scale: [320, 320],
+      ratio_range: [0.1, 2.0],
+      keep_ratio: True}
+    JointRandomCrop: {crop_size: [224, 224]}
+    Pad: {size: [224, 224]}
+  TEST_TRANSFORMS:
+    MultiScaleFlipAug: {
+      img_scale: [224, 224],
+      flip: False,
+      transforms: {
+        JointResize: {keep_ratio: True},
+        JointRandomFlip: {},
+        Normalize: {
+          mean: [123.675, 116.28, 103.53],
+          std: [58.395, 57.12, 57.375],
+          to_rgb: True},
+        Pad: {size: [224, 224]},
+        ImageToTensor: {keys: ['img']},
+        Collect: {keys: ['img']}
+      }
+    } 
+  TRAIN_DATA:
+    DATA_INFO: [['tfrecords/train_01.tfrecord', 'tfrecords/train_02.tfrecord', 'tfrecords/train_03.tfrecord', 'tfrecords/train_04.tfrecord', 'tfrecords/train_05.tfrecord', 'tfrecords/train_06.tfrecord', 'tfrecords/train_07.tfrecord', 'tfrecords/train_08.tfrecord', 'tfrecords/train_09.tfrecord']] # 
+    IS_TFRECORD: True
+    SAMPLES_PER_DEVICE: 8
+    WORKERS_PER_DEVICE: 8
+  VAL_DATA:
+    DATA_INFO: [['tfrecords/val.tfrecord']] # 
+    IS_TFRECORD: True
+    TEST_MODE: False
+    SAMPLES_PER_DEVICE: 8
+    WORKERS_PER_DEVICE: 8
+  TEST_DATA:
+    DATA_INFO: [['tfrecords/val.tfrecord']] # 
+    IS_TFRECORD: True
+    TEST_MODE: True
+    SAMPLES_PER_DEVICE: 8
+    WORKERS_PER_DEVICE: 8
+SCHEDULE:
+  BASE: "schedulers/schedule_efficient.yaml"
+  TOTAL_EPOCHS: 100
+  OPTIMIZER:
+    lr: 0.01
+  LR_POLICY:
+    warmup_iters: 2000
+    warmup_ratio: 0.008
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"

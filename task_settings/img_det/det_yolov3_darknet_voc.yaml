@@ -1,0 +1,14 @@
+MODEL:
+  BASE: "models/detections/det_yolov3_darknet.yaml"
+  BBOX_HEAD:
+    num_classes: 20
+DATA:
+  BASE: "datasets/detections/det_voc_yolo.yaml"
+SCHEDULE:
+  BASE: "schedulers/schedule_yolo.yaml"
+  OPTIMIZER: 
+    lr: 0.001
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"
+  LOG_CONFIG:
+    interval: 10
