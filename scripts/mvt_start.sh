@@ -1,1 +1,1 @@
-docker run -it --runtime=nvidia --rm -P --shm-size=120g --ulimit memlock=-1 --ulimit stack=67108864 --name objective-mtl --net host -v /apdcephfs/private_zhimingqian/codes/mtl/objectdet-mtl:/root/objective-mtl -v /apdcephfs/share_1326378/public_data/cv:/root/datasets tkd-objective-mtl:v1.1 bash
+docker run -it --runtime=nvidia --rm -P --shm-size=120g --ulimit memlock=-1 --ulimit stack=67108864 --name mvt --net host -v xxx:yyy {docker-img} bash
