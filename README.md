@@ -1,23 +1,18 @@
-<<<<<<< HEAD
 ## Introduction
 
   English | [简体中文](README_CN.md)
 
-  Introduction: https://docs.qq.com/doc/DTXhFY2NWZm9NWURo
-  Develop API: https://docs.qq.com/doc/DTU5IdFljcXRkVWVC
-
-  ObjectiveMTL is an open-source toolbox for multiple vision tasks based on PyTorch.
+  MultipleVisualTasks (MVT) is an open-source toolbox for multiple vision tasks based on PyTorch.
 
 ### Major Features
 
 - **Support multiple tasks**
 
-  We support a wide spectrum of vision tasks in current research community, including image classification, image detection and instance segmentation, image segmentation, 
-  data regression and pose estimation.
+  Currently, We only support the vision task of image detection, however, the interfaces of datasets and models are open to other tasks, which will be open lately.
 
 - **Higher efficiency and higher accuracy**
 
-  MTL implements multiple state-of-the-art (SOTA) vision models. 
+  MVT implements multiple state-of-the-art (SOTA) vision models. 
 
 - **Support for various datasets**
 
@@ -25,7 +20,7 @@
 
 - **Well designed, tested and documented**
 
-  We decompose ObjectiveMTL into different components and one can easily construct a customized vision task by combining different modules.
+  We decompose MVT into different components and one can easily construct a customized vision task by combining different modules.
   We provide detailed documentation and API reference.
 
 
@@ -66,6 +61,3 @@
 ## FAQ
 
   Please refer to [FAQ](docs/faq.md) for frequently asked questions.
-=======
-# MultipleVsiualTasks
->>>>>>> 5df551aef727585cde19c324b5dd0b59c926ae56
