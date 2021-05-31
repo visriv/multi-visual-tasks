@@ -7,11 +7,11 @@
 import bisect
 import math
 from collections import defaultdict
-from mtl.utils.reg_util import Registry
+from mvt.utils.reg_util import Registry
 
 import numpy as np
 from torch.utils.data.dataset import ConcatDataset as _ConcatDataset
-from mtl.utils.log_util import print_log
+from mvt.utils.log_util import print_log
 
 
 # --------------------------------------------------------------------------- #

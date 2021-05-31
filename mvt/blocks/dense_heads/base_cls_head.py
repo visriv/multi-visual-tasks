@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 
 from ..block_builder import build_loss
-from mtl.utils.metric_util import Accuracy
+from mvt.utils.metric_util import Accuracy
 
 
 class BaseClsDenseHead(nn.Module, metaclass=ABCMeta):

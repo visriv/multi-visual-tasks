@@ -2,11 +2,11 @@ import torch.nn as nn
 import torch.utils.checkpoint as cp
 from torch.nn.modules.batchnorm import _BatchNorm
 
-from mtl.cores.ops import (ConvModule, build_conv_layer,
+from mvt.cores.ops import (ConvModule, build_conv_layer,
                            build_norm_layer, build_plugin_layer)
-from mtl.utils.init_util import constant_init, kaiming_init
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.log_util import get_root_logger
+from mvt.utils.init_util import constant_init, kaiming_init
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.log_util import get_root_logger
 from ..block_builder import BACKBONES
 
 

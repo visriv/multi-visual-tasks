@@ -3,8 +3,8 @@ import torch.nn as nn
 
 from .anchor import AnchorHead
 from ..block_builder import HEADS
-from mtl.cores.layer_ops.efficient_ops import SeparableConv2d
-from mtl.utils.init_util import bias_init_with_prob, kaiming_init
+from mvt.cores.layer_ops.efficient_ops import SeparableConv2d
+from mvt.utils.init_util import bias_init_with_prob, kaiming_init
 
 
 @HEADS.register_module()

@@ -4,10 +4,10 @@ import torch.utils.checkpoint as cp
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from ..block_builder import BACKBONES
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import constant_init, kaiming_init
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.cores.layer_ops import SELayer
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import constant_init, kaiming_init
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.cores.layer_ops import SELayer
 
 
 class InvertedResidualV3(nn.Module):

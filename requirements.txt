@@ -5,3 +5,5 @@ yacs
 tqdm
 opencv-python
 yapf
+lxml
+pycocotools

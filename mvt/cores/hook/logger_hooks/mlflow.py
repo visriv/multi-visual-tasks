@@ -1,4 +1,4 @@
-from mtl.utils.parallel_util import master_only
+from mvt.utils.parallel_util import master_only
 from ...core_hook import HOOKS
 from .base import LoggerHook
 

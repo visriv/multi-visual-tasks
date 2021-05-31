@@ -2,7 +2,7 @@ import torch
 
 from ...core_bbox import BBOX_SAMPLERS
 from .base_sampler import BaseSampler
-from mtl.utils.runtime_util import ensure_rng
+from mvt.utils.runtime_util import ensure_rng
 
 
 @BBOX_SAMPLERS.register_module()

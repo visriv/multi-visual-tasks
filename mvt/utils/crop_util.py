@@ -2,10 +2,10 @@ import math
 import numpy as np
 import xml.etree.ElementTree as ET
 
-from mtl.utils.io_util import file_load
-from mtl.utils.siliency_util import get_saliency_map
-from mtl.utils.geometric_util import impad
-from mtl.utils.vis_util import imshow_det_bboxes
+from mvt.utils.io_util import file_load
+from mvt.utils.siliency_util import get_saliency_map
+from mvt.utils.geometric_util import impad
+from mvt.utils.vis_util import imshow_det_bboxes
 
 
 def merge_boxes(src_box, extra_box):

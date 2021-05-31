@@ -4,9 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.batchnorm import _BatchNorm
 
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.init_util import constant_init, kaiming_init
-from mtl.cores.layer_ops.inception_layer import (
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.init_util import constant_init, kaiming_init
+from mvt.cores.layer_ops.inception_layer import (
     BasicConv2d, InceptionA, InceptionB, InceptionC, 
     InceptionD, InceptionE, InceptionAux)
 

@@ -2,10 +2,10 @@ import argparse
 import os
 from pathlib import Path
 
-from mtl.utils.config_util import get_task_cfg
-from mtl.datasets.data_builder import build_dataset
-from mtl.utils.misc_util import ProgressBar
-from mtl.utils.vis_util import imshow_det_bboxes
+from mvt.utils.config_util import get_task_cfg
+from mvt.datasets.data_builder import build_dataset
+from mvt.utils.misc_util import ProgressBar
+from mvt.utils.vis_util import imshow_det_bboxes
 
 
 def parse_args():

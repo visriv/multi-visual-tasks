@@ -1,6 +1,6 @@
 import argparse
 
-from mtl.utils.config_util import get_task_cfg
+from mvt.utils.config_util import get_task_cfg
 
 
 def parse_args():

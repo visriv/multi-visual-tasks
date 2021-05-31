@@ -18,7 +18,7 @@ from .tiny_yolo_v4 import TinyYOLOV4Net
 from .yolo_v5 import YOLOV5Net
 from .efficient import EfficientNet
 from .inception_reg_net import InceptionRegNet
-from .swin_transformer import SwinTransformer
+# from .swin_transformer import SwinTransformer
 from .bit_models import ResNetV2
 
 
@@ -29,5 +29,6 @@ __all__ = [
     'VGG', 'MobileNetV2', 'InceptionV3', 
     'GoogLeNet', 'GoogLeNetClarity', 'SEResNet', 'MobileNetV3',
     'CSPDarknet53', 'TinyYOLOV4Net', 'YOLOV5Net', 'EfficientNet',
-    'SwinTransformer', 'ResNetV2', 'InceptionRegNet'
+    # 'SwinTransformer', 
+    'ResNetV2', 'InceptionRegNet'
 ]

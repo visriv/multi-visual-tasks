@@ -1,4 +1,4 @@
-from mtl.utils.io_util import file_load
+from mvt.utils.io_util import file_load
 
 
 if __name__ == '__main__':

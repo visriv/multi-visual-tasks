@@ -1,4 +1,4 @@
-from mtl.utils.reg_util import Registry
+from mvt.utils.reg_util import Registry
 
 HOOKS = Registry('hook')
 

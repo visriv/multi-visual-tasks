@@ -3,10 +3,10 @@
 import torch
 import torch.nn as nn
 
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import normal_init
-from mtl.cores.ops import point_sample, rel_roi_point_to_rel_img_point
-from mtl.blocks.block_builder import HEADS, build_loss
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import normal_init
+from mvt.cores.ops import point_sample, rel_roi_point_to_rel_img_point
+from mvt.blocks.block_builder import HEADS, build_loss
 
 
 @HEADS.register_module()

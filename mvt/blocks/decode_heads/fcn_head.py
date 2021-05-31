@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from .base_decode_head import BaseDecodeHead
 from ..block_builder import HEADS
-from mtl.cores.ops import ConvModule
+from mvt.cores.ops import ConvModule
 
 
 @HEADS.register_module()

@@ -5,8 +5,8 @@ from collections import namedtuple
 import torch.nn.functional as F
 from collections import OrderedDict
 
-from mtl.utils.metric_util import Accuracy
-from mtl.cores.layer_ops.inception_layer import InceptionGAux
+from mvt.utils.metric_util import Accuracy
+from mvt.cores.layer_ops.inception_layer import InceptionGAux
 
 from ..block_builder import HEADS, build_loss
 from .base_cls_head import BaseClsDenseHead

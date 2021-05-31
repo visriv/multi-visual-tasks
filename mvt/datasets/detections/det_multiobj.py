@@ -5,8 +5,8 @@ from PIL import Image
 from io import BytesIO
 
 from .det_base import DetBaseDataset
-from mtl.datasets.data_wrapper import DATASETS
-from mtl.utils.io_util import list_from_file
+from mvt.datasets.data_wrapper import DATASETS
+from mvt.utils.io_util import list_from_file
 
 
 @DATASETS.register_module()

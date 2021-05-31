@@ -1,8 +1,8 @@
 import collections
 
 from ..data_wrapper import PIPELINES
-from mtl.utils.reg_util import Registry
-from mtl.utils.reg_util import build_module_from_dict
+from mvt.utils.reg_util import Registry
+from mvt.utils.reg_util import build_module_from_dict
 
 
 @PIPELINES.register_module()

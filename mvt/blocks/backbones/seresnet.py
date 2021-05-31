@@ -2,7 +2,7 @@ import torch.utils.checkpoint as cp
 
 from ..block_builder import BACKBONES
 from .resnet import Bottleneck, ResLayer, ResNet
-from mtl.cores.layer_ops.se_layer import SELayer
+from mvt.cores.layer_ops.se_layer import SELayer
 
 
 class SEBottleneck(Bottleneck):

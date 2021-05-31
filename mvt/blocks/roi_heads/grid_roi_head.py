@@ -1,6 +1,6 @@
 import torch
 
-from mtl.cores.bbox import bbox2result, bbox2roi
+from mvt.cores.bbox import bbox2result, bbox2roi
 from ..block_builder import HEADS, build_head, build_roi_extractor
 from .standard_roi_head import StandardRoIHead
 

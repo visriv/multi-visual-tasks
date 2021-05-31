@@ -5,7 +5,7 @@ import torch.nn as nn
 from torch.nn import SyncBatchNorm
 
 from .misc import infer_abbr
-from mtl.utils.reg_util import Registry
+from mvt.utils.reg_util import Registry
 
 
 CONV_LAYERS = Registry('conv layer')

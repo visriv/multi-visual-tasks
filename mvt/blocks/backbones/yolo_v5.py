@@ -4,8 +4,8 @@ import functools
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from ..block_builder import BACKBONES
-from mtl.cores.layer_ops import brick as vn_layer
-from mtl.utils.init_util import constant_init, kaiming_init
+from mvt.cores.layer_ops import brick as vn_layer
+from mvt.utils.init_util import constant_init, kaiming_init
 
 
 def _make_divisible(x, divisor, width_multiple):

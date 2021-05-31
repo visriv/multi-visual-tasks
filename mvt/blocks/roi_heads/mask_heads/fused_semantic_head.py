@@ -1,10 +1,10 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import kaiming_init
-from mtl.utils.fp16_util import auto_fp16, force_fp32
-from mtl.blocks.block_builder import HEADS
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import kaiming_init
+from mvt.utils.fp16_util import auto_fp16, force_fp32
+from mvt.blocks.block_builder import HEADS
 
 
 @HEADS.register_module()

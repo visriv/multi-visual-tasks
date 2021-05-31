@@ -3,7 +3,7 @@ import torch.nn as nn
 import warnings
 import torch.nn.functional as F
 
-from mtl.utils.init_util import constant_init, kaiming_init
+from mvt.utils.init_util import constant_init, kaiming_init
 from .ops_builder import (PLUGIN_LAYERS, CONV_LAYERS, build_activation_layer,
                           build_conv_layer, build_norm_layer, build_padding_layer)
 

@@ -2,8 +2,8 @@ import torch.nn as nn
 
 from ..block_builder import HEADS
 from .anchor import AnchorHead
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import bias_init_with_prob, normal_init
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import bias_init_with_prob, normal_init
 
 
 @HEADS.register_module()

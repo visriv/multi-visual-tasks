@@ -3,9 +3,9 @@ import numpy as np
 import pycocotools.mask as maskUtils
 
 from ..data_wrapper import PIPELINES
-from mtl.utils.io_util import imfrombytes
-from mtl.utils.io_util import FileClient
-from mtl.utils.mask_util import BitmapMasks, PolygonMasks
+from mvt.utils.io_util import imfrombytes
+from mvt.utils.io_util import FileClient
+from mvt.utils.mask_util import BitmapMasks, PolygonMasks
 
 
 @PIPELINES.register_module()

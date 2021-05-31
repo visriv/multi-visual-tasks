@@ -3,8 +3,8 @@ import torch
 
 from ..block_builder import HEADS
 from .standard_roi_head import StandardRoIHead
-from mtl.cores.bbox import bbox2roi
-from mtl.blocks.losses import SmoothL1Loss
+from mvt.cores.bbox import bbox2roi
+from mvt.blocks.losses import SmoothL1Loss
 
 
 @HEADS.register_module()

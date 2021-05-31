@@ -1,7 +1,7 @@
 import torch.nn as nn
-from mtl.cores.ops import ConvModule
+from mvt.cores.ops import ConvModule
 
-from mtl.blocks.block_builder import HEADS
+from mvt.blocks.block_builder import HEADS
 from .bbox_head import BBoxHead
 
 

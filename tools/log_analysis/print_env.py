@@ -3,7 +3,7 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-from mtl.utils.runtime_util import collect_env
+from mvt.utils.runtime_util import collect_env
 
 
 if __name__ == '__main__':

@@ -3,8 +3,8 @@ import os
 import os.path as osp
 import yaml
 
-from mtl.utils.parallel_util import master_only
-from mtl.utils.io_util import obj_dump
+from mvt.utils.parallel_util import master_only
+from mvt.utils.io_util import obj_dump
 from ...core_hook import HOOKS
 from .base import LoggerHook
 

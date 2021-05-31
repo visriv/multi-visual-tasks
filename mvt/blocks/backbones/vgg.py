@@ -1,8 +1,8 @@
 import logging
 import torch.nn as nn
 
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.init_util import constant_init, kaiming_init, normal_init
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.init_util import constant_init, kaiming_init, normal_init
 
 
 def conv3x3(in_planes, out_planes, dilation=1):

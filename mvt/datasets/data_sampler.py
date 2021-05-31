@@ -14,7 +14,7 @@ from torch import distributed as dist
 from torch.utils.data import Sampler
 from torch.utils.data import DistributedSampler as _DistributedSampler
 
-from mtl.utils.misc_util import get_dist_info
+from mvt.utils.misc_util import get_dist_info
 
 
 class DistributedSampler(_DistributedSampler):

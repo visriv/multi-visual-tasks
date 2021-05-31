@@ -3,8 +3,8 @@ import numpy as np
 import torch
 
 from ..data_wrapper import PIPELINES
-from mtl.utils.data_util import DataContainer
-from mtl.utils.misc_util import is_str
+from mvt.utils.data_util import DataContainer
+from mvt.utils.misc_util import is_str
 
 
 def to_tensor(data):

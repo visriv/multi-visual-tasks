@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from mtl.utils.init_util import xavier_init
-from mtl.cores.ops import ConvModule
+from mvt.utils.init_util import xavier_init
+from mvt.cores.ops import ConvModule
 
 
 class SwishImplementation(torch.autograd.Function):

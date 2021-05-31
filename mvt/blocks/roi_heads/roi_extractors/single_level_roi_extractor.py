@@ -1,8 +1,8 @@
 import torch
 
 from .base_roi_extractor import BaseRoIExtractor
-from mtl.blocks.block_builder import ROI_EXTRACTORS
-from mtl.utils.fp16_util import force_fp32
+from mvt.blocks.block_builder import ROI_EXTRACTORS
+from mvt.utils.fp16_util import force_fp32
 
 
 @ROI_EXTRACTORS.register_module()

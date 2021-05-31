@@ -1,9 +1,9 @@
 from .model_builder import (CLASSIFIERS, DETECTORS, build_model)
-from .classifications import *
+#from .classifications import *
 from .detections import *
-from .segmentations import *
-from .regressions import *
-from .pose_estimations import *
+#from .segmentations import *
+#from .regressions import *
+#from .pose_estimations import *
 
 __all__ = [
     'CLASSIFIERS', 'DETECTORS', 'build_model', 

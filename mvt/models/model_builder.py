@@ -4,7 +4,7 @@
 # @Email   : zhimingqian@tencent.com
 # @File    : block_builder.py
 
-from mtl.utils.reg_util import Registry, build_model_from_cfg
+from mvt.utils.reg_util import Registry, build_model_from_cfg
 
 
 # --------------------------------------------------------------------------- #

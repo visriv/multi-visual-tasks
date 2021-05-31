@@ -3,9 +3,9 @@ import math
 import torch
 import torch.nn as nn
 
-from mtl.cores.bbox import bbox_overlaps
+from mvt.cores.bbox import bbox_overlaps
 from ..block_builder import LOSSES
-from mtl.utils.loss_util import weighted_loss
+from mvt.utils.loss_util import weighted_loss
 
 
 @weighted_loss

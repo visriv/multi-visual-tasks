@@ -1,10 +1,10 @@
 import torch.nn as nn
 
 from .fcn_mask_head import FCNMaskHead
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import constant_init, xavier_init
-from mtl.utils.fp16_util import auto_fp16
-from mtl.blocks.block_builder import HEADS
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import constant_init, xavier_init
+from mvt.utils.fp16_util import auto_fp16
+from mvt.blocks.block_builder import HEADS
 
 
 @HEADS.register_module()

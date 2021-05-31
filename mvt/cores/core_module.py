@@ -3,7 +3,7 @@ from functools import partial
 import torch
 
 TORCH_VERSION = torch.__version__
-from mtl.utils.reg_util import Registry
+from mvt.utils.reg_util import Registry
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 MODULE_WRAPPERS = Registry('module wrapper')

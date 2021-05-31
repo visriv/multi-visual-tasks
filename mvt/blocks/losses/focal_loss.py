@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from ..block_builder import LOSSES
-from mtl.utils.loss_util import weight_reduce_loss
+from mvt.utils.loss_util import weight_reduce_loss
 
 
 # This method is for debugging

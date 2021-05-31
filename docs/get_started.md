@@ -51,7 +51,7 @@
   - `--resume-from` the checkpoint file to resume from, including epoch information.
   - `--load-from` only loads the model weights and the training epoch starts from 0. It is usually used for finetuning.
 
-  **Important:** When training with the given docker, please refer to 'scripts/mtl_start.sh' 
+  **Important:** When training with the given docker, please refer to 'scripts/mvt_start.sh' 
   Examples:
 
     ```shell   

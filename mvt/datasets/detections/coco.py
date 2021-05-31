@@ -8,11 +8,11 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from terminaltables import AsciiTable
 
-from mtl.datasets.data_wrapper import DATASETS
-from mtl.datasets.detections.det_base import DetBaseDataset
-from mtl.utils.io_util import obj_dump
-from mtl.cores.eval.common_eval import eval_recalls
-from mtl.utils.log_util import print_log
+from mvt.datasets.data_wrapper import DATASETS
+from mvt.datasets.detections.det_base import DetBaseDataset
+from mvt.utils.io_util import obj_dump
+from mvt.cores.eval.common_eval import eval_recalls
+from mvt.utils.log_util import print_log
 
 
 @DATASETS.register_module()

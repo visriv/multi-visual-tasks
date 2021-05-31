@@ -10,7 +10,7 @@ from io import BytesIO
 import os.path as osp
 
 from .det_base import DetBaseDataset
-from mtl.datasets.data_wrapper import DATASETS
+from mvt.datasets.data_wrapper import DATASETS
 
 
 @DATASETS.register_module()
