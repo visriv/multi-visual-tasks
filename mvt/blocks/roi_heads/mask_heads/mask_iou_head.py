@@ -3,9 +3,9 @@ import torch
 import torch.nn as nn
 from torch.nn.modules.utils import _pair
 
-from mtl.utils.init_util import kaiming_init, normal_init
-from mtl.utils.fp16_util import force_fp32
-from mtl.blocks.block_builder import HEADS, build_loss
+from mvt.utils.init_util import kaiming_init, normal_init
+from mvt.utils.fp16_util import force_fp32
+from mvt.blocks.block_builder import HEADS, build_loss
 
 
 @HEADS.register_module()

@@ -9,10 +9,10 @@ from functools import partial
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from ..block_builder import BACKBONES
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.cores.layer_ops.efficient_ops import MemoryEfficientSwish, Swish
-from mtl.cores.ops import build_norm_layer
-from mtl.utils.init_util import constant_init, kaiming_init
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.cores.layer_ops.efficient_ops import MemoryEfficientSwish, Swish
+from mvt.cores.ops import build_norm_layer
+from mvt.utils.init_util import constant_init, kaiming_init
 
 
 def round_filters(filters, global_params):

@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from mtl.cores.ops import ConvModule
+from mvt.cores.ops import ConvModule
 from ..block_builder import BACKBONES
 from .resnet import BasicBlock, ResLayer
 

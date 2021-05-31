@@ -3,7 +3,7 @@ MODEL:
   BBOX_HEAD:
     num_classes: 65
 DATA:
-  BASE: "datasets/detections/det_multiobj_yolo.yaml"  
+  BASE: "datasets/detections/det_coco_yolo.yaml"  
 SCHEDULE:
   BASE: "schedulers/schedule_yolo.yaml"
   TOTAL_EPOCHS: 100

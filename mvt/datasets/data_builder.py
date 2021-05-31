@@ -16,9 +16,9 @@ from .data_sampler import (DistributedGroupSampler,
                            GroupSampler)
 from .data_wrapper import (ConcatDataset, RepeatDataset, 
                            ClassBalancedDataset, DATASETS)
-from mtl.utils.reg_util import Registry, build_data_from_cfg
-from mtl.utils.runtime_util import worker_init_fn, collate
-from mtl.utils.misc_util import get_dist_info
+from mvt.utils.reg_util import Registry, build_data_from_cfg
+from mvt.utils.runtime_util import worker_init_fn, collate
+from mvt.utils.misc_util import get_dist_info
 
 
 # --------------------------------------------------------------------------- #

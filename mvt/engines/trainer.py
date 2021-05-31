@@ -2,20 +2,20 @@ import random
 import numpy as np
 import torch
 
-from mtl.utils.parallel_util import CustomDataParallel
-from mtl.utils.parallel_util import CustomDistributedDataParallel
-from mtl.cores.core_hook import HOOKS
-from mtl.cores.hook import (DistSamplerSeedHook, 
+from mvt.utils.parallel_util import CustomDataParallel
+from mvt.utils.parallel_util import CustomDistributedDataParallel
+from mvt.cores.core_hook import HOOKS
+from mvt.cores.hook import (DistSamplerSeedHook, 
                             Fp16OptimizerHook, OptimizerHook,
                             EvalHook, DistEvalHook)
-from mtl.cores.runner import EpochBasedRunner
-from mtl.cores.core_optimizer import build_optimizer
-from mtl.utils.log_util import get_root_logger
-from mtl.datasets.data_builder import build_dataloader, build_dataset
-from mtl.utils.data_util import replace_ImageToTensor
-from mtl.utils.reg_util import build_module_from_dict
+from mvt.cores.runner import EpochBasedRunner
+from mvt.cores.core_optimizer import build_optimizer
+from mvt.utils.log_util import get_root_logger
+from mvt.datasets.data_builder import build_dataloader, build_dataset
+from mvt.utils.data_util import replace_ImageToTensor
+from mvt.utils.reg_util import build_module_from_dict
 from yacs.config import CfgNode
-from mtl.utils.config_util import convert_to_dict
+from mvt.utils.config_util import convert_to_dict
 
 
 def set_random_seed(seed, deterministic=False):

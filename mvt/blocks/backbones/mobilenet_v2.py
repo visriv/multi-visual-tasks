@@ -3,10 +3,10 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import torch.nn as nn
 import torch.utils.checkpoint as cp
 
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import constant_init, kaiming_init
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.misc_util import make_divisible
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import constant_init, kaiming_init
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.misc_util import make_divisible
 from ..block_builder import BACKBONES
 
 

@@ -1,8 +1,8 @@
 import numpy as np
 import torch
 
-from mtl.cores.ops import nms
-from mtl.cores.bbox import bbox_mapping_back
+from mvt.cores.ops import nms
+from mvt.cores.bbox import bbox_mapping_back
 from math import sqrt
 
 

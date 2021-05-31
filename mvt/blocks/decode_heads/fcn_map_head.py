@@ -1,7 +1,7 @@
 from .fcn_head import SegFCNHead
 from ..block_builder import HEADS
-from mtl.utils.fp16_util import force_fp32
-from mtl.cores.layer_ops import resize
+from mvt.utils.fp16_util import force_fp32
+from mvt.cores.layer_ops import resize
 
 
 @HEADS.register_module()

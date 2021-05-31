@@ -4,7 +4,7 @@
 
 import math
 import itertools
-from mtl.utils.geometric_util import imresize
+from mvt.utils.geometric_util import imresize
 import numpy as np
 import cv2
 

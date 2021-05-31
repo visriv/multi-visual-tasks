@@ -7,10 +7,10 @@ import warnings
 import torch
 from .base_runner import BaseRunner
 from ..core_runner import RUNNERS
-from mtl.utils.checkpoint_util import save_checkpoint
-from mtl.utils.runtime_util import get_host_info
-from mtl.utils.misc_util import is_list_of
-from mtl.utils.path_util import symlink
+from mvt.utils.checkpoint_util import save_checkpoint
+from mvt.utils.runtime_util import get_host_info
+from mvt.utils.misc_util import is_list_of
+from mvt.utils.path_util import symlink
 
 
 @RUNNERS.register_module()

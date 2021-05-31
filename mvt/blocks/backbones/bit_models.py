@@ -23,9 +23,9 @@ import logging
 import torch.nn as nn
 import torch.nn.functional as F
 
-# mtl relevants
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.init_util import constant_init, kaiming_init
+# mvt.relevants
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.init_util import constant_init, kaiming_init
 from ..block_builder import BACKBONES
 
 class StdConv2d(nn.Conv2d):

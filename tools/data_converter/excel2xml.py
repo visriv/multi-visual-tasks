@@ -7,7 +7,7 @@ import numpy as np
 from lxml.etree import Element, ElementTree, SubElement
 from PIL import Image
 
-from mtl.utils.log_util import get_logger
+from mvt.utils.log_util import get_logger
 
 
 chinese_names = [

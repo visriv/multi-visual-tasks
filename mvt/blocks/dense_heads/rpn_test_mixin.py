@@ -1,6 +1,6 @@
 import sys
 
-from mtl.utils.bbox_util import merge_aug_proposals
+from mvt.utils.bbox_util import merge_aug_proposals
 
 
 class RPNTestMixin(object):

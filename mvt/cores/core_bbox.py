@@ -1,4 +1,4 @@
-from mtl.utils.reg_util import Registry, build_module_from_dict
+from mvt.utils.reg_util import Registry, build_module_from_dict
 
 BBOX_ASSIGNERS = Registry('bbox_assigner')
 BBOX_SAMPLERS = Registry('bbox_sampler')

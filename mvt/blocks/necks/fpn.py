@@ -2,9 +2,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..block_builder import NECKS
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import xavier_init
-from mtl.utils.fp16_util import auto_fp16
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import xavier_init
+from mvt.utils.fp16_util import auto_fp16
 
 
 @NECKS.register_module()

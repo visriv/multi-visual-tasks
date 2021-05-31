@@ -6,12 +6,12 @@ from torch.utils.data import Dataset
 from yacs.config import CfgNode
 from threading import local
 
-from mtl.utils.gen_tfrecords.yt_example_pb2 import Example
-from mtl.cores.eval.common_eval import eval_map, eval_recalls
-from mtl.datasets.data_wrapper import DATASETS
-from mtl.datasets.transforms import Compose
-from mtl.utils.io_util import file_load, list_from_file
-from mtl.utils.tfrecord_util import tfrecord2idx
+# from mvt.utils.gen_tfrecords.yt_example_pb2 import Example
+from mvt.cores.eval.common_eval import eval_map, eval_recalls
+from mvt.datasets.data_wrapper import DATASETS
+from mvt.datasets.transforms import Compose
+from mvt.utils.io_util import file_load, list_from_file
+# from mvt.utils.tfrecord_util import tfrecord2idx
 
 
 @DATASETS.register_module()

@@ -4,9 +4,9 @@ import torch.nn.functional as F
 
 from .cascade_decode_head import BaseCascadeDecodeHead
 from ..block_builder import HEADS
-from mtl.cores.ops import ConvModule
-from mtl.cores.layer_ops import resize
-from mtl.cores.layer_ops import SelfAttentionBlock as _SelfAttentionBlock
+from mvt.cores.ops import ConvModule
+from mvt.cores.layer_ops import resize
+from mvt.cores.layer_ops import SelfAttentionBlock as _SelfAttentionBlock
 
 
 class SpatialGatherModule(nn.Module):

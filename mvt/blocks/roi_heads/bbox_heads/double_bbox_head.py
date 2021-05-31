@@ -1,10 +1,10 @@
 import torch.nn as nn
 
 from .bbox_head import BBoxHead
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import normal_init, xavier_init
-from mtl.blocks.backbones import Bottleneck
-from mtl.blocks.block_builder import HEADS
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import normal_init, xavier_init
+from mvt.blocks.backbones import Bottleneck
+from mvt.blocks.block_builder import HEADS
 
 
 class BasicResBlock(nn.Module):

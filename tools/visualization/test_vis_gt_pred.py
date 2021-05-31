@@ -12,26 +12,26 @@ import numpy as np
 from yacs.config import CfgNode
 
 from configs import cfg
-from mtl.cores.ops import fuse_conv_bn
-from mtl.utils.parallel_util import (DataParallel, 
+from mvt.cores.ops import fuse_conv_bn
+from mvt.utils.parallel_util import (DataParallel, 
                                      DistributedDataParallel, 
                                      init_dist)
-from mtl.utils.misc_util import get_dist_info
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.fp16_util import wrap_fp16_model
-from mtl.engines.evaluator import multi_device_test, single_device_test
-from mtl.datasets.data_builder import build_dataloader, build_dataset
-from mtl.utils.mask_util import encode_mask_results
-from mtl.models.model_builder import build_model
-from mtl.utils.config_util import (get_task_cfg, 
+from mvt.utils.misc_util import get_dist_info
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.fp16_util import wrap_fp16_model
+from mvt.engines.evaluator import multi_device_test, single_device_test
+from mvt.datasets.data_builder import build_dataloader, build_dataset
+from mvt.utils.mask_util import encode_mask_results
+from mvt.models.model_builder import build_model
+from mvt.utils.config_util import (get_task_cfg, 
                                    get_dataset_global_args,
                                    get_dict_from_list,
                                    convert_to_dict)
-from mtl.utils.geometric_util import imresize
-from mtl.utils.misc_util import ProgressBar
-from mtl.utils.photometric_util import tensor2imgs
+from mvt.utils.geometric_util import imresize
+from mvt.utils.misc_util import ProgressBar
+from mvt.utils.photometric_util import tensor2imgs
 
-from mtl.utils.io_util import obj_dump
+from mvt.utils.io_util import obj_dump
 
 
 def get_gt_by_idx(annotations, idx: int):

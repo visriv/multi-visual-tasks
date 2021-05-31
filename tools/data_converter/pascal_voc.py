@@ -3,10 +3,10 @@ import os.path as osp
 import xml.etree.ElementTree as ET
 import numpy as np
 
-from mtl.utils.data_util import voc_classes
-from mtl.utils.misc_util import track_progress
-from mtl.utils.io_util import list_from_file, obj_dump
-from mtl.utils.path_util import mkdir_or_exist 
+from mvt.utils.data_util import voc_classes
+from mvt.utils.misc_util import track_progress
+from mvt.utils.io_util import list_from_file, obj_dump
+from mvt.utils.path_util import mkdir_or_exist 
 
 
 label_ids = {name: i for i, name in enumerate(voc_classes())}

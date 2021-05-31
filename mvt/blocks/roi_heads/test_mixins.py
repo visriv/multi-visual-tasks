@@ -2,11 +2,11 @@ import logging
 import sys
 import torch
 
-from mtl.cores.bbox import bbox2roi, bbox_mapping
-from mtl.utils.bbox_util import merge_aug_bboxes, merge_aug_masks
-from mtl.cores.ops import multiclass_nms
+from mvt.cores.bbox import bbox2roi, bbox_mapping
+from mvt.utils.bbox_util import merge_aug_bboxes, merge_aug_masks
+from mvt.cores.ops import multiclass_nms
 
-from mtl.utils.log_util import get_root_logger
+from mvt.utils.log_util import get_root_logger
     
 logger = get_root_logger
 

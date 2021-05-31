@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from mtl.utils.init_util import normal_init
+from mvt.utils.init_util import normal_init
 from ..block_builder import HEADS
 from .base_cls_head import BaseClsDenseHead
 

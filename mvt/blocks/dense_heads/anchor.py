@@ -6,13 +6,13 @@ from yacs.config import CfgNode
 from ..block_builder import HEADS, build_loss
 from .base_det_head import BaseDetHead
 from .dense_test_mixins import BBoxTestMixin
-from mtl.utils.init_util import normal_init
-from mtl.utils.fp16_util import force_fp32
-from mtl.cores.anchor import anchor_inside_flags, images_to_levels
-from mtl.cores.core_anchor import build_anchor_generator
-from mtl.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
-from mtl.utils.misc_util import multi_apply, unmap
-from mtl.cores.ops import multiclass_nms
+from mvt.utils.init_util import normal_init
+from mvt.utils.fp16_util import force_fp32
+from mvt.cores.anchor import anchor_inside_flags, images_to_levels
+from mvt.cores.core_anchor import build_anchor_generator
+from mvt.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
+from mvt.utils.misc_util import multi_apply, unmap
+from mvt.cores.ops import multiclass_nms
 
 
 @HEADS.register_module()

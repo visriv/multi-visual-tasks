@@ -2,13 +2,13 @@ import numpy as np
 import torch
 from yacs.config import CfgNode
 
-from mtl.utils.parallel_util import scatter
-from mtl.utils.runtime_util import collate
-from mtl.utils.io_util import imread
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.data_util import get_classes
-from mtl.datasets.transforms import Compose
-from mtl.models.model_builder import build_model
+from mvt.utils.parallel_util import scatter
+from mvt.utils.runtime_util import collate
+from mvt.utils.io_util import imread
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.data_util import get_classes
+from mvt.datasets.transforms import Compose
+from mvt.models.model_builder import build_model
 
 
 class LoadImageToDetector(object):

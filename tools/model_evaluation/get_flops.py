@@ -1,9 +1,9 @@
 import argparse
 import torch
 
-from mtl.models.model_builder import build_model
-from mtl.utils.config_util import get_task_cfg
-from mtl.utils.fps_stat_util import get_model_complexity_info
+from mvt.models.model_builder import build_model
+from mvt.utils.config_util import get_task_cfg
+from mvt.utils.fps_stat_util import get_model_complexity_info
 
 
 def parse_args():
@@ -33,7 +33,7 @@ def main():
     cfg = get_task_cfg(args.config)
     # import modules from string list.
     if cfg.get('custom_imports', None):
-        from mtl.utils.misc_util import import_modules_from_strings
+        from mvt.utils.misc_util import import_modules_from_strings
         import_modules_from_strings(**cfg['custom_imports'])
 
     model = build_model(

@@ -4,8 +4,8 @@ import torch.nn as nn
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from ..block_builder import BACKBONES
-from mtl.utils.init_util import kaiming_init, constant_init
-from mtl.cores.layer_ops import brick as vn_layer
+from mvt.utils.init_util import kaiming_init, constant_init
+from mvt.cores.layer_ops import brick as vn_layer
 
 
 @BACKBONES.register_module()

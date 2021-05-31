@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
 
-from mtl.cores.bbox import bbox2result
+from mvt.cores.bbox import bbox2result
 from ...model_builder import DETECTORS
-from mtl.blocks.block_builder import build_backbone, build_head, build_neck
+from mvt.blocks.block_builder import build_backbone, build_head, build_neck
 from .base_detector import BaseDetector
-from mtl.utils.config_util import convert_to_dict
+from mvt.utils.config_util import convert_to_dict
 
 
 @DETECTORS.register_module()

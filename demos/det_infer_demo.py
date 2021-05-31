@@ -7,8 +7,8 @@
 import os
 
 from configs import cfg
-from mtl.utils.config_util import get_task_cfg
-from mtl.engines.predictor import (get_detector, inference_detector,
+from mvt.utils.config_util import get_task_cfg
+from mvt.engines.predictor import (get_detector, inference_detector,
                                    show_detector_result)
     
 

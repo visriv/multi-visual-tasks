@@ -4,8 +4,8 @@ from itertools import chain
 import torch
 from torch.nn.utils import clip_grad
 
-from mtl.utils.parallel_util import allreduce_grads
-from mtl.utils.fp16_util import LossScaler, wrap_fp16_model
+from mvt.utils.parallel_util import allreduce_grads
+from mvt.utils.fp16_util import LossScaler, wrap_fp16_model
 from ..core_hook import HOOKS, Hook
 
 

@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from ..data_wrapper import PIPELINES
-from mtl.cores.eval.post_transforms import (affine_transform, fliplr_joints,
+from mvt.cores.eval.post_transforms import (affine_transform, fliplr_joints,
                                             get_affine_transform, get_warp_matrix,
                                             warp_affine_joints)
 

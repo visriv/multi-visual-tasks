@@ -5,10 +5,10 @@ from yacs.config import CfgNode
 from ..block_builder import HEADS, build_head, build_roi_extractor
 from .base_roi_head import BaseRoIHead
 from .test_mixins import BBoxTestMixin, MaskTestMixin
-from mtl.cores.bbox import bbox2result, bbox2roi, bbox_mapping
-from mtl.cores.core_bbox import build_assigner, build_sampler
-from mtl.utils.bbox_util import merge_aug_bboxes, merge_aug_masks
-from mtl.cores.ops import multiclass_nms
+from mvt.cores.bbox import bbox2result, bbox2roi, bbox_mapping
+from mvt.cores.core_bbox import build_assigner, build_sampler
+from mvt.utils.bbox_util import merge_aug_bboxes, merge_aug_masks
+from mvt.cores.ops import multiclass_nms
 
 
 @HEADS.register_module()

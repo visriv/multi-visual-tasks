@@ -2,7 +2,7 @@ import os.path as osp
 import numpy as np
 
 from .det_animal import DetAnimalDataset
-from mtl.datasets.data_wrapper import DATASETS
+from mvt.datasets.data_wrapper import DATASETS
 
 
 @DATASETS.register_module()

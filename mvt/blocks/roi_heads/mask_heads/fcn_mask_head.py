@@ -4,10 +4,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.utils import _pair
 
-from mtl.cores.ops import ConvModule, build_upsample_layer
-from mtl.utils.fp16_util import auto_fp16, force_fp32
-from mtl.utils.mask_util import mask_target
-from mtl.blocks.block_builder import HEADS, build_loss
+from mvt.cores.ops import ConvModule, build_upsample_layer
+from mvt.utils.fp16_util import auto_fp16, force_fp32
+from mvt.utils.mask_util import mask_target
+from mvt.blocks.block_builder import HEADS, build_loss
 
 BYTES_PER_FLOAT = 4
 GPU_MEM_LIMIT = 1024**3  # 1 GB memory limit

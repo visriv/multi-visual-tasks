@@ -1,8 +1,8 @@
 from inspect import signature
 import torch
 
-from mtl.cores.bbox import bbox2result, bbox_mapping_back
-from mtl.cores.ops import multiclass_nms
+from mvt.cores.bbox import bbox2result, bbox_mapping_back
+from mvt.cores.ops import multiclass_nms
 
 
 class BBoxTestMixin(object):

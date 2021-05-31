@@ -1,6 +1,6 @@
 import torch
 
-from mtl.utils.misc_util import NiceRepr
+from mvt.utils.misc_util import NiceRepr
 
 
 class SamplingResult(NiceRepr):

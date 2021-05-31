@@ -20,7 +20,7 @@ from torch.utils.cpp_extension import CUDA_HOME
 from getpass import getuser
 from socket import gethostname
 
-from mtl.utils.data_util import DataContainer
+from mvt.utils.data_util import DataContainer
 
 
 def collect_env():

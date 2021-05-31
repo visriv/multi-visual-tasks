@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from ..block_builder import LOSSES
-from mtl.utils.loss_util import weight_reduce_loss
+from mvt.utils.loss_util import weight_reduce_loss
 
 
 def smooth_l1_loss(pred,

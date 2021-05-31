@@ -1,6 +1,6 @@
 import numpy as np
 import torch.nn as nn
-from mtl.cores.ops import build_conv_layer, build_norm_layer
+from mvt.cores.ops import build_conv_layer, build_norm_layer
 
 from ..block_builder import BACKBONES
 from .resnet import ResNet

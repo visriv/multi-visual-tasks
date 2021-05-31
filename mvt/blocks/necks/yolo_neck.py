@@ -6,8 +6,8 @@ import torch.nn.functional as F
 from collections import OrderedDict
 
 from ..block_builder import NECKS
-from mtl.cores.ops import ConvModule
-from mtl.cores.layer_ops import brick as vn_layer
+from mvt.cores.ops import ConvModule
+from mvt.cores.layer_ops import brick as vn_layer
 
 
 class DetectionBlock(nn.Module):

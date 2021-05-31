@@ -1,7 +1,7 @@
 import os.path as osp
 from argparse import ArgumentParser
 import numpy as np
-from mtl.utils.io_util import file_load
+from mvt.utils.io_util import file_load
 
 
 def print_coco_results(results):

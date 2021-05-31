@@ -7,13 +7,13 @@ import torch
 import torch.distributed as dist
 import numpy as np
 
-from mtl.utils.misc_util import ProgressBar
-from mtl.utils.photometric_util import tensor2imgs
-from mtl.utils.misc_util import get_dist_info
-from mtl.utils.mask_util import encode_mask_results
-from mtl.utils.io_util import imread, file_load, obj_dump
-from mtl.utils.geometric_util import imresize
-from mtl.utils.path_util import mkdir_or_exist
+from mvt.utils.misc_util import ProgressBar
+from mvt.utils.photometric_util import tensor2imgs
+from mvt.utils.misc_util import get_dist_info
+from mvt.utils.mask_util import encode_mask_results
+from mvt.utils.io_util import imread, file_load, obj_dump
+from mvt.utils.geometric_util import imresize
+from mvt.utils.path_util import mkdir_or_exist
 
 
 #----------------------------------------------------------------------------- 

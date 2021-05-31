@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 
 from ..block_builder import LOSSES
-from mtl.utils.loss_util import weighted_loss
+from mvt.utils.loss_util import weighted_loss
 
 
 @weighted_loss

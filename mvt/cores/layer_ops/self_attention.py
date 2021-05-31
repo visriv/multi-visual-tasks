@@ -2,8 +2,8 @@ import torch
 from torch import nn as nn
 from torch.nn import functional as F
 
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import constant_init
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import constant_init
 
 
 class SelfAttentionBlock(nn.Module):

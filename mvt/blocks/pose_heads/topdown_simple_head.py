@@ -3,12 +3,12 @@ import torch.nn as nn
 
 from .base_topdown_head import TopDownBaseHead
 from ..block_builder import HEADS, build_loss
-from mtl.cores.ops import (build_conv_layer, 
+from mvt.cores.ops import (build_conv_layer, 
                            build_norm_layer)
-from mtl.utils.init_util import constant_init, normal_init
-from mtl.cores.eval.top_down_eval import pose_pck_accuracy
-from mtl.cores.eval.post_transforms import flip_back
-from mtl.cores.layer_ops.layer_resize import resize
+from mvt.utils.init_util import constant_init, normal_init
+from mvt.cores.eval.top_down_eval import pose_pck_accuracy
+from mvt.cores.eval.post_transforms import flip_back
+from mvt.cores.layer_ops.layer_resize import resize
 
 
 @HEADS.register_module()

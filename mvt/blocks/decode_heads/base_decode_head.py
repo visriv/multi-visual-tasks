@@ -4,10 +4,10 @@ import torch.nn as nn
 
 from ..block_builder import build_pixel_sampler
 from ..block_builder import build_loss
-from mtl.utils.metric_util import accuracy
-from mtl.utils.init_util import normal_init
-from mtl.utils.fp16_util import auto_fp16, force_fp32
-from mtl.cores.layer_ops import resize
+from mvt.utils.metric_util import accuracy
+from mvt.utils.init_util import normal_init
+from mvt.utils.fp16_util import auto_fp16, force_fp32
+from mvt.cores.layer_ops import resize
 
 
 class BaseDecodeHead(nn.Module, metaclass=ABCMeta):

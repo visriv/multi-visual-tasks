@@ -3,11 +3,11 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-from .classifications import *
+#from .classifications import *
 from .detections import *
-from .segmentations import *
-from .regressions import *
-from .pose_estimations import *
+#from .segmentations import *
+#from .regressions import *
+#from .pose_estimations import *
 from .transforms import *
 from .data_sampler import (DistributedSampler, GroupSampler, 
                            DistributedGroupSampler)

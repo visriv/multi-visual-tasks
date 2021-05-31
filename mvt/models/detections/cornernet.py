@@ -1,6 +1,6 @@
 import torch
 
-from mtl.cores.bbox import bbox2result, bbox_mapping_back
+from mvt.cores.bbox import bbox2result, bbox_mapping_back
 from ..model_builder import DETECTORS
 from .base_detectors import SingleStageDetector
 

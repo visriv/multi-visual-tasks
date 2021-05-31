@@ -4,13 +4,13 @@ import random
 import math
 
 from ..data_wrapper import PIPELINES
-from mtl.utils.mask_util import PolygonMasks
-from mtl.utils.bbox_util import bbox_overlaps_np
-from mtl.utils.misc_util import is_list_of, is_str
-from mtl.utils.geometric_util import (imresize, imflip,
+from mvt.utils.mask_util import PolygonMasks
+from mvt.utils.bbox_util import bbox_overlaps_np
+from mvt.utils.misc_util import is_list_of, is_str
+from mvt.utils.geometric_util import (imresize, imflip,
                                       impad, impad_to_multiple,
                                       imrescale, imcrop)
-from mtl.utils.photometric_util import imnormalize, bgr2hsv, hsv2bgr, rgb2gray
+from mvt.utils.photometric_util import imnormalize, bgr2hsv, hsv2bgr, rgb2gray
 
 try:
     from imagecorruptions import corrupt

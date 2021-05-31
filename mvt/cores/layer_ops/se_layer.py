@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 from ..ops import ConvModule
-from mtl.utils.misc_util import is_tuple_of
+from mvt.utils.misc_util import is_tuple_of
 
 
 class SELayer(nn.Module):

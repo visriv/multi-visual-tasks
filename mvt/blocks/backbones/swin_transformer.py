@@ -12,9 +12,9 @@ import torch.utils.checkpoint as checkpoint
 from collections import OrderedDict
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 
-# mtl relevants
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.init_util import constant_init, kaiming_init
+# mvt.relevants
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.init_util import constant_init, kaiming_init
 from ..block_builder import BACKBONES
 
 

@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from .base_reg_head import BaseRegHead
 from ..block_builder import HEADS, build_loss
-from mtl.utils.init_util import normal_init
+from mvt.utils.init_util import normal_init
 
 
 @HEADS.register_module()

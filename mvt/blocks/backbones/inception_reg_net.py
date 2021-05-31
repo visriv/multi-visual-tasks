@@ -5,9 +5,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.checkpoint as cp
 
-from mtl.cores.ops import ConvModule
-from mtl.utils.init_util import constant_init, kaiming_init
-from mtl.utils.checkpoint_util import load_checkpoint
+from mvt.cores.ops import ConvModule
+from mvt.utils.init_util import constant_init, kaiming_init
+from mvt.utils.checkpoint_util import load_checkpoint
 from ..block_builder import BACKBONES
 
 

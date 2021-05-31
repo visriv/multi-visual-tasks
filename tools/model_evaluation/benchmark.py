@@ -2,14 +2,14 @@ import argparse
 import time
 import torch
 
-from mtl.cores.ops import fuse_conv_bn
-from mtl.utils.config_util import get_task_cfg
-from mtl.utils.parallel_util import DataParallel
-from mtl.utils.checkpoint_util import load_checkpoint
-from mtl.utils.fp16_util import wrap_fp16_model
-from mtl.datasets.data_builder import build_dataloader, build_dataset
-from mtl.utils.data_util import replace_ImageToTensor
-from mtl.models.model_builder import build_model
+from mvt.cores.ops import fuse_conv_bn
+from mvt.utils.config_util import get_task_cfg
+from mvt.utils.parallel_util import DataParallel
+from mvt.utils.checkpoint_util import load_checkpoint
+from mvt.utils.fp16_util import wrap_fp16_model
+from mvt.datasets.data_builder import build_dataloader, build_dataset
+from mvt.utils.data_util import replace_ImageToTensor
+from mvt.models.model_builder import build_model
 
 
 def parse_args():

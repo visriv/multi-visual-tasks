@@ -6,11 +6,11 @@ import torch
 import os
 import os.path as osp
 
-from mtl.utils.io_util import imread
-from mtl.utils.geometric_util import imresize
-from mtl.utils.photometric_util import imnormalize
-from mtl.cores.ops import multiclass_nms
-from mtl.utils.vis_util import imshow_det_bboxes
+from mvt.utils.io_util import imread
+from mvt.utils.geometric_util import imresize
+from mvt.utils.photometric_util import imnormalize
+from mvt.cores.ops import multiclass_nms
+from mvt.utils.vis_util import imshow_det_bboxes
 
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
@@ -180,7 +180,7 @@ if __name__ == '__main__':
     assert (len(net_feed_input) == 1)
     sess = rt.InferenceSession(output_file)
 
-    # from mtl.cores.bbox import bbox2result
+    # from mvt.cores.bbox import bbox2result
     out_list = sess.run(
         None, {net_feed_input[0]: one_img.detach().numpy()})
 

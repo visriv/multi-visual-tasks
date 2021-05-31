@@ -8,9 +8,9 @@ import inspect
 from torch import nn
 from yacs.config import CfgNode
 
-from mtl.utils.reg_util import (Registry, build_module_from_cfg, 
+from mvt.utils.reg_util import (Registry, build_module_from_cfg, 
                                 build_module_from_dict)
-from mtl.utils.config_util import convert_to_dict
+from mvt.utils.config_util import convert_to_dict
 
 # --------------------------------------------------------------------------- #
 # Registries for blocks

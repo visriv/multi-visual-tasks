@@ -5,8 +5,8 @@ import torch.nn.functional as F
 from ..block_builder import HEADS
 from .anchor import AnchorHead
 from .rpn_test_mixin import RPNTestMixin
-from mtl.utils.init_util import normal_init
-from mtl.cores.ops import batched_nms
+from mvt.utils.init_util import normal_init
+from mvt.cores.ops import batched_nms
 
 
 @HEADS.register_module()

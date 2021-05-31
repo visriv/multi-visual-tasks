@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import torch.nn as nn
 
-from mtl.cores.eval.top_down_eval import keypoints_from_heatmaps
+from mvt.cores.eval.top_down_eval import keypoints_from_heatmaps
 
 
 class TopDownBaseHead(nn.Module):

@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 from torch.nn.modules.utils import _pair
-from mtl.utils.misc_util import is_list_of
+from mvt.utils.misc_util import is_list_of
 from ..core_anchor import ANCHOR_GENERATORS
 
 
@@ -37,7 +37,7 @@ class AnchorGenerator(object):
             width and height. By default it is 0 in V2.0.
 
     Examples:
-        >>> from mtl.cores.anchor import AnchorGenerator
+        >>> from mvt.cores.anchor import AnchorGenerator
         >>> self = AnchorGenerator([16], [1.], [1.], [9])
         >>> all_anchors = self.grid_anchors([(2, 2)], device='cpu')
         >>> print(all_anchors)
@@ -501,7 +501,7 @@ class LegacyAnchorGenerator(AnchorGenerator):
             in v1.x models.
 
     Examples:
-        >>> from mtl.cores.anchor import LegacyAnchorGenerator
+        >>> from mvt.cores.anchor import LegacyAnchorGenerator
         >>> self = LegacyAnchorGenerator(
         >>>     [16], [1.], [1.], [9], center_offset=0.5)
         >>> all_anchors = self.grid_anchors(((2, 2),), device='cpu')
