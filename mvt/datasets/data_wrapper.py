@@ -26,6 +26,7 @@ class ConcatDataset(_ConcatDataset):
     """A wrapper of concatenated dataset.
     Same as :obj:`torch.utils.data.dataset.ConcatDataset`, but
     concat the group flag for image aspect ratio.
+    
     Args:
         datasets (list[:obj:`Dataset`]): A list of datasets.        
     """
@@ -47,11 +48,14 @@ class ConcatDataset(_ConcatDataset):
 
     def get_cat_ids(self, idx):
         """Get category ids of concatenated dataset by index.
+
         Args:
             idx (int): Index of data.
+
         Returns:
             list[int]: All categories in the image of specified index.
         """
+
         if idx < 0:
             if -idx > len(self):
                 raise ValueError(
@@ -66,14 +70,17 @@ class ConcatDataset(_ConcatDataset):
 
     def evaluate(self, results, logger=None, **kwargs):
         """Evaluate the results.
+
         Args:
             results (list[list | tuple]): Testing results of the dataset.
             logger (logging.Logger | str | None): Logger used for printing
                 related information during evaluation. Default: None.
+
         Returns:
             dict[str: float]: AP results of the total dataset or each separate
             dataset if `self.separate_eval=True`.
         """
+
         assert len(results) == self.cumulative_sizes[-1], \
             ('Dataset and results have different sizes: '
              f'{self.cumulative_sizes[-1]} v.s. {len(results)}')
@@ -123,6 +130,7 @@ class RepeatDataset(object):
     dataset. This is useful when the data loading time is long but the dataset
     is small. Using RepeatDataset can reduce the data loading time between
     epochs.
+
     Args:
         dataset (:obj:`Dataset`): The dataset to be repeated.
         times (int): Repeat times.

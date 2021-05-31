@@ -2,7 +2,7 @@
 
   English | [简体中文](README_CN.md)
 
-  MultipleVisualTasks (MVT) is an open-source toolbox for multiple vision tasks based on PyTorch.
+  MultipleVisualTasks (MVT) is an open-source toolbox for multiple vision tasks based on PyTorch. Our repo is designed according to {MMDetection: https://github.com/open-mmlab/mmdetection} and {Detectron2: https://github.com/facebookresearch/detectron2}
 
 ### Major Features
 
@@ -41,16 +41,6 @@
   - [configure training losses](docs/tutorials/4_configure_loss.md)
   - [customize runtime settings](docs/tutorials/5_customize_runtime.md)
   - [other supported operations](docs/tutorials/6_support_detail.md)
-
-
-## Supported algorithms
-
-  Algorithm details and trained models with corresponding evaluations:
-  - [classification](docs/tasks/classification.md)
-  - [detection](docs/tasks/detection.md)
-  - [pose estimation](docs/tasks/pose_estimation.md)
-  - [regression](docs/tasks/regression.md)
-  - [segmentation](docs/tasks/segmentation.md)
 
 
 ## Useful Tools

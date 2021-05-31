@@ -176,6 +176,7 @@ class HRModule(nn.Module):
 
     def forward(self, x):
         """Forward function."""
+
         if self.num_branches == 1:
             return [self.branches[0](x[0])]
 
@@ -199,6 +200,7 @@ class HRNet(nn.Module):
     """HRNet backbone.
     High-Resolution Representations for Labeling Pixels and Regions
     arXiv: https://arxiv.org/abs/1904.04514
+    
     Args:
         extra (dict): detailed configuration for each stage of HRNet.
         in_channels (int): Number of input image channels. Default: 3.

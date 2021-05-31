@@ -2,14 +2,13 @@
 # @Time    : 2020/12/02 16:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : block_builder.py
 
 import inspect
 from torch import nn
 from yacs.config import CfgNode
 
-from mvt.utils.reg_util import (Registry, build_module_from_cfg, 
-                                build_module_from_dict)
+from mvt.utils.reg_util import Registry, build_module_from_cfg
+from mvt.utils.reg_util import build_module_from_dict
 from mvt.utils.config_util import convert_to_dict
 
 # --------------------------------------------------------------------------- #

@@ -1,9 +1,7 @@
 MODEL:
   TYPE: "det"
   NAME: "SSD"
-  # DEVICE: "cpu"
   PRETRAINED_MODEL_PATH: "meta/models/vgg16_caffe-292e1171.pth"
-  # CUDNN_BENCHMARK: False
   BACKBONE:
     type: "SSDVGG"
     input_size: 300

@@ -16,5 +16,5 @@ RUNTIME:
   SEED: 7
   WORKFLOW: [['train', 1], ['val', 1]]
   EVALUATION: {
-    metric: 'accuracy',   # cls: 'accuracy', 'precision', 'recall', 'f1_score' det: 'mAP', 'Recall'
+    metric: 'accuracy',   # det: 'mAP', 'Recall'
     metric_options: {'topk': 1}}

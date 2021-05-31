@@ -13,11 +13,6 @@ from .transforms import (Albu, CutOut, Expand, MinIoURandomCrop, Normalize,
                          JointRandomCrop, JointRandomFlip, JointResize, SegRescale,
                          RandomGrayscale, ImgResize, ImgRandomFlip, ImgCenterCrop,
                          ImgRandomCrop, ImgRandomResizedCrop, SegRandomCrop)
-from .pose_transforms import (TopDownRandomFlip, TopDownHalfBodyTransform,
-                              TopDownGetRandomScaleRotation, TopDownAffine,
-                              TopDownGenerateTarget, TopDownGenerateTargetRegression,
-                              TopDownRandomTranslation)
-
 
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor',
@@ -31,8 +26,4 @@ __all__ = [
     'ContrastTransform', 'Translate', 'SegRandomCrop',  'GenerateHeatMap',
     'RandomGrayscale', 'ImgResize', 'ImgRandomFlip', 'ImgCenterCrop',
     'ImgRandomCrop', 'ImgRandomResizedCrop', 
-    
-    'TopDownRandomFlip', 'TopDownHalfBodyTransform', 'TopDownGetRandomScaleRotation',
-    'TopDownAffine', 'TopDownGenerateTarget', 'TopDownGenerateTargetRegression',
-    'TopDownRandomTranslation'
 ]

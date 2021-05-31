@@ -7,9 +7,9 @@ import pycocotools.mask as mask_util
 import pycocotools.mask as maskUtils
 from mvt.cores.ops import roi_align
 from mvt.utils.misc_util import slice_list
-from mvt.utils.geometric_util import (rescale_size, imrescale, imresize, 
-                                      imflip, impad, imshear, imtranslate,
-                                      imrotate)
+from mvt.utils.geometric_util import rescale_size, imrescale, imresize
+from mvt.utils.geometric_util import imflip, impad, imshear, imtranslate
+from mvt.utils.geometric_util import imrotate
 
 
 class BaseInstanceMasks(metaclass=ABCMeta):

@@ -19,6 +19,7 @@ def mse_loss(pred,
 @LOSSES.register_module()
 class MSELoss(nn.Module):
     """MSELoss.
+
     Args:
         reduction (str, optional): The method that reduces the loss to a
             scalar. Options are "none", "mean" and "sum".
@@ -32,6 +33,7 @@ class MSELoss(nn.Module):
 
     def forward(self, pred, target, weight=None, avg_factor=None):
         """Forward function of loss.
+
         Args:
             pred (torch.Tensor): The prediction.
             target (torch.Tensor): The learning target of the prediction.

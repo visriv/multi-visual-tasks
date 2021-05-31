@@ -27,7 +27,7 @@ MODEL:
     num_outs: 5
   BBOX_HEAD:
     type: 'RetinaSepConvHead'
-    num_classes: 81
+    num_classes: 80
     num_ins: 5
     in_channels: 64
     stacked_convs: 3

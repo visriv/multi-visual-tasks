@@ -1,6 +1,6 @@
 DATA:
   NAME: "CocoDataset"
-  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/CocoDet" # /root/datasets
+  ROOT_PATH: "datasets/CocoDataset"
   TRAIN_TRANSFORMS:
     LoadImageFromFile: {to_float32: True}
     LoadAnnotations: {with_bbox: True}
@@ -44,7 +44,6 @@ DATA:
   TRAIN_DATA:
     TYPE: "RepeatDataset" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 2
-    #IMAGE_SIZE: [300, 300]
     DATA_INFO: ["annotations/instances_train2017.json"]
     DATA_PREFIX: ["train2017/"]
     IS_TFRECORD: False
@@ -53,7 +52,6 @@ DATA:
   VAL_DATA:
     TYPE: "Normal"
     FLAG: 1
-    #MIN_SIZE: 100
     DATA_INFO: ["annotations/instances_val2017.json"]
     DATA_PREFIX: ["val2017/"]
     IS_TFRECORD: False
@@ -63,7 +61,6 @@ DATA:
   TEST_DATA:
     TYPE: "Normal"
     FLAG: 1
-    #MIN_SIZE: 100
     DATA_INFO: ["annotations/instances_val2017.json"]
     DATA_PREFIX: ["val2017/"]
     IS_TFRECORD: False

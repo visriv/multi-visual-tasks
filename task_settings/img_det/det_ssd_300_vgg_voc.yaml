@@ -4,6 +4,16 @@ MODEL:
     num_classes: 20
 DATA:
   BASE: "datasets/detections/det_voc.yaml"
+  ROOT_PATH: "datasets/VOCDataset"
+  TRAIN_DATA:
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  VAL_DATA:
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  TEST_DATA:
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
 SCHEDULE:
   BASE: "schedulers/schedule_2x.yaml"
   OPTIMIZER: 

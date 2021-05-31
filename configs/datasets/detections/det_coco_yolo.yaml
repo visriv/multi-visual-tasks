@@ -1,6 +1,6 @@
 DATA:
-  NAME: "DetAnimalDataset"
-  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/AnimalDet" # /root/datasets
+  NAME: "CocoDataset"
+  ROOT_PATH: "datasets/CocoDataset"
   TRAIN_TRANSFORMS:
     LoadImageFromFile: {to_float32: True}
     LoadAnnotations: {with_bbox: True}
@@ -40,30 +40,27 @@ DATA:
   TRAIN_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: [['tfrecords/train.tfrecord']] # ["metas/train.txt"]
+    DATA_INFO: ["metas/train.txt"]
     DATA_PREFIX: ["images/"]
     ANNO_PREFIX: ["annotations/"]
-    IS_TFRECORD: True
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 0
   VAL_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
+    DATA_INFO: ["metas/val.txt"]
     DATA_PREFIX: ["images/"]
     ANNO_PREFIX: ["annotations/"]
-    IS_TFRECORD: True
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 0
   TEST_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
+    DATA_INFO: ["metas/val.txt"]
     DATA_PREFIX: ["images/"]
     ANNO_PREFIX: ["annotations/"]
-    IS_TFRECORD: True
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 0

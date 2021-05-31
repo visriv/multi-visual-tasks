@@ -2,7 +2,6 @@
 # @Time    : 2020/12/01 16:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : log_util.py
 
 import os
 import logging

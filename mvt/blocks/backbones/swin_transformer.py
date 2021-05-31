@@ -1,10 +1,3 @@
-# --------------------------------------------------------
-# Swin Transformer
-# Copyright (c) 2021 Microsoft
-# Licensed under The MIT License [see LICENSE for details]
-# Written by Ze Liu
-# --------------------------------------------------------
-
 import torch
 import logging
 import torch.nn as nn
@@ -12,7 +5,6 @@ import torch.utils.checkpoint as checkpoint
 from collections import OrderedDict
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 
-# mvt.relevants
 from mvt.utils.checkpoint_util import load_checkpoint
 from mvt.utils.init_util import constant_init, kaiming_init
 from ..block_builder import BACKBONES
@@ -166,6 +158,7 @@ class WindowAttention(nn.Module):
 
 class SwinTransformerBlock(nn.Module):
     r""" Swin Transformer Block.
+
     Args:
         dim (int): Number of input channels.
         input_resolution (tuple[int]): Input resulotion.
@@ -341,6 +334,7 @@ class PatchMerging(nn.Module):
 
 class BasicLayer(nn.Module):
     """ A basic Swin Transformer layer for one stage.
+
     Args:
         dim (int): Number of input channels.
         input_resolution (tuple[int]): Input resolution.
@@ -460,6 +454,7 @@ class SwinTransformer(nn.Module):
     r""" Swin Transformer
         A PyTorch impl of : `Swin Transformer: Hierarchical Vision Transformer using Shifted Windows`  -
           https://arxiv.org/pdf/2103.14030
+
     Args:
         img_size (int | tuple(int)): Input image size. Default 224
         patch_size (int | tuple(int)): Patch size. Default: 4

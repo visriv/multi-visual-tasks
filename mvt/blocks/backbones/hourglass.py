@@ -8,6 +8,7 @@ from .resnet import BasicBlock, ResLayer
 class HourglassModule(nn.Module):
     """Hourglass Module for HourglassNet backbone.
     Generate module recursively and use BasicBlock as the base unit.
+
     Args:
         depth (int): Depth of current HourglassModule.
         stage_channels (list[int]): Feature channels of sub-modules in current
@@ -80,6 +81,7 @@ class HourglassNet(nn.Module):
     Stacked Hourglass Networks for Human Pose Estimation.
     More details can be found in the `paper
     <https://arxiv.org/abs/1603.06937>`_ .
+
     Args:
         downsample_times (int): Downsample times in a HourglassModule.
         num_stacks (int): Number of HourglassModule modules stacked,
@@ -90,6 +92,7 @@ class HourglassNet(nn.Module):
             HourglassModule.
         feat_channel (int): Feature channel of conv after a HourglassModule.
         norm_cfg (dict): Dictionary to construct and config norm layer.
+        
     Example:
         >>> import torch
         >>> self = HourglassNet()

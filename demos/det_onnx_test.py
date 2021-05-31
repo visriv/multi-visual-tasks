@@ -15,16 +15,20 @@ from mvt.utils.vis_util import imshow_det_bboxes
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
-CLASSES = ('person', 'cartoon-person', 'game-role', 'cat', 'dog', 'snake',
-           'bird', 'fish', 'rabbit', 'monkey', 'horse', 'chicken', 'pig',
-           'cow', 'sheep', 'bicycle', 'tricycle', 'motorbike', 'tractor',
-           'car', 'bus', 'truck', 'excavator', 'crane', 'train', 'plane',
-           'tank', 'ship', 'villa', 'pavilion', 'tower', 'temple', 'palace', 
-           'chair', 'bed', 'table', 'sofa', 'bench', 'vase', 'potted-plant', 
-           'bag', 'umbrella', 'computer', 'television', 'lamp', 'mouse', 
-           'keyboard', 'cell-phone', 'dish', 'bowl', 'spoon', 'bottle', 'cup', 
-           'fork', 'pot', 'knife', 'basketball', 'skateboard', 'book', 'banana', 
-           'apple', 'orange', 'watermelon', 'pizza', 'cake')
+CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+           'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
+           'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
+           'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe',
+           'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+           'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat',
+           'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
+           'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl',
+           'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot',
+           'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+           'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop',
+           'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
+           'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
+           'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
 
 
 def preprocess_example_input(input_config):
@@ -47,7 +51,7 @@ def preprocess_example_input(input_config):
         std = np.array(normalize_cfg['std'], dtype=np.float32)
         one_img = imnormalize(one_img, mean, std)
 
-    # 得到原图片宽高比例
+    # ratio of width/height for the original picture
     ori_shape = one_img.shape
     new_shape = input_shape
     print("ori_shape：", ori_shape)
@@ -98,7 +102,7 @@ def bbox2result(bboxes, labels, num_classes):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Convert MTL models to ONNX')
+        description='Convert MVT models to ONNX')
     # parser.add_argument('config', help='test config file path')
     # parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('--input-img', type=str, help='Images for input')
@@ -133,27 +137,27 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    # 指定opset version
+    # opset version
     assert args.opset_version == 11, 'Only support opset 11 now'
-    # 指定input img
+    # input img
     if not args.input_img:
         args.input_img = osp.join(
             osp.dirname(__file__), '../meta/test_data/a0519qvbyom_001.jpg')
-    # 指定input shape
+    # input shape
     if len(args.shape) == 1:
         input_shape = (1, 3, args.shape[0], args.shape[0])
     elif len(args.shape) == 2:
         input_shape = (1, 3) + tuple(args.shape)
     else:
         raise ValueError('invalid input shape')
-    # 指定normalize_cfg
+    # normalize_cfg
     assert len(args.mean) == 3
     assert len(args.std) == 3
     normalize_cfg = {'mean': args.mean, 'std': args.std}
-    # onnx模型
-    output_file = "meta/onnx_models/det_yolov4_cspdarknet_multiobj.onnx"
+    # onnx model
+    output_file = "meta/onnx_models/det_yolov4_cspdarknet_coco.onnx"
 
-    # 预处理
+    # preprocessing
     input_config = {
         'input_shape': input_shape,
         'input_path': args.input_img,

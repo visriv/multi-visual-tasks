@@ -1,9 +1,10 @@
 MODEL:
   BASE: "models/detections/det_efficientdet_d0.yaml"
   BBOX_HEAD:
-    num_classes: 65
+    num_classes: 80
 DATA:
-  BASE: "datasets/detections/det_multiobj_efficient.yaml" 
+  BASE: "datasets/detections/det_coco_efficient.yaml"
+  ROOT_PATH: "datasets/CocoDataset"
   TRAIN_TRANSFORMS:
     JointResize: {
       img_scale: [320, 320],
@@ -28,19 +29,16 @@ DATA:
       }
     } 
   TRAIN_DATA:
-    DATA_INFO: [['tfrecords/train_01.tfrecord', 'tfrecords/train_02.tfrecord', 'tfrecords/train_03.tfrecord', 'tfrecords/train_04.tfrecord', 'tfrecords/train_05.tfrecord', 'tfrecords/train_06.tfrecord', 'tfrecords/train_07.tfrecord', 'tfrecords/train_08.tfrecord', 'tfrecords/train_09.tfrecord']] # 
-    IS_TFRECORD: True
+    DATA_INFO: ["metas/train.txt"]
     SAMPLES_PER_DEVICE: 8
     WORKERS_PER_DEVICE: 8
   VAL_DATA:
-    DATA_INFO: [['tfrecords/val.tfrecord']] # 
-    IS_TFRECORD: True
+    DATA_INFO: ["metas/val.txt"]
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 8
     WORKERS_PER_DEVICE: 8
   TEST_DATA:
-    DATA_INFO: [['tfrecords/val.tfrecord']] # 
-    IS_TFRECORD: True
+    DATA_INFO: ["metas/val.txt"]
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 8
     WORKERS_PER_DEVICE: 8

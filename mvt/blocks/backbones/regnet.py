@@ -10,7 +10,6 @@ from .resnext import Bottleneck
 @BACKBONES.register_module()
 class RegNet(ResNet):
     """RegNet backbone.
-
     More details can be found in `paper <https://arxiv.org/abs/2003.13678>`_ .
 
     Args:

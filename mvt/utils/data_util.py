@@ -2,7 +2,7 @@
 # @Time    : 2020/12/02 16:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : dataset_util.py
+
 import warnings
 import functools
 import torch

@@ -61,91 +61,59 @@ class DetBaseDataset(Dataset):
             self.CLASSES = self.get_classes()
         
         self.sel_index = sel_index
-        self.is_tfrecord = data_cfg.IS_TFRECORD
         # processing pipeline
         self.pipeline_cfg = pipeline_cfg
         self.pipeline = Compose(self.get_pipeline_list())
         
-        if self.is_tfrecord: # using self.idxs instead of self.data_infos
-            # for tfrecord, the data should be full after filtering
+        # load annotations (and proposals)
+        if ("DATA_PREFIX" in data_cfg and 
+                isinstance(data_cfg.DATA_PREFIX, list)):
+            self.data_prefix = data_cfg.DATA_PREFIX[sel_index]
+        else:
             self.data_prefix = None
-            self.proposals = None
+
+        if ("ANNO_PREFIX" in data_cfg and 
+                isinstance(data_cfg.ANNO_PREFIX, list)):
+            self.anno_prefix = data_cfg.ANNO_PREFIX[sel_index]
+        else:
             self.anno_prefix = None
+
+        if ("SEG_PREFIX" in data_cfg and 
+                isinstance(data_cfg.SEG_PREFIX, list)):
+            self.seg_prefix = data_cfg.SEG_PREFIX[sel_index]
+        else:
             self.seg_prefix = None
+        
+        if ("PROPOSAL_FILE" in data_cfg and 
+                isinstance(data_cfg.PROPOSAL_FILE, list)):
+            self.proposal_file = data_cfg.PROPOSAL_FILE[sel_index]
+        else:
             self.proposal_file = None
 
-            tfindexs = []
-            for i in range(len(self.ann_file)):
-                if not osp.isabs(self.ann_file[i]):
-                    self.ann_file[i] = osp.join(
-                        self.data_root, self.ann_file[i])
-
-                tfindexs.append(tfrecord2idx(
-                    self.ann_file[i], 
-                    self.ann_file[i].replace('.tfrecord', '.idx')))
-
-            self.idxs = []
-            self.tffiles = None
-            self.samples = 0
-            for index, tffile in zip(tfindexs, self.ann_file):
-                idx = []
-                with open(index) as idxf:
-                    for line in idxf:
-                        offset, _ = line.split(' ')
-                        idx.append(offset)
-                self.samples += len(idx)
-                print("load %s, samples:%s" %(tffile,  len(idx)))
-                self.idxs.append((idx, tffile))
+        # join paths if data_root is specified
+        if not (self.data_prefix is None or osp.isabs(self.data_prefix)):
+            self.data_prefix = osp.join(self.data_root, self.data_prefix)
+        if not (self.anno_prefix is None or osp.isabs(self.anno_prefix)):
+            self.anno_prefix = osp.join(self.data_root, self.anno_prefix)
+        if not (self.seg_prefix is None or osp.isabs(self.seg_prefix)):
+            self.seg_prefix = osp.join(self.data_root, self.seg_prefix)
+        if not (self.proposal_file is None or osp.isabs(self.proposal_file)):
+            self.proposal_file = osp.join(self.data_root, self.proposal_file)
+        if self.proposal_file is not None:
+            self.proposals = self.load_proposals(self.proposal_file)
         else:
-            # load annotations (and proposals)
-            if ("DATA_PREFIX" in data_cfg and 
-                    isinstance(data_cfg.DATA_PREFIX, list)):
-                self.data_prefix = data_cfg.DATA_PREFIX[sel_index]
-            else:
-                self.data_prefix = None
-
-            if ("ANNO_PREFIX" in data_cfg and 
-                    isinstance(data_cfg.ANNO_PREFIX, list)):
-                self.anno_prefix = data_cfg.ANNO_PREFIX[sel_index]
-            else:
-                self.anno_prefix = None
-
-            if ("SEG_PREFIX" in data_cfg and 
-                    isinstance(data_cfg.SEG_PREFIX, list)):
-                self.seg_prefix = data_cfg.SEG_PREFIX[sel_index]
-            else:
-                self.seg_prefix = None
-            
-            if ("PROPOSAL_FILE" in data_cfg and 
-                    isinstance(data_cfg.PROPOSAL_FILE, list)):
-                self.proposal_file = data_cfg.PROPOSAL_FILE[sel_index]
-            else:
-                self.proposal_file = None
-
-            # join paths if data_root is specified
-            if not (self.data_prefix is None or osp.isabs(self.data_prefix)):
-                self.data_prefix = osp.join(self.data_root, self.data_prefix)
-            if not (self.anno_prefix is None or osp.isabs(self.anno_prefix)):
-                self.anno_prefix = osp.join(self.data_root, self.anno_prefix)
-            if not (self.seg_prefix is None or osp.isabs(self.seg_prefix)):
-                self.seg_prefix = osp.join(self.data_root, self.seg_prefix)
-            if not (self.proposal_file is None or osp.isabs(self.proposal_file)):
-                self.proposal_file = osp.join(self.data_root, self.proposal_file)
-            if self.proposal_file is not None:
-                self.proposals = self.load_proposals(self.proposal_file)
-            else:
-                self.proposals = None
-            
-            if not osp.isabs(self.ann_file):
-                self.ann_file = osp.join(self.data_root, self.ann_file)
-            self.data_infos = self.load_annotations(self.ann_file)
-            
-            # filter images too small and containing no annotations
-            if not self.test_mode:
-                valid_inds = self._filter_imgs()
-                self.data_infos = [self.data_infos[i] for i in valid_inds]
-                if self.proposals is not None:
-                    self.proposals = [self.proposals[i] for i in valid_inds]
+            self.proposals = None
+        
+        if not osp.isabs(self.ann_file):
+            self.ann_file = osp.join(self.data_root, self.ann_file)
+        self.data_infos = self.load_annotations(self.ann_file)
+        
+        # filter images too small and containing no annotations
+        if not self.test_mode:
+            valid_inds = self._filter_imgs()
+            self.data_infos = [self.data_infos[i] for i in valid_inds]
+            if self.proposals is not None:
+                self.proposals = [self.proposals[i] for i in valid_inds]
         
         # set group flag for the sampler
         self._set_group_flag()
@@ -153,10 +121,7 @@ class DetBaseDataset(Dataset):
     def __len__(self):
         """Total number of samples of data."""
 
-        if self.is_tfrecord:
-            return self.samples
-        else:
-            return len(self.data_infos)
+        return len(self.data_infos)
 
     def get_pipeline_list(self):
         """Get the list of configures for constructing pipelines
@@ -175,9 +140,7 @@ class DetBaseDataset(Dataset):
             if len(v_t) > 0:
                 if not isinstance(v_t, CfgNode):
                     raise TypeError("pipeline items must be a CfgNode")
-            if self.is_tfrecord and k_t == 'LoadImageFromFile':
-                # remove the load image process
-                continue
+
             pipeline_item["type"] = k_t
 
             for k_a, v_a in v_t.items():
@@ -209,59 +172,10 @@ class DetBaseDataset(Dataset):
         """Load proposal from proposal file."""
 
         return file_load(proposal_file)
-
-    def record_parser(self, feature_list):
-        """Call when is_tfrecord is ture."""
-
-        raise NotImplementedError("Must Implement parser")
-    
-    def get_record(self, f, offset):
-        """Get the record when is_tfrecord is true."""
-        
-        if not self.is_tfrecord:
-            raise ValueError(
-                "Please set is_tfrecord to be true when call this function")
-
-        f.seek(offset)
-
-        # length,crc
-        byte_len_crc = f.read(12)
-        proto_len = struct.unpack('Q', byte_len_crc[:8])[0]
-        # proto,crc
-        pb_data = f.read(proto_len)
-        if len(pb_data) < proto_len:
-            print("read pb_data err,proto_len:%s pb_data len:%s"%(proto_len, len(pb_data)))
-            return None
-        
-        example = Example()
-        example.ParseFromString(pb_data)
-        #keep key value in order
-        feature = sorted(example.features.feature.items())
-     
-        record = self.record_parser(feature)
-        #print(record)
-        return record
     
     def getitem_info(self, index):
-        if self.is_tfrecord:
-            if self.tffiles is None:
-                self.tffiles = dict()
-                for idx, tffile in self.idxs:
-                    self.tffiles[tffile] = open(tffile, 'rb')
 
-            for idx, tffile in self.idxs:
-                if index >= len(idx):
-                    index -= len(idx)
-                    continue
-                # every thread keep a f instace
-                f = self.tffiles[tffile]
-
-                offset = int(idx[index])
-                return  self.get_record(f, offset)
-
-            print("bad index,", index)
-        else:
-            return self.data_infos[index]
+        return self.data_infos[index]
 
     def get_ann_info(self, idx):
         """Get annotation by index.
@@ -314,12 +228,12 @@ class DetBaseDataset(Dataset):
         """
         
         self.flag = np.zeros(len(self), dtype=np.uint8)
-        if not self.is_tfrecord:
-            self.flag = np.zeros(len(self), dtype=np.uint8)
-            for i in range(len(self)):
-                img_info = self.getitem_info(i)
-                if img_info['width'] / img_info['height'] > 1:
-                    self.flag[i] = 1
+
+        self.flag = np.zeros(len(self), dtype=np.uint8)
+        for i in range(len(self)):
+            img_info = self.getitem_info(i)
+            if img_info['width'] / img_info['height'] > 1:
+                self.flag[i] = 1
 
     def _rand_another(self, idx):
         """Get another random index from the same group as the given index."""
@@ -357,22 +271,10 @@ class DetBaseDataset(Dataset):
             dict: Training data and annotation after pipeline with new keys \
                 introduced by pipeline.
         """
-        if self.is_tfrecord:
-            item_info = self.getitem_info(idx)
-            results = {
-                'img_info': item_info['img_info'],
-                'ann_info': item_info['ann'],
-                'filename': item_info['img_info']['filename'],
-                'ori_filename': item_info['img_info']['id'],
-                'img': item_info['img'],
-                'img_shape': item_info['img'].shape,
-                'ori_shape': item_info['img'].shape,
-                'img_fields': ['img']
-            } # no need to load image
-        else:
-            img_info = self.getitem_info(idx)
-            ann_info = self.get_ann_info(idx)
-            results = dict(img_info=img_info, ann_info=ann_info)
+        
+        img_info = self.getitem_info(idx)
+        ann_info = self.get_ann_info(idx)
+        results = dict(img_info=img_info, ann_info=ann_info)
         if self.proposals is not None:
             results['proposals'] = self.proposals[idx]
         self.pre_pipeline(results)
@@ -388,20 +290,9 @@ class DetBaseDataset(Dataset):
             dict: Testing data after pipeline with new keys intorduced by \
                 piepline.
         """
-        if self.is_tfrecord:
-            item_info = self.getitem_info(idx)
-            results = {
-                'img_info': item_info['img_info'],
-                'filename': item_info['img_info']['filename'],
-                'ori_filename': item_info['img_info']['id'],
-                'img': item_info['img'],
-                'img_shape': item_info['img'].shape,
-                'ori_shape': item_info['img'].shape,
-                'img_fields': ['img']
-            } # no need to load image
-        else:
-            img_info = self.getitem_info(idx)
-            results = dict(img_info=img_info)
+        
+        img_info = self.getitem_info(idx)
+        results = dict(img_info=img_info)
         if self.proposals is not None:
             results['proposals'] = self.proposals[idx]
         self.pre_pipeline(results)
