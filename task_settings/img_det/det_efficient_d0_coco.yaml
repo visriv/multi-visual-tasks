@@ -1,10 +1,11 @@
 MODEL:
   BASE: "models/detections/det_efficientdet_d0.yaml"
+  PRETRAINED_MODEL_PATH: ""
   BBOX_HEAD:
     num_classes: 80
 DATA:
   BASE: "datasets/detections/det_coco_efficient.yaml"
-  ROOT_PATH: "datasets/CocoDataset"
+  ROOT_PATH: "/home/qzm/Work/Data/COCO"
   TRAIN_TRANSFORMS:
     JointResize: {
       img_scale: [320, 320],
@@ -29,17 +30,12 @@ DATA:
       }
     } 
   TRAIN_DATA:
-    DATA_INFO: ["metas/train.txt"]
     SAMPLES_PER_DEVICE: 8
     WORKERS_PER_DEVICE: 8
   VAL_DATA:
-    DATA_INFO: ["metas/val.txt"]
-    TEST_MODE: False
     SAMPLES_PER_DEVICE: 8
     WORKERS_PER_DEVICE: 8
   TEST_DATA:
-    DATA_INFO: ["metas/val.txt"]
-    TEST_MODE: True
     SAMPLES_PER_DEVICE: 8
     WORKERS_PER_DEVICE: 8
 SCHEDULE:

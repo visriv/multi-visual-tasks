@@ -35,19 +35,21 @@ class CocoDataset(DetBaseDataset):
 
     def load_annotations(self, ann_file):
         """Load annotation from COCO style annotation file.
+
         Args:
             ann_file (str): Path of annotation file.
+
         Returns:
             list[dict]: Annotation info from COCO api.
         """
 
         self.coco = COCO(ann_file)
-        self.cat_ids = self.coco.get_cat_ids(cat_names=self.CLASSES)
+        self.cat_ids = self.coco.getCatIds(catNms=self.CLASSES)
         self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
-        self.img_ids = self.coco.get_img_ids()
+        self.img_ids = self.coco.getImgIds()
         data_infos = []
         for i in self.img_ids:
-            info = self.coco.load_imgs([i])[0]
+            info = self.coco.loadImgs([i])[0]
             info['filename'] = info['file_name']
             data_infos.append(info)
         return data_infos
@@ -63,32 +65,37 @@ class CocoDataset(DetBaseDataset):
         """
 
         img_id = self.data_infos[idx]['id']
-        ann_ids = self.coco.get_ann_ids(img_ids=[img_id])
-        ann_info = self.coco.load_anns(ann_ids)
+        ann_ids = self.coco.getAnnIds(imgIds=[img_id])
+        ann_info = self.coco.loadAnns(ann_ids)
         return self._parse_ann_info(self.data_infos[idx], ann_info)
 
     def get_cat_ids(self, idx):
         """Get COCO category ids by index.
+
         Args:
             idx (int): Index of data.
+
         Returns:
             list[int]: All categories in the image of specified index.
         """
 
         img_id = self.data_infos[idx]['id']
-        ann_ids = self.coco.get_ann_ids(img_ids=[img_id])
-        ann_info = self.coco.load_anns(ann_ids)
+        ann_ids = self.coco.getAnnIds(imgIds=[img_id])
+        ann_info = self.coco.loadAnns(ann_ids)
         return [ann['category_id'] for ann in ann_info]
 
     def _filter_imgs(self, min_size=32):
         """Filter images too small or without ground truths."""
+
         valid_inds = []
         # obtain images that contain annotation
         ids_with_ann = set(_['image_id'] for _ in self.coco.anns.values())
+
         # obtain images that contain annotations of the required categories
         ids_in_cat = set()
         for i, class_id in enumerate(self.cat_ids):
-            ids_in_cat |= set(self.coco.cat_img_map[class_id])
+            ids_in_cat |= set(self.coco.catToImgs[class_id])
+
         # merge the image id sets of the two conditions and use the merged set
         # to filter out images if self.filter_empty_gt=True
         ids_in_cat &= ids_with_ann
@@ -102,18 +109,22 @@ class CocoDataset(DetBaseDataset):
                 valid_inds.append(i)
                 valid_img_ids.append(img_id)
         self.img_ids = valid_img_ids
+
         return valid_inds
 
     def _parse_ann_info(self, img_info, ann_info):
         """Parse bbox and mask annotation.
+
         Args:
             ann_info (list[dict]): Annotation info of an image.
             with_mask (bool): Whether to parse mask annotations.
+
         Returns:
             dict: A dict containing the following keys: bboxes, bboxes_ignore,\
                 labels, masks, seg_map. "masks" are raw annotations and not \
                 decoded into binary masks.
         """
+        
         gt_bboxes = []
         gt_labels = []
         gt_bboxes_ignore = []
@@ -164,9 +175,11 @@ class CocoDataset(DetBaseDataset):
     def xyxy2xywh(self, bbox):
         """Convert ``xyxy`` style bounding boxes to ``xywh`` style for COCO
         evaluation.
+
         Args:
             bbox (numpy.ndarray): The bounding boxes, shape (4, ), in
                 ``xyxy`` order.
+
         Returns:
             list[float]: The converted bounding boxes, in ``xywh`` order.
         """
@@ -181,6 +194,7 @@ class CocoDataset(DetBaseDataset):
 
     def _proposal2json(self, results):
         """Convert proposal results to COCO json style."""
+
         json_results = []
         for idx in range(len(self)):
             img_id = self.img_ids[idx]
@@ -192,10 +206,12 @@ class CocoDataset(DetBaseDataset):
                 data['score'] = float(bboxes[i][4])
                 data['category_id'] = 1
                 json_results.append(data)
+
         return json_results
 
     def _det2json(self, results):
         """Convert detection results to COCO json style."""
+
         json_results = []
         for idx in range(len(self)):
             img_id = self.img_ids[idx]
@@ -209,10 +225,12 @@ class CocoDataset(DetBaseDataset):
                     data['score'] = float(bboxes[i][4])
                     data['category_id'] = self.cat_ids[label]
                     json_results.append(data)
+
         return json_results
 
     def _segm2json(self, results):
         """Convert instance segmentation results to COCO json style."""
+
         bbox_json_results = []
         segm_json_results = []
         for idx in range(len(self)):
@@ -247,6 +265,7 @@ class CocoDataset(DetBaseDataset):
                         segms[i]['counts'] = segms[i]['counts'].decode()
                     data['segmentation'] = segms[i]
                     segm_json_results.append(data)
+
         return bbox_json_results, segm_json_results
 
     def results2json(self, results, outfile_prefix):
@@ -254,6 +273,7 @@ class CocoDataset(DetBaseDataset):
         There are 3 types of results: proposals, bbox predictions, mask
         predictions, and they have different data types. This method will
         automatically recognize the type, and dump them to json files.
+
         Args:
             results (list[list | tuple | ndarray]): Testing results of the
                 dataset.
@@ -261,10 +281,12 @@ class CocoDataset(DetBaseDataset):
                 prefix is "somepath/xxx", the json files will be named
                 "somepath/xxx.bbox.json", "somepath/xxx.segm.json",
                 "somepath/xxx.proposal.json".
+
         Returns:
             dict[str: str]: Possible keys are "bbox", "segm", "proposal", and \
                 values are corresponding filenames.
         """
+
         result_files = dict()
         if isinstance(results[0], list):
             json_results = self._det2json(results)
@@ -287,10 +309,11 @@ class CocoDataset(DetBaseDataset):
         return result_files
 
     def fast_eval_recall(self, results, proposal_nums, iou_thrs, logger=None):
+
         gt_bboxes = []
         for i in range(len(self.img_ids)):
-            ann_ids = self.coco.get_ann_ids(img_ids=self.img_ids[i])
-            ann_info = self.coco.load_anns(ann_ids)
+            ann_ids = self.coco.getAnnIds(imgIds=self.img_ids[i])
+            ann_info = self.coco.loadAnns(ann_ids)
             if len(ann_info) == 0:
                 gt_bboxes.append(np.zeros((0, 4)))
                 continue
@@ -308,21 +331,25 @@ class CocoDataset(DetBaseDataset):
         recalls = eval_recalls(
             gt_bboxes, results, proposal_nums, iou_thrs, logger=logger)
         ar = recalls.mean(axis=1)
+
         return ar
 
     def format_results(self, results, jsonfile_prefix=None, **kwargs):
         """Format the results to json (standard format for COCO evaluation).
+
         Args:
             results (list[tuple | numpy.ndarray]): Testing results of the
                 dataset.
             jsonfile_prefix (str | None): The prefix of json files. It includes
                 the file path and the prefix of filename, e.g., "a/b/prefix".
                 If not specified, a temp file will be created. Default: None.
+
         Returns:
             tuple: (result_files, tmp_dir), result_files is a dict containing \
                 the json filepaths, tmp_dir is the temporal directory created \
                 for saving json files when jsonfile_prefix is not specified.
         """
+
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
@@ -334,6 +361,7 @@ class CocoDataset(DetBaseDataset):
         else:
             tmp_dir = None
         result_files = self.results2json(results, jsonfile_prefix)
+
         return result_files, tmp_dir
 
     def evaluate(self,
@@ -517,4 +545,5 @@ class CocoDataset(DetBaseDataset):
                     f'{ap[4]:.3f} {ap[5]:.3f}')
         if tmp_dir is not None:
             tmp_dir.cleanup()
+
         return eval_results

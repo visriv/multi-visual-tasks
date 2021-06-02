@@ -1,10 +1,11 @@
 MODEL:
   BASE: "models/detections/det_yolov3_darknet.yaml"
+  PRETRAINED_MODEL_PATH: ""
   BBOX_HEAD:
     num_classes: 20
 DATA:
   BASE: "datasets/detections/det_voc_yolo.yaml"
-  ROOT_PATH: "datasets/VOCDataset"
+  ROOT_PATH: "/home/qzm/Work/Data/VOC/VOCdevkit"
   TRAIN_DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4

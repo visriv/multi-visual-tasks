@@ -7,7 +7,7 @@ MODEL:
 DATA:
   BASE: "datasets/detections/det_voc.yaml"
   # ROOT_PATH: "datasets/VOCDataset"
-  ROOT_PATH: "/home/qzm/Data/VOC/VOCdevkit"
+  ROOT_PATH: "/home/qzm/Work/Data/VOC/VOCdevkit"
   TRAIN_DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4

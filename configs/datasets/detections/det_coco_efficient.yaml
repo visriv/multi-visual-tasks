@@ -40,26 +40,23 @@ DATA:
   TRAIN_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: ["metas/train.txt"]
-    DATA_PREFIX: ["images/"]
-    ANNO_PREFIX: ["annotations/"]
+    DATA_INFO: ["annotations/instances_train2017.json"]
+    DATA_PREFIX: ["train2017/"]
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
   VAL_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: ["metas/val.txt"]
-    DATA_PREFIX: ["images/"]
-    ANNO_PREFIX: ["annotations/"]
+    DATA_INFO: ["annotations/instances_val2017.json"]
+    DATA_PREFIX: ["val2017/"]
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
   TEST_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: ["metas/val.txt"]
-    DATA_PREFIX: ["images/"]
-    ANNO_PREFIX: ["annotations/"]
+    DATA_INFO: ["annotations/instances_val2017.json"]
+    DATA_PREFIX: ["val2017/"]
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4

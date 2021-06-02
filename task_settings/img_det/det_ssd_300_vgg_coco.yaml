@@ -1,10 +1,11 @@
 MODEL:
   BASE: "models/detections/det_ssd_300_vgg.yaml"
+  PRETRAINED_MODEL_PATH: ""
   BBOX_HEAD:
     num_classes: 80
 DATA:
   BASE: "datasets/detections/det_coco.yaml"
-  ROOT_PATH: "datasets/CocoDataset"
+  ROOT_PATH: "/home/qzm/Work/Data/COCO"
   TRAIN_DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
