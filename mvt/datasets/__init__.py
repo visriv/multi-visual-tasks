@@ -3,11 +3,7 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-#from .classifications import *
 from .detections import *
-#from .segmentations import *
-#from .regressions import *
-#from .pose_estimations import *
 from .transforms import *
 from .data_sampler import (DistributedSampler, GroupSampler, 
                            DistributedGroupSampler)
@@ -17,8 +13,8 @@ from .data_wrapper import (DATASETS, PIPELINES, ConcatDataset,
 
 
 __all__ = [
-    'DetBaseDataset', 'VOCDataset', 'CocoDataset', 'MosaicDataset',
-    'DetAnimalDataset', 'CatDogHeadDataset', 'MultiObjectDataset',
+    'DetBaseDataset', 'VOCDataset', 'CocoDataset', 'DetBaseDataset',
+
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor',
     'Transpose', 'Collect', 'ClsCollect', 'RegCollect', 'PosCollect', 
     'DefaultFormatBundle', 'LoadAnnotations',
@@ -28,17 +24,11 @@ __all__ = [
     'MinIoURandomCrop', 'Expand', 'PhotoMetricDistortion', 'Albu',
     'InstaBoost', 'RandomCenterCropPad', 'AutoAugment', 'CutOut', 'Shear',
     'Rotate', 'ColorTransform', 'EqualizeTransform', 'BrightnessTransform',
-    'ContrastTransform', 'Translate', 'SegRandomCrop',  'GenerateHeatMap',
+    'ContrastTransform', 'Translate', 
     'RandomGrayscale', 'ImgResize', 'ImgRandomFlip', 'ImgCenterCrop',
     'ImgRandomCrop', 'ImgRandomResizedCrop',
     'build_dataset', 'build_dataloader',
     'DATASETS', 'PIPELINES', 'ConcatDataset', 'RepeatDataset', 
     'ClassBalancedDataset', 'BboxCluesDataset',
-    'DistributedSampler', 'GroupSampler', 'DistributedGroupSampler',
-    'CIFAR10', 'CIFAR100', 'ClsBaseDataset', 'ImageNet', 'MNIST', 'FashionMNIST',
-    'ClarityDataset', 'BeautyDataset', 'RotationDataset', 'BareDegreeDataset',
-    'CoverQualityDataset', 'ZhongTaiCommonDataset',
-    'SegBaseDataset', 'SegVOCDataset', 'CityscapesDataset', 'SegConcatDataset',
-    'SegHeatMapConcatDataset',
-    'PosMNodesTopDwonDataset'
+    'DistributedSampler', 'GroupSampler', 'DistributedGroupSampler'
     ]

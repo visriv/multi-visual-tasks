@@ -2,7 +2,11 @@ from mvt.utils.io_util import file_load
 
 
 if __name__ == '__main__':
-    file_path = 'meta/test_json_annos/anno-4/20201224220454.json'
+    file_path = '/home/qzm/Work/Data/RetailDet/train/a_annotations.json'
     file_data = file_load(file_path)
-    file_data.pop('imageData')
-    print(file_data)
+
+    class_names = ''
+    for category in file_data['categories']:
+        class_names += '\'' + category['name'] + '\'' + ', '
+    
+    print(class_names)

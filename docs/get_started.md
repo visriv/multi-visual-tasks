@@ -60,6 +60,7 @@
     python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_det/det_faster_rcnn_r50_fpn_coco.yaml
     python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_det/det_ssd_300_vgg_voc.yaml
     python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_det/det_ssd_300_vgg_coco.yaml
+    python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_det/det_ssd_300_vgg_retail.yaml
     ```
 
 ### Train with multiple GPUs

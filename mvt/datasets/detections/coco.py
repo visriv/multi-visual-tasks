@@ -3,7 +3,6 @@ import logging
 import os.path as osp
 import tempfile
 import numpy as np
-import pycocotools
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from terminaltables import AsciiTable
