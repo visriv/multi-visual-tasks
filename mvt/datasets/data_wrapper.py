@@ -2,7 +2,6 @@
 # @Time    : 2020/12/03 18:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : data_wrapper.py
 
 import bisect
 import math

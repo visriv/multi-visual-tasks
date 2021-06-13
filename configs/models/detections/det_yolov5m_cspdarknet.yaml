@@ -1,0 +1,25 @@
+MODEL:
+  TYPE: "det"
+  NAME: "YOLOV5"
+  PRETRAINED_MODEL_PATH: ""
+  BACKBONE:
+    type: 'DarknetCSP'
+    scale: 'v5m5p'
+    out_indices: [2, 3, 4]
+  NECK:
+    type: 'YOLOV5Neck'
+    in_channels: [192, 384, 768]
+    out_channels: [192, 384, 768]
+  BBOX_HEAD:
+    type: 'YOLOCSPHead'
+    num_classes: 80
+    in_channels: [192, 384, 768]
+  TEST_CFG:
+    nms_pre: -1
+    min_bbox_size: 0
+    score_thr: 0.001
+    conf_thr: 0.005
+    nms: {
+      type: 'common_nms', 
+      iou_threshold: 0.65}
+    max_per_img: 300

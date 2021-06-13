@@ -45,14 +45,14 @@ def build_dataset(data_cfg, pipeline_cfg, default_args, sel_index=0):
     elif data_cfg.TYPE == 'Repeat':
         cfg_opt = data_cfg.clone()
         cfg_opt.defrost()
-        cfg_opt.TYPE = "Normal"
+        cfg_opt.TYPE = "Concat"
         dataset = RepeatDataset(
             build_dataset(cfg_opt, pipeline_cfg, default_args, sel_index), 
             data_cfg.FLAG)
     elif data_cfg.TYPE == 'Balanced':
         cfg_opt = data_cfg.clone()
         cfg_opt.defrost()
-        cfg_opt.TYPE = "Normal"
+        cfg_opt.TYPE = "Concat"
         dataset = ClassBalancedDataset(
             build_dataset(
                 cfg_opt, pipeline_cfg, default_args, sel_index), data_cfg.FLAG)

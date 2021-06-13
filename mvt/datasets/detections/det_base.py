@@ -6,12 +6,10 @@ from torch.utils.data import Dataset
 from yacs.config import CfgNode
 from threading import local
 
-# from mvt.utils.gen_tfrecords.yt_example_pb2 import Example
 from mvt.cores.eval.common_eval import eval_map, eval_recalls
 from mvt.datasets.data_wrapper import DATASETS
 from mvt.datasets.transforms import Compose
 from mvt.utils.io_util import file_load, list_from_file
-# from mvt.utils.tfrecord_util import tfrecord2idx
 
 
 @DATASETS.register_module()
@@ -128,7 +126,7 @@ class DetBaseDataset(Dataset):
 
         Note:
             self.pipeline is a CfgNode
-        
+
         Returns:
             list[dict]: list of dicts with types and parameters for 
                 constructing pipelines.
@@ -140,23 +138,33 @@ class DetBaseDataset(Dataset):
             if len(v_t) > 0:
                 if not isinstance(v_t, CfgNode):
                     raise TypeError("pipeline items must be a CfgNode")
-
+            if self.is_tfrecord and k_t == 'LoadImageFromFile':
+                # remove the load image process
+                continue
             pipeline_item["type"] = k_t
 
             for k_a, v_a in v_t.items():
                 if isinstance(v_a, CfgNode):
-                    pipeline_item[k_a] = []
-                    for sub_kt, sub_vt in v_a.items():
-                        sub_item = {}
-                        if len(sub_vt) > 0:
-                            if not isinstance(sub_vt, CfgNode):
-                                raise TypeError("transform items must be a CfgNode")
-                        sub_item["type"] = sub_kt
-                        for sub_ka, sub_va in sub_vt.items():
-                            if isinstance(sub_va, CfgNode):
-                                raise TypeError("Only support two built-in layers")
-                            sub_item[sub_ka] = sub_va
-                        pipeline_item[k_a].append(sub_item)
+                    if 'type' in v_a:
+                        pipeline_item[k_a] = {}
+                        for sub_kt, sub_vt in v_a.items():
+                            pipeline_item[k_a][sub_kt] = sub_vt
+                    else:
+                        pipeline_item[k_a] = []
+                        for sub_kt, sub_vt in v_a.items():
+                            sub_item = {}
+                            if len(sub_vt) > 0:
+                                if not isinstance(sub_vt, CfgNode):
+                                    raise TypeError("transform items must be a CfgNode")
+                            if self.is_tfrecord and sub_kt == 'LoadImageFromFile':
+                                # remove the load image process
+                                continue
+                            sub_item["type"] = sub_kt
+                            for sub_ka, sub_va in sub_vt.items():
+                                if isinstance(sub_va, CfgNode):
+                                    raise TypeError("Only support two built-in layers")
+                                sub_item[sub_ka] = sub_va
+                            pipeline_item[k_a].append(sub_item)
                 else:
                     pipeline_item[k_a] = v_a
             pipeline_list.append(pipeline_item)
@@ -210,6 +218,7 @@ class DetBaseDataset(Dataset):
         results['bbox_fields'] = []
         results['mask_fields'] = []
         results['seg_fields'] = []
+        results['dataset'] = self
 
     def _filter_imgs(self, min_size=32):
         """Filter images too small."""
@@ -274,7 +283,7 @@ class DetBaseDataset(Dataset):
         
         img_info = self.getitem_info(idx)
         ann_info = self.get_ann_info(idx)
-        results = dict(img_info=img_info, ann_info=ann_info)
+        results = dict(img_info=img_info, ann_info=ann_info, _idx=idx)
         if self.proposals is not None:
             results['proposals'] = self.proposals[idx]
         self.pre_pipeline(results)

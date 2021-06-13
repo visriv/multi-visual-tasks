@@ -1,10 +1,10 @@
 MODEL:
-  BASE: "models/detections/det_ssd_300_vgg.yaml"
+  BASE: "models/detections/det_yolov4_cspdarknet.yaml"
   PRETRAINED_MODEL_PATH: ""
   BBOX_HEAD:
     num_classes: 116
 DATA:
-  BASE: "datasets/detections/det_retail.yaml"
+  BASE: "datasets/detections/det_retail_yolo.yaml"
   ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
   TRAIN_DATA:
     SAMPLES_PER_DEVICE: 4
@@ -16,8 +16,19 @@ DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
 SCHEDULE:
-  BASE: "schedulers/schedule_2x.yaml"
-  OPTIMIZER: 
-    lr: 0.0001
+  BASE: "schedulers/schedule_yolo.yaml"
+  TOTAL_EPOCHS: 100
+  OPTIMIZER:
+    lr: 0.001
+  LR_POLICY:
+    warmup_iters: 5000
+    warmup_ratio: 0.001
+    step: [66, 92]
 RUNTIME:
   BASE: "runtimes/local_runtime.yaml"
+  LOG_CONFIG:
+    interval: 20
+    hooks: {
+      TextLoggerHook: {ignore_last: False},
+      TensorboardLoggerHook: {}
+    }

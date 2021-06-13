@@ -1,11 +1,10 @@
 import inspect
-import warnings
-from functools import partial
 import torch.nn as nn
 from torch.nn import SyncBatchNorm
 
 from .misc import infer_abbr
 from mvt.utils.reg_util import Registry
+from mvt.cores.layer_ops.brick import Mish
 
 
 CONV_LAYERS = Registry('conv layer')
@@ -17,7 +16,7 @@ PLUGIN_LAYERS = Registry('plugin layer')
 
 for module in [
         nn.ReLU, nn.LeakyReLU, nn.PReLU, nn.RReLU, nn.ReLU6, nn.ELU,
-        nn.Sigmoid, nn.Tanh
+        nn.Sigmoid, nn.Tanh, Mish
 ]:
     ACTIVATION_LAYERS.register_module(module=module)
 

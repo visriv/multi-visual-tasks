@@ -59,7 +59,7 @@ def imshow(img, win_name='', wait_time=0):
     cv2.imshow(win_name, imread(img))
     if wait_time == 0:  # prevent from hangning if windows was closed
         while True:
-            ret = cv2.waitKey(1)
+            ret = cv2.waitKey(0)
 
             closed = cv2.getWindowProperty(win_name, cv2.WND_PROP_VISIBLE) < 1
             # if user closed window or if some key pressed

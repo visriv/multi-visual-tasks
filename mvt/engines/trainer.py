@@ -47,7 +47,7 @@ def get_builtin_config_dict(log_cfg):
                     if not isinstance(sub_vt, CfgNode):
                         raise TypeError("transform items must be a CfgNode")
                 sub_item["type"] = sub_kt
-                for sub_ka, sub_va in sub_vt:
+                for sub_ka, sub_va in sub_vt.items():
                     if isinstance(sub_va, CfgNode):
                         raise TypeError("Only support two built-in layers")
                     sub_item[sub_ka] = sub_va

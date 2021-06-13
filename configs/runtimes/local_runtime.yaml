@@ -8,7 +8,7 @@ RUNTIME:
   LOG_CONFIG:
     interval: 50
     hooks: {
-      TextLoggerHook: {},
+      TextLoggerHook: {ignore_last: True},
       TensorboardLoggerHook: {}
     }
   LOG_LEVEL: "INFO"
