@@ -8,7 +8,7 @@ DATA:
   TRAIN_TRANSFORMS:
     MosaicPipeline: {
       individual_pipeline: {
-        LoadImageFromFile: {backend: 'turbojpeg'},
+        LoadImageFromFile: {backend: 'pillow'},
         LoadAnnotations: {with_bbox: True},
         JointResize: {img_scale: [608, 608], keep_ratio: True}
       }, pad_val: 114}
@@ -20,8 +20,7 @@ DATA:
         format: 'pascal_voc',
         min_area: 4,
         min_visibility: 0.2,
-        label_fields: ['gt_labels'],
-        check_each_transform: False},
+        label_fields: ['gt_labels']},
       transforms: {
         PadIfNeeded: {
           min_height: 1824,
@@ -59,27 +58,22 @@ DATA:
         }
       }
   TRAIN_DATA:
-    DATA_INFO: [['tfrecords/train.tfrecord']] # ["metas/train.txt"]
-    IS_TFRECORD: True
-    SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    TYPE: 'Balanced'
+    SAMPLES_PER_DEVICE: 1
+    WORKERS_PER_DEVICE: 1
   VAL_DATA:
-    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
-    IS_TFRECORD: True
-    SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    SAMPLES_PER_DEVICE: 1
+    WORKERS_PER_DEVICE: 1
   TEST_DATA:
-    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
-    IS_TFRECORD: True
-    SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    SAMPLES_PER_DEVICE: 1
+    WORKERS_PER_DEVICE: 1
 SCHEDULE:
   BASE: "schedulers/schedule_efficient.yaml"
-  TOTAL_EPOCHS: 200
+  TOTAL_EPOCHS: 24
   OPTIMIZER:
     lr: 0.01
   LR_POLICY:
-    warmup_iters: 2000
-    warmup_ratio: 0.008
+    warmup_iters: 1000
+    warmup_ratio: 0.001
 RUNTIME:
   BASE: "runtimes/local_runtime.yaml"

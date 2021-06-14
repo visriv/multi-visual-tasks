@@ -6,18 +6,12 @@ DATA:
   BASE: "datasets/detections/det_retail_mosaic.yaml"
   ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
   TRAIN_DATA:
-    DATA_INFO: [['tfrecords/train.tfrecord']] # ["metas/train.txt"]
-    IS_TFRECORD: True
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 0
   VAL_DATA:
-    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
-    IS_TFRECORD: True
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 0
   TEST_DATA:
-    DATA_INFO: [['tfrecords/val.tfrecord']] # ["metas/val.txt"]
-    IS_TFRECORD: True
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 0
 SCHEDULE:

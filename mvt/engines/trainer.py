@@ -191,12 +191,12 @@ def train_processor(cfg,
 
     # user-defined hooks
     if len(cfg.RUNTIME.CUSTOM_HOOKS) > 0:
-        custom_hooks = convert_to_dict(cfg.RUNTIME.CUSTOM_HOOKS)
-        for hook_cfg in custom_hooks:
-            assert isinstance(custom_hooks[hook_cfg], dict), \
+        for hook_cfg in cfg.RUNTIME.CUSTOM_HOOKS:
+            custom_hook = convert_to_dict(hook_cfg)
+            assert isinstance(custom_hook, dict), \
                 'Each item in custom_hooks expects dict type, but got ' \
-                f'{type(hook_cfg)}'
-            item_cfg = custom_hooks[hook_cfg].copy()
+                f'{type(custom_hook)}'
+            item_cfg = custom_hook.copy()
             priority = item_cfg.pop('priority', 'NORMAL')
             hook = build_module_from_dict(item_cfg, HOOKS)
             runner.register_hook(hook, priority=priority)

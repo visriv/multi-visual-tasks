@@ -12,9 +12,9 @@ from .mobilenet_v2 import MobileNetV2
 from .mobilenet_v3 import MobileNetV3
 from .seresnet import SEResNet
 from .tiny_yolo_v4 import TinyYOLOV4Net
-from .yolo_v5 import YOLOV5Net
 from .efficient import EfficientNet
 from .swin_transformer import SwinTransformer
+from .darknetcsp import DarknetCSP
 
 
 __all__ = [
@@ -22,6 +22,6 @@ __all__ = [
     'RegNet', 'ResBlock', 'ResLayer', 'BasicBlock', 'Bottleneck', 
     'ResNet', 'ResNetV1c', 'ResNetV1d', 'ResNeXt', 'L2Norm', 'SSDVGG', 
     'VGG', 'MobileNetV2', 'SEResNet', 'MobileNetV3',
-    'CSPDarknet53', 'TinyYOLOV4Net', 'YOLOV5Net', 'EfficientNet',
-    'SwinTransformer'
+    'CSPDarknet53', 'TinyYOLOV4Net', 'EfficientNet',
+    'SwinTransformer', 'DarknetCSP'
 ]

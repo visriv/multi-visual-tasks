@@ -1,3 +1,5 @@
+import math
+
 from ..core_module import is_module_wrapper
 from ..core_hook import HOOKS, Hook
 from mvt.utils.parallel_util import get_dist_info

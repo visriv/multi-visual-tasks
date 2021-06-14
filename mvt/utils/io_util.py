@@ -19,10 +19,6 @@ try:
     from PIL import Image
 except ImportError:
     Image = None
-try:
-    from turbojpeg import TJCS_RGB, TJPF_BGR, TJPF_GRAY
-except ImportError:
-    TJCS_RGB = TJPF_GRAY = TJPF_BGR = TurboJPEG = None
 
 from .handlers import JsonHandler, PickleHandler, YamlHandler
 from .misc_util import is_str
@@ -37,8 +33,7 @@ file_handlers = {
     'pkl': PickleHandler()
 }
 
-jpeg = None
-supported_backends = ['cv2', 'turbojpeg', 'pillow']
+supported_backends = ['cv2', 'pillow']
 
 imread_flags = {
     'color': IMREAD_COLOR,
@@ -47,22 +42,6 @@ imread_flags = {
 }
 
 imread_backend = 'cv2'
-
-
-def _jpegflag(flag='color', channel_order='bgr'):
-    channel_order = channel_order.lower()
-    if channel_order not in ['rgb', 'bgr']:
-        raise ValueError('channel order must be either "rgb" or "bgr"')
-
-    if flag == 'color':
-        if channel_order == 'bgr':
-            return TJPF_BGR
-        elif channel_order == 'rgb':
-            return TJCS_RGB
-    elif flag == 'grayscale':
-        return TJPF_GRAY
-    else:
-        raise ValueError('flag must be "color" or "grayscale"')
 
 
 def _pillow2array(img, flag='color', channel_order='bgr'):
@@ -147,14 +126,7 @@ def imread(img_or_path, flag='color', channel_order='bgr', backend=None):
     elif is_str(img_or_path):
         check_file_exist(img_or_path,
                          f'img file does not exist: {img_or_path}')
-        if backend == 'turbojpeg':
-            with open(img_or_path, 'rb') as in_file:
-                img = jpeg.decode(in_file.read(),
-                                  _jpegflag(flag, channel_order))
-                if img.shape[-1] == 1:
-                    img = img[:, :, 0]
-            return img
-        elif backend == 'pillow':
+        if backend == 'pillow':
             img = Image.open(img_or_path)
             img = _pillow2array(img, flag, channel_order)
             return img
@@ -202,12 +174,9 @@ def imfrombytes(content, flag='color', channel_order='bgr', backend=None):
         backend = imread_backend
     if backend not in supported_backends:
         raise ValueError(f'backend: {backend} is not supported. Supported '
-                         "backends are 'cv2', 'turbojpeg', 'pillow'")
-    if backend == 'turbojpeg':
-        img = jpeg.decode(content, _jpegflag(flag, channel_order))
-        if img.shape[-1] == 1:
-            img = img[:, :, 0]
-    elif backend == 'pillow':
+                         "backends are 'cv2', 'pillow'")
+
+    if backend == 'pillow':
         buff = io.BytesIO(content)
         img = Image.open(buff)
         img = _pillow2array(img, flag, channel_order)

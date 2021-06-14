@@ -10,3 +10,5 @@ pycocotools
 timm
 terminaltables
 tensorboard
+albumentations
+imagecorruptions

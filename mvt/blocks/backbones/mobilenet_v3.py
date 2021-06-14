@@ -7,7 +7,7 @@ from ..block_builder import BACKBONES
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import constant_init, kaiming_init
 from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.cores.layer_ops import SELayer
+from mvt.cores.layer_ops.se_layer import SELayer
 
 
 class InvertedResidualV3(nn.Module):

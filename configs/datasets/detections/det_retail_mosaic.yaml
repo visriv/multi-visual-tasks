@@ -4,7 +4,7 @@ DATA:
   TRAIN_TRANSFORMS:
     MosaicPipeline: {
       individual_pipeline: {
-        LoadImageFromFile: {backend: 'turbojpeg'},
+        LoadImageFromFile: {backend: 'pillow'},
         LoadAnnotations: {with_bbox: True},
         JointResize: {img_scale: [640, 640], keep_ratio: True}
       }, pad_val: 114}
@@ -16,8 +16,7 @@ DATA:
         format: 'pascal_voc',
         min_area: 4,
         min_visibility: 0.2,
-        label_fields: ['gt_labels'],
-        check_each_transform: False},
+        label_fields: ['gt_labels']},
       transforms: {
         PadIfNeeded: {
           min_height: 1920,
@@ -69,7 +68,7 @@ DATA:
         }
       }
   TRAIN_DATA:
-    TYPE: "Balanced" # "Normal" "Concat" "Repeat" "Balanced"
+    TYPE: "Concat" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 1
     DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json"]
     DATA_PREFIX: ["train/a_images/", "train/b_images/"]

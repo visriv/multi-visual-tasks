@@ -5,13 +5,17 @@ SCHEDULE:
     lr: 0.08
     momentum: 0.9
     weight_decay: 0.00004
+    PARAMWISE_CFG:
+      custom_keys: {
+        'backbone': { lr_mult: 0.1, decay_mult: 1 },
+      }
   OPTIMIZER_CONFIG:
     grad_clip: {
-      max_norm: 10,
+      max_norm: 35,
       norm_type: 2}
   LR_POLICY:
     policy: "CosineAnnealing"
-    min_lr_ratio: 0.001
+    min_lr_ratio: 0.0001
     warmup: "linear"
-    warmup_iters: 2000
+    warmup_iters: 1000
     warmup_ratio: 0.008

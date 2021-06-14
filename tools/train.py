@@ -215,6 +215,8 @@ def main():
     else:
         test_dataset = None
 
+    # print(model.state_dict().keys())
+
     train_processor(
         cfg,
         model,

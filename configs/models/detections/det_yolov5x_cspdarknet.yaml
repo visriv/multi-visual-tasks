@@ -14,6 +14,9 @@ MODEL:
     type: 'YOLOCSPHead'
     num_classes: 80
     in_channels: [320, 640, 1280]
+    loss_bbox: {
+      type: 'CIoULoss', 
+      loss_weight: 3.2}
   TEST_CFG:
     nms_pre: -1
     min_bbox_size: 0

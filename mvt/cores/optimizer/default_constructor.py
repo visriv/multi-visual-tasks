@@ -49,7 +49,7 @@ class DefaultOptimizerConstructor:
             ``dcn_offset_lr_mult``. If you wish to apply both of them to the
             offset layer in deformable convs, set ``dcn_offset_lr_mult``
             to the original ``dcn_offset_lr_mult`` * ``bias_lr_mult``.
-        2. If the option ``dcn_offset_lr_mult`` is used, the construtor will
+        2. If the option ``dcn_offset_lr_mult`` is used, the constructor will
             apply it to all the DCN layers in the model. So be carefull when
             the model contains multiple DCN layers in places other than
             backbone.
@@ -129,6 +129,7 @@ class DefaultOptimizerConstructor:
         """Add all parameters of module to the params list.
         The parameters of the given module will be added to the list of param
         groups, with specific rules defined by paramwise_cfg.
+    
         Args:
             params (list[dict]): A list of param groups, it will be modified
                 in place.
@@ -157,7 +158,7 @@ class DefaultOptimizerConstructor:
             isinstance(module, torch.nn.Conv2d)
             and module.in_channels == module.groups)
 
-        for name, param in module.named_parameters(recurse=False):
+        for name, param in module.named_parameters(recurse=True):
             param_group = {'params': [param]}
             if not param.requires_grad:
                 params.append(param_group)
@@ -205,15 +206,15 @@ class DefaultOptimizerConstructor:
                         param_group[
                             'weight_decay'] = self.base_wd * bias_decay_mult
             params.append(param_group)
-
-        is_dcn_module = False
-        for child_name, child_mod in module.named_children():
-            child_prefix = f'{prefix}.{child_name}' if prefix else child_name
-            self.add_params(
-                params,
-                child_mod,
-                prefix=child_prefix,
-                is_dcn_module=is_dcn_module)
+        
+        # is_dcn_module = False
+        # for child_name, child_mod in module.named_children():
+        #     child_prefix = f'{prefix}.{child_name}' if prefix else child_name
+        #     self.add_params(
+        #         params,
+        #         child_mod,
+        #         prefix=child_prefix,
+        #         is_dcn_module=is_dcn_module)
 
     def __call__(self, model):
         if hasattr(model, 'module'):
@@ -229,5 +230,13 @@ class DefaultOptimizerConstructor:
         params = []
         self.add_params(params, model)
         optimizer_cfg['params'] = params
+
+        # keys_list = list(model.state_dict().keys())
+        # num_keys = len(keys_list)
+        # for j in range(num_keys):
+        #     for i in range(j+1, num_keys):
+        #         if keys_list[i] == keys_list[j]:
+        #             print(keys_list[i])
+        # print('check model succeed')
 
         return build_module_from_dict(optimizer_cfg, OPTIMIZERS)
