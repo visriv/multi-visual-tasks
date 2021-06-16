@@ -284,7 +284,7 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
             # Get top-k prediction
             if not torch.onnx.is_in_onnx_export():
                 conf_thr = cfg.get('conf_thr', -1)
-                conf_inds = conf_pred.ge(conf_thr).nonzero().flatten()
+                conf_inds = conf_pred.ge(conf_thr).nonzero(as_tuple=False).flatten()
                 bbox_pred = bbox_pred[conf_inds, :]
                 cls_pred = cls_pred[conf_inds, :]
                 conf_pred = conf_pred[conf_inds]

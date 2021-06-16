@@ -123,7 +123,7 @@ class DetRetailOneDataset(DetBaseDataset):
                  metric='mAP',
                  logger=None,
                  proposal_nums=(100, 300, 1000),
-                 iou_thr=0.5,
+                 iou_thr=0.75,
                  scale_ranges=None):
         """Evaluate in VOC protocol.
         
@@ -158,10 +158,7 @@ class DetRetailOneDataset(DetBaseDataset):
 
         if metric == 'mAP':
             assert isinstance(iou_thr, float)
-            if self.year == 2007:
-                ds_name = 'voc07'
-            else:
-                ds_name = self.CLASSES
+            ds_name = list(self.CLASSES)
             mean_ap, _ = eval_map(
                 results,
                 annotations,
