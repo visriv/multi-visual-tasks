@@ -15,7 +15,8 @@ dataset_aliases = {
     'animal_det': ['DetAnimalDataset'],
     'cdhead_det': ['CatDogHeadDataset'],
     'multi_objdet': ['MultiObjectDataset'],
-    'retail_det': ['DetRetailDataset']
+    'retail_det': ['DetRetailDataset'],
+    'retail_one_det': ['DetRetailOneDataset']
 }
 
 
@@ -248,6 +249,9 @@ def retail_det_classes():
         'daofandian4', 'yingyingquqi', 'lefuqiu'
     ]
 
+
+def retail_one_det_classes():
+    return ['retail']
 
 def voc_seg_classes():
     return [
