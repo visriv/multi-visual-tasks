@@ -334,8 +334,8 @@ class YOLOCSPHead(BaseDetHead, BBoxTestMixin):
             cls_pred = torch.cat([cls_pred, padding], dim=1)
 
             det_bboxes, det_labels = multiclass_nms(bbox_pred, cls_pred,
-                                                    cfg.score_thr, cfg.nms,
-                                                    cfg.max_per_img)
+                                                    cfg['score_thr'], cfg['nms'],
+                                                    cfg['max_per_img'])
             return det_bboxes, det_labels
         else:
             cls_pred = cls_pred * conf_pred[:, None]

@@ -12,7 +12,6 @@ from configs import cfg
 from mvt.utils.parallel_util import DataParallel
 from mvt.utils.checkpoint_util import load_checkpoint
 from mvt.datasets.data_builder import build_dataloader, build_dataset
-from mvt.utils.mask_util import encode_mask_results
 from mvt.models.model_builder import build_model
 from mvt.utils.config_util import get_task_cfg, get_dataset_global_args
 from mvt.utils.geometric_util import imresize
@@ -99,7 +98,7 @@ def save_json(img_names, det_results, json_path):
         images.append(img_info)
         for j in range(len(det_result)):
             anno_info = {
-                "image_id": 0,
+                "image_id": i,
                 "bbox": [
                     int(det_result[j, 0] + 0.5), 
                     int(det_result[j, 1] + 0.5), 
