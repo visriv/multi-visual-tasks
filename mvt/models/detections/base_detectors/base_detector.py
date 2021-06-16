@@ -357,6 +357,8 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             show=show,
             wait_time=wait_time,
             out_file=out_file)
+        
+        valid_bbox_indices = bboxes[:, 4] > 0.3
+        results = np.concatenate([bboxes, labels[..., np.newaxis]], axis=-1)
 
-        if not (show or out_file):
-            return img
+        return results[valid_bbox_indices]

@@ -4,7 +4,7 @@ MODEL:
     num_classes: 116
 DATA:
   BASE: "datasets/detections/det_retail_mosaic.yaml"
-  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
+  ROOT_PATH: "/home/qzm/Work/Data/RetailDet"
   TRAIN_TRANSFORMS:
     MosaicPipeline: {
       individual_pipeline: {

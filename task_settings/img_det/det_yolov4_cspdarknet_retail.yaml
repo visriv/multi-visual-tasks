@@ -5,7 +5,7 @@ MODEL:
     num_classes: 116
 DATA:
   BASE: "datasets/detections/det_retail_yolo.yaml"
-  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
+  ROOT_PATH: "/home/qzm/Work/Data/RetailDet"
   TRAIN_DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
@@ -21,9 +21,8 @@ SCHEDULE:
   OPTIMIZER:
     lr: 0.001
   LR_POLICY:
-    warmup_iters: 5000
-    warmup_ratio: 0.001
-    step: [66, 92]
+    policy: "CosineAnnealing"
+    min_lr_ratio: 0.2
 RUNTIME:
   BASE: "runtimes/local_runtime.yaml"
   LOG_CONFIG:

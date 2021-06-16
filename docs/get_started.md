@@ -13,6 +13,7 @@
     - [Export Onnx Models](#export-onnx-models)
   - [Inference with Trained Models](#inference-with-trained-models)
     - [Evaluate a dataset](#evaluate-a-dataset)
+    - [Test a dataset](#test-a-dataset)
     - [Run demos](#run-demos)
     - [Test Onnx Models](#test-onnx-models)
   - [Tutorials](#tutorials)
@@ -131,6 +132,16 @@
     python3 ./tools/test.py task_settings/img_det/det_faster_rcnn_r50_fpn_coco.yaml  meta/train_infos/det_faster_rcnn_r50_fpn_coco/epoch_24.pth --eval 'mAP' --out 'meta/test_infos/det_faster_rcnn_r50_fpn_coco_eval.pkl' --show-dir 'meta/test_infos/det_faster_rcnn_r50_fpn_coco_eval'
     ```
 
+### Test a dataset
+
+  We also provide scripts to test with a dataloader.
+
+  Examples:
+
+    ```shell
+    python3 tools/model_evaluation/eval_with_json_labels.py task_settings/img_det/det_yolov4_cspdarknet_retail.yaml meta/train_infos/det_yolov4_cspdarknet_retail/epoch_100.pth --out-dir meta/test_infos/det_yolov4_cspdarknet_retail --json-path meta_test_infos/a_predictions.json
+    ```
+
 ### Run demos
 
   We also provide scripts to run demos.
@@ -138,8 +149,7 @@
   Examples:
 
     ```shell
-    python3 demos/det_infer_demo.py
-    python3 demos/det_show_results.py  
+    python3 demos/det_infer_demo.py 
     ```
 
 ### Test Onnx Models

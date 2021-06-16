@@ -15,14 +15,14 @@ if __name__ == '__main__':
     """Test demo for detection models"""
 
     print('Infer the detection results from an image.')
-    image_file_name = 'a0519qvbyom_001.jpg'
+    image_file_name = '9.jpg'
     image_dir = 'meta/test_data'
     image_path = os.path.join(image_dir, image_file_name)
     save_dir = 'meta/test_res'
     save_path = os.path.join(save_dir, image_file_name) # None for no saving
 
-    task_config_path = 'task_settings/img_det/det_faster_rcnn_r50_fpn_coco.yaml'
-    checkpoint_path = 'meta/train_infos/det_faster_rcnn_r50_fpn_coco/epoch_100.pth'
+    task_config_path = 'task_settings/img_det/det_yolov4_cspdarknet_retail.yaml'
+    checkpoint_path = 'meta/train_infos/det_yolov4_cspdarknet_retail/epoch_100.pth'
         
     with_show = True
     show_score_thr = 0.3
