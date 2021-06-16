@@ -55,8 +55,8 @@ DATA:
   TEST_DATA:
     TYPE: "Concat"
     FLAG: 1
-    DATA_INFO: ["test/b_annotations.json"] 
-    DATA_PREFIX: ["test/b_images"] 
+    DATA_INFO: ["train/b_annotations.json"] 
+    DATA_PREFIX: ["train/b_images/"] 
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4

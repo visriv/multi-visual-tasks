@@ -3,6 +3,15 @@ MODEL:
   PRETRAINED_MODEL_PATH: ""
   BBOX_HEAD:
     num_classes: 1
+  TEST_CFG:
+    nms_pre: 1000
+    min_bbox_size: 0
+    score_thr: 0.05
+    conf_thr: 0.005
+    nms: {
+      type: 'common_nms', 
+      iou_threshold: 0.75 }
+    max_per_img: 100
 DATA:
   BASE: "datasets/detections/det_retail_one_yolo.yaml"
   ROOT_PATH: "data/"

@@ -219,6 +219,10 @@ def eval_recalls(gts,
 
     all_ious = []
     for i in range(img_num):
+        # TODO: is this a bug?
+        if isinstance(proposals[i], list):
+            proposals[i] = proposals[i][0]
+
         if proposals[i].ndim == 2 and proposals[i].shape[1] == 5:
             scores = proposals[i][:, 4]
             sort_idx = np.argsort(scores)[::-1]
@@ -231,7 +235,7 @@ def eval_recalls(gts,
         else:
             ious = bbox_overlaps_np(gts[i], img_proposal[:prop_num, :4])
         all_ious.append(ious)
-    all_ious = np.array(all_ious)
+    all_ious = np.array(all_ious, dtype=object)
     recalls = cal_recalls(all_ious, proposal_nums, iou_thrs)
 
     print_recall_summary(recalls, proposal_nums, iou_thrs, logger=logger)
