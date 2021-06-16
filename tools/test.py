@@ -2,7 +2,7 @@
 # @Time    : 2020/12/1 21:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : test.py
+
 import argparse
 import os
 import torch
@@ -108,11 +108,11 @@ def main():
 
     # build the dataloader
     dataset_args = get_dataset_global_args(cfg.DATA)
-    dataset = build_dataset(cfg.DATA.TEST_DATA, cfg.DATA.TEST_TRANSFORMS, dataset_args)
+    dataset = build_dataset(cfg.DATA.VAL_DATA, cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader = build_dataloader(
         dataset,
-        samples_per_device=cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
+        samples_per_device=cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
+        workers_per_device=cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
         dist=distributed,
         shuffle=False)
 

@@ -4,6 +4,7 @@
 # @Email   : zhimingqian@tencent.com
 
 from .detections import *
+from .embeddings import *
 from .transforms import *
 from .data_sampler import (DistributedSampler, GroupSampler, 
                            DistributedGroupSampler)
@@ -14,9 +15,10 @@ from .data_wrapper import (DATASETS, PIPELINES, ConcatDataset,
 
 __all__ = [
     'DetBaseDataset', 'VOCDataset', 'CocoDataset', 'DetRetailDataset', 'DetRetailOneDataset',
+    'EmbRetailDataset',
 
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor',
-    'Transpose', 'Collect', 'ClsCollect', 'RegCollect', 'PosCollect', 
+    'Transpose', 'Collect', 'EmbCollect', 
     'DefaultFormatBundle', 'LoadAnnotations',
     'LoadImageFromFile', 'LoadImageFromWebcam',
     'LoadMultiChannelImageFromFiles', 'LoadProposals', 'MultiScaleFlipAug',

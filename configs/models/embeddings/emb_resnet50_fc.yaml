@@ -1,0 +1,22 @@
+MODEL:
+  TYPE: "emb"
+  NAME: "ImgClsEmbedder"
+  PRETRAINED_MODEL_PATH: "meta/models/resnet50-19c8e357.pth"
+  BACKBONE:
+    type: "ResNet"
+    depth: 50
+    num_stages: 4
+    out_indices: [3]
+    frozen_stages: 1
+    norm_cfg: {
+      type: 'BN', 
+      requires_grad: True}
+    norm_eval: True
+  NECK:
+    type: "GlobalAveragePooling"
+  EMB_HEAD:
+    type: "LinearEmbHead"
+    in_channels: 2048
+    out_channels: 256
+    loss:
+      type: 'TripletMarginLoss'

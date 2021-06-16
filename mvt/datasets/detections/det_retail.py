@@ -1,4 +1,3 @@
-import os.path as osp
 import numpy as np
 
 from mvt.utils.io_util import file_load

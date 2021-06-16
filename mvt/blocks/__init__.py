@@ -26,5 +26,6 @@ __all__ = [
 
     'CrossEntropyLoss', 'AssociativeEmbeddingLoss', 'FocalLoss', 'GHMC', 'GHMR', 
     'IoULoss', 'BoundedIoULoss', 'GIoULoss', 'DIoULoss', 'CIoULoss', 
-    'MSELoss', 'L1Loss', 'SmoothL1Loss', 'BalancedL1Loss', 'SoftFocalLoss', 
+    'MSELoss', 'L1Loss', 'SmoothL1Loss', 'BalancedL1Loss', 'SoftFocalLoss',
+    'TripletMarginLoss' 
 ]

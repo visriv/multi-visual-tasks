@@ -212,6 +212,8 @@ def single_device_test(model,
 
     if model_type == 'det':
         return single_device_det_test(model, data_loader, show, out_dir, show_score_thr)
+    elif model_type == 'emb':
+        return None
     else:
         return None
 
@@ -223,5 +225,7 @@ def multi_device_test(model,
                       gpu_collect=False):
     if model_type == 'det':
         return multi_device_det_test(model, data_loader, tmpdir, gpu_collect)
+    elif model_type == 'emb':
+        return None
     else:
         return None

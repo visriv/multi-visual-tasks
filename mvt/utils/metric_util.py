@@ -1,6 +1,5 @@
 import torch.nn as nn
 import torch
-import sys
 import numpy as np
 
 from .bbox_util import bbox_overlaps_np
@@ -106,6 +105,7 @@ def accuracy(pred, target, topk=1, thresh=None):
             function will return a tuple containing accuracies of
             each ``topk`` number.
     """
+
     if isinstance(topk, list):
         topk = tuple(topk)
     assert isinstance(topk, (int, tuple))
@@ -122,7 +122,7 @@ def accuracy(pred, target, topk=1, thresh=None):
 
     maxk = max(topk)
     if pred.size(0) == 0:
-        accu = [pred.new_tensor(0.) for i in range(len(topk))]
+        accu = [pred.new_tensor(0.) for _ in range(len(topk))]
         return accu[0] if return_single else accu
     assert pred.ndim == target.ndim + 1
     assert pred.size(0) == target.size(0)

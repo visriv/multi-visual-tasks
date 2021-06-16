@@ -176,7 +176,7 @@ class DefaultFormatBundle():
         # gt_label is for classfication
         for key in [
                 'proposals', 'gt_bboxes', 'gt_bboxes_ignore', 
-                'gt_labels', 'gt_label', 
+                'gt_labels', 'gt_label', 'label'
             ]: 
             if key not in results:
                 continue
@@ -296,7 +296,7 @@ class Collect():
 
 
 @PIPELINES.register_module()
-class ClsCollect():
+class EmbCollect():
     """Collect data from the loader relevant to the specific task.
     This is usually the last stage of the data loader pipeline. Typically keys
     is set to some subset of "img" and "gt_label".
@@ -328,110 +328,6 @@ class ClsCollect():
 
         return self.__class__.__name__ + \
             f'(keys={self.keys})'
-
-
-@PIPELINES.register_module()
-class RegCollect():
-    """Collect data from the loader relevant to the specific task.
-    This is usually the last stage of the data loader pipeline. Typically keys
-    is set to some subset of "img" and "gt_label".
-    """
-
-    def __init__(self, 
-                 keys,
-                 unstacked_keys=[],
-                 meta_keys=['filename']):
-
-        self.keys = keys
-        self.unstacked_keys = unstacked_keys
-        self.meta_keys = meta_keys
-
-    def __call__(self, results):
-
-        data = {}
-        data_meta = {}
-        for key in self.keys:
-            data[key] = DataContainer(to_tensor(results[key]), stack=True, pad_dims=None)
-        for key in self.unstacked_keys:
-            data[key] = DataContainer(to_tensor(results[key]))
-        for key, value in results.items():
-            if key in self.meta_keys:
-                data_meta[key] = value
-        data['data_metas'] = DataContainer(data_meta, cpu_only=True)
-        return data
-
-    def __repr__(self):
-
-        return self.__class__.__name__ + \
-            f'(keys={self.keys})'
-
-
-@PIPELINES.register_module()
-class PosCollect():
-    """Collect data from the loader relevant to the specific task.
-
-    This keeps the items in `keys` as it is, and collect items in `meta_keys`
-    into a meta item called `meta_name`.This is usually the last stage of the
-    data loader pipeline.
-    For example, when keys='imgs', meta_keys=('filename', 'label',
-    'original_shape'), meta_name='img_metas', the results will be a dict with
-    keys 'imgs' and 'img_metas', where 'img_metas' is a DataContainer of
-    another dict with keys 'filename', 'label', 'original_shape'.
-
-    Args:
-        keys (Sequence[str|tuple]): Required keys to be collected. If a tuple
-          (key, key_new) is given as an element, the item retrived by key will
-          be renamed as key_new in collected data.
-        meta_name (str): The name of the key that contains meta infomation.
-          This key is always populated. Default: "img_metas".
-        meta_keys (Sequence[str|tuple]): Keys that are collected under
-          meta_name. The contents of the `meta_name` dictionary depends
-          on `meta_keys`.
-    """
-
-    def __init__(self, keys, meta_keys, meta_name='img_metas'):
-        self.keys = keys
-        self.meta_keys = meta_keys
-        self.meta_name = meta_name
-
-    def __call__(self, results):
-        """Performs the Collect formating.
-
-        Args:
-            results (dict): The resulting dict to be modified and passed
-              to the next transform in pipeline.
-        """
-        if 'ann_info' in results:
-            results.update(results['ann_info'])
-
-        data = {}
-        for key in self.keys:
-            if isinstance(key, tuple):
-                assert len(key) == 2
-                key_src, key_tgt = key[:2]
-            else:
-                key_src = key_tgt = key
-            data[key_tgt] = results[key_src]
-
-        meta = {}
-        if len(self.meta_keys) != 0:
-            for key in self.meta_keys:
-                if isinstance(key, tuple):
-                    assert len(key) == 2
-                    key_src, key_tgt = key[:2]
-                else:
-                    key_src = key_tgt = key
-                meta[key_tgt] = results[key_src]
-        if 'bbox_id' in results:
-            meta['bbox_id'] = results['bbox_id']
-        data[self.meta_name] = DataContainer(meta, cpu_only=True)
-
-        return data
-
-    def __repr__(self):
-        """Compute the string representation."""
-        return (f'{self.__class__.__name__}('
-                f'keys={self.keys}, meta_keys={self.meta_keys})')
 
 
 @PIPELINES.register_module()

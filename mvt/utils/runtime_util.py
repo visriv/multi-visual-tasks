@@ -2,7 +2,6 @@
 # @Time    : 2020/12/02 17:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : runtime_util.py
 
 import time
 import random

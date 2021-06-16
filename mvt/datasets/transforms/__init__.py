@@ -2,8 +2,8 @@ from .auto_augment import (AutoAugment, BrightnessTransform, ColorTransform,
                            ContrastTransform, EqualizeTransform, Rotate, Shear,
                            Translate)
 from .compose import Compose
-from .formating import (Collect, ClsCollect, DefaultFormatBundle, ImageToTensor,
-                        ToTensor, Transpose, to_tensor, RegCollect, PosCollect)
+from .formating import (Collect, EmbCollect, DefaultFormatBundle, ImageToTensor,
+                        ToTensor, Transpose, to_tensor)
 from .instaboost import InstaBoost
 from .loading import (LoadAnnotations, LoadImageFromFile, LoadImageFromWebcam,
                       LoadMultiChannelImageFromFiles, LoadProposals)
@@ -16,8 +16,8 @@ from .transforms import (Albu, CutOut, Expand, MinIoURandomCrop, Normalize,
 
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor',
-    'Transpose', 'Collect', 'ClsCollect', 'DefaultFormatBundle', 'LoadAnnotations',
-    'LoadImageFromFile', 'LoadImageFromWebcam', 'RegCollect', 'PosCollect',
+    'Transpose', 'Collect', 'EmbCollect', 'DefaultFormatBundle', 'LoadAnnotations',
+    'LoadImageFromFile', 'LoadImageFromWebcam',
     'LoadMultiChannelImageFromFiles', 'LoadProposals', 'MultiScaleFlipAug',
     'JointResize', 'JointRandomFlip', 'Pad', 'JointRandomCrop', 'Normalize', 'SegRescale',
     'MinIoURandomCrop', 'Expand', 'PhotoMetricDistortion', 'Albu',

@@ -8,6 +8,7 @@ from .ssd import SSDHead
 from .yolo import YOLOV3Head, TinyYOLOV4Head
 from .retina_sepconv_head import RetinaSepConvHead
 from .yolocsp import YOLOCSPHead
+from .linear_emb_head import LinearEmbHead
 
 
 
@@ -15,5 +16,5 @@ __all__ = [
     'AnchorFreeHead', 'AnchorHead', 
     'RPNHead', 'RetinaHead', 'SSDHead', 'FCOSHead', 
     'ATSSHead', 'YOLOV3Head', 'TinyYOLOV4Head', 
-    'RetinaSepConvHead', 'YOLOCSPHead'
+    'RetinaSepConvHead', 'YOLOCSPHead', 'LinearEmbHead'
 ]

@@ -2,7 +2,6 @@
 # @Time    : 2020/12/02 22:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : block_builder.py
 
 from mvt.utils.reg_util import Registry, build_model_from_cfg
 
@@ -12,10 +11,7 @@ from mvt.utils.reg_util import Registry, build_model_from_cfg
 # --------------------------------------------------------------------------- #
 CLASSIFIERS = Registry("classifier")
 DETECTORS = Registry("detector")
-SEGMENTORS = Registry("segmentor")
-REGRESSORS = Registry("regressor")
-POSERS = Registry("poser")
-MULTITASKERS = Registry("multitasker")
+EMBEDDERS = Registry("embedder")
 
 
 def build_model(cfg):
@@ -29,11 +25,7 @@ def build_model(cfg):
         return build_model_from_cfg(cfg, CLASSIFIERS)
     elif model_type == "det":
         return build_model_from_cfg(cfg, DETECTORS)
-    elif model_type == "seg":
-        return build_model_from_cfg(cfg, SEGMENTORS)
-    elif model_type == "reg":
-        return build_model_from_cfg(cfg, REGRESSORS)
-    elif model_type == "pos":
-        return build_model_from_cfg(cfg, POSERS)
+    elif model_type == "emb":
+        return build_model_from_cfg(cfg, EMBEDDERS)
     else:
         raise TypeError(f"No type for the task {model_type}")

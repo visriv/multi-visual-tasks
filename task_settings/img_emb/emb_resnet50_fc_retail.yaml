@@ -1,0 +1,10 @@
+MODEL:
+  BASE: "models/embeddings/emb_resnet50_fc.yaml"  
+DATA:
+  BASE: "datasets/embeddings/emb_retail.yaml"
+  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
+SCHEDULE:
+  BASE: "schedulers/schedule_efficient.yaml"
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"
+  

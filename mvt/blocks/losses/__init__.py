@@ -8,6 +8,7 @@ from .iou_loss import (BoundedIoULoss, CIoULoss, DIoULoss, GIoULoss, IoULoss,
 from .mse_loss import MSELoss, mse_loss, JointsMSELoss, CombinedTargetMSELoss, JointsOHKMMSELoss
 from .smooth_l1_loss import L1Loss, SmoothL1Loss, l1_loss, smooth_l1_loss
 from .balanced_l1_loss import BalancedL1Loss, balanced_l1_loss
+from .triplet_loss import TripletMarginLoss
 
 __all__ = [
     'CrossEntropyLoss', 'AssociativeEmbeddingLoss', 'FocalLoss', 'GHMC', 'GHMR', 
@@ -16,5 +17,6 @@ __all__ = [
     'binary_cross_entropy', 'cross_entropy', 'mask_cross_entropy', 
     'sigmoid_focal_loss', 'iou_loss', 'bounded_iou_loss', 'mse_loss', 
     'l1_loss', 'smooth_l1_loss', 'balanced_l1_loss', 
-    'MSELoss', 'JointsMSELoss', 'CombinedTargetMSELoss', 'JointsOHKMMSELoss'
+    'MSELoss', 'JointsMSELoss', 'CombinedTargetMSELoss', 'JointsOHKMMSELoss',
+    'TripletMarginLoss'
 ]
