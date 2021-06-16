@@ -1,0 +1,33 @@
+MODEL:
+  BASE: "models/detections/det_yolov4_cspdarknet.yaml"
+  PRETRAINED_MODEL_PATH: ""
+  BBOX_HEAD:
+    num_classes: 1
+DATA:
+  BASE: "datasets/detections/det_retail_one_yolo.yaml"
+  ROOT_PATH: "data/"
+  TRAIN_DATA:
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  VAL_DATA:
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  TEST_DATA:
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+SCHEDULE:
+  BASE: "schedulers/schedule_yolo.yaml"
+  TOTAL_EPOCHS: 100
+  OPTIMIZER:
+    lr: 0.001
+  LR_POLICY:
+    policy: "CosineAnnealing"
+    min_lr_ratio: 0.2
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"
+  LOG_CONFIG:
+    interval: 20
+    hooks: {
+      TextLoggerHook: {ignore_last: False},
+      TensorboardLoggerHook: {}
+    }

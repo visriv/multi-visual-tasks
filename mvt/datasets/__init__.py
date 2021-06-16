@@ -13,7 +13,7 @@ from .data_wrapper import (DATASETS, PIPELINES, ConcatDataset,
 
 
 __all__ = [
-    'DetBaseDataset', 'VOCDataset', 'CocoDataset', 'DetBaseDataset',
+    'DetBaseDataset', 'VOCDataset', 'CocoDataset', 'DetRetailDataset', 'DetRetailOneDataset',
 
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor',
     'Transpose', 'Collect', 'ClsCollect', 'RegCollect', 'PosCollect', 

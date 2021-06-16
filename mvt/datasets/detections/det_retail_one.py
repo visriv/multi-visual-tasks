@@ -8,14 +8,14 @@ from mvt.cores.eval.common_eval import eval_map, eval_recalls
 
 
 @DATASETS.register_module()
-class DetRetailDataset(DetBaseDataset):
+class DetRetailOneDataset(DetBaseDataset):
 
     CLASSES = ('retail')
     
     def __init__(self, data_cfg, pipeline_cfg, root_path, sel_index=0):
         """Same as base detection dataset"""
 
-        super(DetRetailDataset, self).__init__(
+        super(DetRetailOneDataset, self).__init__(
             data_cfg, pipeline_cfg, root_path, sel_index)
 
         self.cat2label = {cat: i for i, cat in enumerate(self.CLASSES)}
