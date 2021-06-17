@@ -16,16 +16,12 @@ imgs = gts['images']
 annotations = gts['annotations']
 categories = gts['categories']
 
-inds = list(range(len(imgs)))
-random.seed(1000)
-random.shuffle(inds)
 num_train = int(len(imgs) * 0.8)
 
 imgs_train = imgs[:num_train]
 imgs_val = imgs[num_train:]
 print('Number of training images = ', len(imgs_train))
 print('Number of validation images = ', len(imgs_val))
-
 
 save_dict = {}
 save_dict['annotations'] = annotations

@@ -24,40 +24,52 @@ class DetRetailOneDataset(DetBaseDataset):
 
         data_infos = []
         file_data = file_load(ann_file)
-        anno_num = 0
         anno_len = len(file_data['annotations'])
+        tmp = {}
         for img_info in file_data['images']:
+            img_id = img_info['id']
             data_info = {
-                'id': img_info['id'],
+                'id': img_id,
                 'filename': img_info['file_name'], 
                 'width': img_info['width'], 
-                'height': img_info['height']}
+                'height': img_info['height'],
+                'ann': {
+                    'bboxes': [],
+                    'labels': [],
+                    'bboxes_ignore': [],
+                    'labels_ignore': []
+                    } 
+                }
+            tmp[img_id] = data_info
 
-            bboxes = []
-            labels = []
-            bboxes_ignore = []
-            labels_ignore = []
-            for i in range(anno_num, anno_len):
-                if file_data['annotations'][i]['image_id'] == img_info['id']:
-                    label = 0
-                    ori_bbox = file_data['annotations'][i]['bbox']
-                    bbox = [
-                        ori_bbox[0],
-                        ori_bbox[1],
-                        ori_bbox[0] + ori_bbox[2],
-                        ori_bbox[1] + ori_bbox[3]
-                    ]
-                    iscrowd = file_data['annotations'][i]['iscrowd']
-                    area = file_data['annotations'][i]['area']
-                    if iscrowd or (area < 10):
-                        bboxes_ignore.append(bbox)
-                        labels_ignore.append(label)
-                    else:
-                        bboxes.append(bbox)
-                        labels.append(label)
-                else:
-                    anno_num = i
-                    break
+        for i in range(anno_len):
+            img_id = file_data['annotations'][i]['image_id']
+            if img_id not in tmp:
+                continue
+
+            label = 0
+            ori_bbox = file_data['annotations'][i]['bbox']
+            bbox = [
+                ori_bbox[0],
+                ori_bbox[1],
+                ori_bbox[0] + ori_bbox[2],
+                ori_bbox[1] + ori_bbox[3]
+            ]
+            iscrowd = file_data['annotations'][i]['iscrowd']
+            area = file_data['annotations'][i]['area']
+            if iscrowd or (area < 10):
+                tmp[img_id]['ann']['bboxes_ignore'].append(bbox)
+                tmp[img_id]['ann']['labels_ignore'].append(label)
+            else:
+                tmp[img_id]['ann']['bboxes'].append(bbox)
+                tmp[img_id]['ann']['labels'].append(label)
+           
+        for img_id in tmp:
+            bboxes = tmp[img_id]['ann']['bboxes']
+            labels = tmp[img_id]['ann']['labels']
+            bboxes_ignore = tmp[img_id]['ann']['bboxes_ignore']
+            labels_ignore = tmp[img_id]['ann']['labels_ignore']
+            
             if not bboxes:
                 bboxes = np.zeros((0, 4))
                 labels = np.zeros((0, ))
@@ -70,13 +82,13 @@ class DetRetailOneDataset(DetBaseDataset):
             else:
                 bboxes_ignore = np.array(bboxes_ignore, ndmin=2)
                 labels_ignore = np.array(labels_ignore)
-            data_info['ann'] = dict(
-                bboxes=bboxes.astype(np.float32),
-                labels=labels.astype(np.int64),
-                bboxes_ignore=bboxes_ignore.astype(np.float32),
-                labels_ignore=labels_ignore.astype(np.int64))
 
-            data_infos.append(data_info)
+            tmp[img_id]['ann']['bboxes'] = bboxes
+            tmp[img_id]['ann']['labels'] = labels
+            tmp[img_id]['ann']['bboxes_ignore'] = bboxes_ignore
+            tmp[img_id]['ann']['labels_ignore'] = labels_ignore
+
+            data_infos.append(tmp[img_id])
         
         return data_infos
 
