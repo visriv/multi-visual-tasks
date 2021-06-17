@@ -3,21 +3,27 @@ MODEL:
 DATA:
   BASE: "datasets/embeddings/emb_retail.yaml"
   ROOT_PATH: "data/"
+  TRAIN_TRANSFORMS:
+    ImgResize: {size: 128}
+  TEST_TRANSFORMS:
+    ImgResize: {size: 128}
   TRAIN_DATA:
     DATA_INFO: ["train/a_train_annotations.json", "train/b_annotations.json"]
     DATA_PREFIX: ["train/a_images/", "train/b_images/"]
-    SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    SAMPLES_PER_DEVICE: 8
+    WORKERS_PER_DEVICE: 8
   VAL_DATA:
-    DATA_INFO: ["train/a_val_annotations.json"]
-    DATA_PREFIX: ["train/a_images/"]
-    SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    #DATA_INFO: ["train/a_val_annotations.json", "train/b_annotations.json"]
+    #DATA_PREFIX: ["train/a_images/", "train/b_images/"]
+    DATA_INFO: ["train/b_annotations.json"]
+    DATA_PREFIX: ["train/b_images/"]
+    SAMPLES_PER_DEVICE: 8
+    WORKERS_PER_DEVICE: 0
   TEST_DATA:
-    DATA_INFO: ["train/a_val_annotations.json"] 
-    DATA_PREFIX: ["train/a_images/"] 
-    SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    DATA_INFO: ["train/a_val_annotations.json", "train/b_annotations.json"]
+    DATA_PREFIX: ["train/a_images/", "train/b_images/"]
+    SAMPLES_PER_DEVICE: 8
+    WORKERS_PER_DEVICE: 8
 SCHEDULE:
   BASE: "schedulers/schedule_efficient.yaml"
 RUNTIME:

@@ -143,6 +143,15 @@
     python3 tools/model_evaluation/eval_with_json_labels.py task_settings/img_det/det_yolov4_cspdarknet_retail.yaml meta/train_infos/det_yolov4_cspdarknet_retail/epoch_100.pth --out-dir meta/test_infos/det_yolov4_cspdarknet_retail --json-path meta_test_infos/a_predictions.json
     ```
 
+### Test embedding
+    
+    Save reference embeddings and labels before evaluation:
+    
+    Examples:
+    ```shell
+    python3 tools/model_evaluation/save_embeddings.py task_settings/img_emb/emb_resnet50_fc_retail_xu.yaml meta/train_infos/emb_resnet50_fc_retail_xu/epoch_6.pth --save-path meta/reference_embedding.pkl
+    ```
+
 ### Run demos
 
   We also provide scripts to run demos.

@@ -36,7 +36,6 @@ def single_device_det_test(model,
             data['img_metas'][i] = data['img_metas'][i].data[0]
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
-
         batch_size = len(result)
         if show or out_dir:
             if batch_size == 1 and isinstance(data['img'][0], torch.Tensor):
@@ -79,6 +78,25 @@ def single_device_det_test(model,
             prog_bar.update()
     return results
 
+def single_device_emb_test(model, data_loader):
+    model.eval()
+    results = []
+    dataset = data_loader.dataset
+    prog_bar = ProgressBar(len(dataset))
+    for _, data in enumerate(data_loader):
+        data['img_metas'] = data['img_metas'].data[0]
+        data['img'] = data['img'].data[0]
+        data['label'] = data['label'].data[0]
+
+        with torch.no_grad():
+            result = model(return_loss=False, rescale=True, **data)
+        
+        batch_size = len(result)
+        results.extend(result)
+
+        for _ in range(batch_size):
+            prog_bar.update()
+    return results
 
 def multi_device_det_test(model, data_loader, tmpdir=None, gpu_collect=False):
     """Test model with multiple gpus.
@@ -213,7 +231,7 @@ def single_device_test(model,
     if model_type == 'det':
         return single_device_det_test(model, data_loader, show, out_dir, show_score_thr)
     elif model_type == 'emb':
-        return None
+        return single_device_emb_test(model, data_loader)
     else:
         return None
 

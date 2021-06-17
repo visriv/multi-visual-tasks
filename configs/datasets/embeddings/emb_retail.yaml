@@ -36,7 +36,7 @@ DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
   VAL_DATA:
-    TYPE: "Normal"
+    TYPE: "Concat"
     FLAG: 1
     DATA_INFO: ["train/a_annotations.json"]
     DATA_PREFIX: ["train/a_images/"]
