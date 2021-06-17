@@ -23,7 +23,7 @@ class MlpEmbHead(BaseEmbHead):
                  loss=dict(type='TripletMarginLoss')):
         super(MlpEmbHead, self).__init__()
         self.in_channels = in_channels
-	self.mid_channels = in_channels // 2
+        self.mid_channels = in_channels // 2
         self.out_channels = out_channels
         self.loss = build_loss(loss)
         self.miner = MultiSimilarityMiner()
@@ -32,7 +32,7 @@ class MlpEmbHead(BaseEmbHead):
 
     def _init_layers(self):
         self.fc1 = nn.Linear(self.in_channels, self.mid_channels)
-	self.act = nn.GELU()
+        self.act = nn.GELU()
         self.fc2 = nn.Linear(self.mid_channels, self.out_channels)
 
     def init_weights(self):
@@ -40,7 +40,7 @@ class MlpEmbHead(BaseEmbHead):
     
     def forward(self, x):
         x = x[0].view(x[0].size(0), -1)
-	x = self.fc2(self.act(self.fc1(x)))
+        x = self.fc2(self.act(self.fc1(x)))
         return x
 
     def forward_train(self, feats, labels):

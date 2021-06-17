@@ -79,6 +79,6 @@ MODEL:
     score_thr: 0.05
     nms: {
       type: 'common_nms',
-      iou_thr: 0.5}
+      iou_threshold: 0.5}
     max_per_img: 100
 

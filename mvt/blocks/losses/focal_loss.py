@@ -194,7 +194,7 @@ class SoftFocalLoss(nn.Module):
                 else:
                     assert weight.numel() == loss_cls.numel()
                     weight = weight.view(loss_cls.size(0), -1)
-            assert weight.ndim == loss_cls.ndim            
+            assert weight.ndim == loss_cls.ndim
             loss_cls = loss_cls * weight
 
         if reduction == 'mean' and avg_factor is not None:

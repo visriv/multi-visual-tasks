@@ -48,17 +48,17 @@ MODEL:
       momentum: 0.01, 
       eps: 0.001, 
       requires_grad: True}
-    loss_cls: {
-      type: 'SoftFocalLoss',
-      gamma: 1.5,
-      alpha: 0.25,
-      loss_weight: 1.0} # for cpu training 
     # loss_cls: {
-    #   type: 'FocalLoss',
-    #   use_sigmoid: True,
+    #   type: 'SoftFocalLoss',
     #   gamma: 1.5,
     #   alpha: 0.25,
-    #   loss_weight: 1.0} # for gpu training
+    #   loss_weight: 1.0} # for cpu training 
+    loss_cls: {
+      type: 'FocalLoss',
+      use_sigmoid: True,
+      gamma: 1.5,
+      alpha: 0.25,
+      loss_weight: 1.0} # for gpu training
     loss_bbox: {
       type: 'SmoothL1Loss', 
       beta: 0.11, 
@@ -79,5 +79,5 @@ MODEL:
     score_thr: 0.05
     nms: {
       type: 'common_nms',
-      iou_thr: 0.5}
+      iou_threshold: 0.5}
     max_per_img: 300

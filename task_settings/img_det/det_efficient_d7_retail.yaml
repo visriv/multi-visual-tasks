@@ -47,7 +47,6 @@ DATA:
       flip: False,
       transforms: {
         JointResize: {keep_ratio: True},
-        RandomFlip: {},
         Pad: {size_divisor: 32},
         Normalize: {
           mean: [114, 114, 114],
