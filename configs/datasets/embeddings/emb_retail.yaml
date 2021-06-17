@@ -2,7 +2,7 @@ DATA:
   NAME: "EmbRetailDataset"
   ROOT_PATH: "datasets/DetRetailDataset"
   TRAIN_TRANSFORMS:
-    ImgResize: {size: 128}
+    ImgResize: {size: 224}
     PhotoMetricDistortion: {
       brightness_delta: 32,
       contrast_range: [0.5, 1.5],

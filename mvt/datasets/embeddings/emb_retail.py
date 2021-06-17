@@ -103,14 +103,15 @@ class EmbRetailDataset(EmbBaseDataset):
         crop_bbox = [
             max(rot_bbox[0] + x_random_offset - width_half_diff, 0),
             max(rot_bbox[1] + y_random_offset - height_half_diff, 0),
-            min(rot_bbox[2] + x_random_offset + width_half_diff, self.data_infos[idx]['width'] - 1),
-            min(rot_bbox[3] + y_random_offset + height_half_diff, self.data_infos[idx]['height'] - 1)
+            min(rot_bbox[2] + x_random_offset + width_half_diff, rot_img.shape[1] - 1),
+            min(rot_bbox[3] + y_random_offset + height_half_diff, rot_img.shape[0] - 1)
         ]
 
         # crop with bbox	
         bbox_img = imcrop(rot_img, np.array(crop_bbox))
         # bbox_img = imcrop(rot_img, rot_bbox)
         # imshow(bbox_img[..., [2, 1, 0]])
+        # print(bbox_img.shape[0], bbox_img.shape[1])
 
         results = {
             'filename': self.data_infos[idx]['filename'],
