@@ -8,7 +8,7 @@ from mvt.cores.metric_ops.multi_similarity_miner import MultiSimilarityMiner
 
 
 @HEADS.register_module()
-class LinearEmbHead(BaseEmbHead):
+class MlpEmbHead(BaseEmbHead):
     """Linear regressor head.
 
     Args:
@@ -21,24 +21,27 @@ class LinearEmbHead(BaseEmbHead):
                  out_channels,
                  in_channels,
                  loss=dict(type='TripletMarginLoss')):
-        super(LinearEmbHead, self).__init__()
+        super(MlpEmbHead, self).__init__()
         self.in_channels = in_channels
+	self.mid_channels = in_channels // 2
         self.out_channels = out_channels
         self.loss = build_loss(loss)
         self.miner = MultiSimilarityMiner()
 
-
         self._init_layers()
 
     def _init_layers(self):
-        self.fc = nn.Linear(self.in_channels, self.out_channels)
+        self.fc1 = nn.Linear(self.in_channels, self.mid_channels)
+	self.act = nn.GELU()
+        self.fc2 = nn.Linear(self.mid_channels, self.out_channels)
 
     def init_weights(self):
         normal_init(self.fc, mean=0, std=0.01, bias=0)
     
     def forward(self, x):
         x = x[0].view(x[0].size(0), -1)
-        return self.fc(x)
+	x = self.fc2(self.act(self.fc1(x)))
+        return x
 
     def forward_train(self, feats, labels):
         embeddings = self(feats)

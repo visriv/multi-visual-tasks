@@ -1,0 +1,35 @@
+MODEL:
+  BASE: "models/embeddings/emb_resnet50_fc.yaml"  
+DATA:
+  BASE: "datasets/embeddings/emb_retail.yaml"
+  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
+  TRAIN_TRANSFORMS:
+    ImgResize: {size: 224}    
+  TEST_TRANSFORMS:
+    ImgResize: {size: 224}
+  TRAIN_DATA:
+    TYPE: "Repeat" # "Normal" "Concat" "Repeat" "Balanced"
+    FLAG: 3
+    DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json"]
+    DATA_PREFIX: ["train/a_images/", "train/b_images/"]
+    SAMPLES_PER_DEVICE: 32
+    WORKERS_PER_DEVICE: 8
+  VAL_DATA:
+    TYPE: "Normal"
+    DATA_INFO: ["train/a_annotations.json"]
+    DATA_PREFIX: ["train/a_images/"]
+    TEST_MODE: False
+    SAMPLES_PER_DEVICE: 32
+    WORKERS_PER_DEVICE: 8
+  TEST_DATA:
+    TYPE: "Concat"
+    DATA_INFO: ["test/a_annotations.json"]
+    DATA_PREFIX: ["test/a_images/"]
+    TEST_MODE: True
+    SAMPLES_PER_DEVICE: 32
+    WORKERS_PER_DEVICE: 8
+SCHEDULE:
+  BASE: "schedulers/schedule_efficient.yaml"
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"
+  

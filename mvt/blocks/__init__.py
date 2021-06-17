@@ -16,13 +16,12 @@ __all__ = [
 
     'AnchorFreeHead', 'AnchorHead', 'RPNHead', 'RetinaHead', 'SSDHead', 
     'FCOSHead', 'ATSSHead', 'YOLOV3Head', 'RetinaSepConvHead',
-    'BBoxTestMixin', 'YOLOCSPHead'
-    
-    'BaseRoIHead', 'CascadeRoIHead', 'MaskScoringRoIHead', 'StandardRoIHead', 
-    'DynamicRoIHead', 'GridRoIHead',  'BBoxHead', 'ConvFCBBoxHead', 
+    'BBoxTestMixin', 'YOLOCSPHead', 'BaseRoIHead', 'CascadeRoIHead', 'MaskScoringRoIHead', 
+    'StandardRoIHead', 'DynamicRoIHead', 'GridRoIHead',  'BBoxHead', 'ConvFCBBoxHead', 
     'Shared2FCBBoxHead',  'Shared4Conv1FCBBoxHead', 'DoubleConvFCBBoxHead', 
     'SingleRoIExtractor', 'GenericRoIExtractor', 'MaskTestMixin', 'GridHead',
     'MaskPointHead', 'FCNMaskHead','MaskIoUHead', 'FusedSemanticHead', 'CoarseMaskHead',
+    'LinearEmbHead', 'MlpEmbHead'
 
     'CrossEntropyLoss', 'AssociativeEmbeddingLoss', 'FocalLoss', 'GHMC', 'GHMR', 
     'IoULoss', 'BoundedIoULoss', 'GIoULoss', 'DIoULoss', 'CIoULoss', 

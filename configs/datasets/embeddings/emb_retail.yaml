@@ -2,7 +2,7 @@ DATA:
   NAME: "EmbRetailDataset"
   ROOT_PATH: "datasets/DetRetailDataset"
   TRAIN_TRANSFORMS:
-    ImgResize: {size: 224}
+    ImgResize: {size: 128}
     PhotoMetricDistortion: {
       brightness_delta: 32,
       contrast_range: [0.5, 1.5],
@@ -18,7 +18,7 @@ DATA:
       keys: ['img', 'label']
       }
   TEST_TRANSFORMS:
-    ImgResize: {size: 224}
+    ImgResize: {size: 128}
     Normalize: {
       mean: [125.307, 122.961, 113.8575], 
       std: [51.5865, 50.847, 51.255], 
