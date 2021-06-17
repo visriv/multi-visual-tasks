@@ -41,9 +41,10 @@ class EmbRetailDataset(EmbBaseDataset):
 
         data_infos = []
         file_data = file_load(self.ann_file)
-	
+        
+        img_idx_dict = {}
         for i, img_info in enumerate(file_data['images']):
-            assert img_info['id'] == i
+            img_idx_dict[img_info['id']] = i
 
         for i, bbox_anno in enumerate(file_data['annotations']):
             img_idx = bbox_anno['image_id']
@@ -51,13 +52,17 @@ class EmbRetailDataset(EmbBaseDataset):
             area = bbox_anno['area']
             if iscrowd or (area < 10):
                 continue
-
+            
+            if img_idx not in img_idx_dict:
+                continue
+            
+            idx = img_idx_dict[img_idx]
             data_infos.append(dict(
-                filename=file_data['images'][img_idx]['file_name'],
+                filename=file_data['images'][idx]['file_name'],
                 label=bbox_anno['category_id'],
-		        bbox=bbox_anno['bbox'],
-                width=file_data['images'][img_idx]['width'],
-                height=file_data['images'][img_idx]['height']))
+                bbox=bbox_anno['bbox'],
+                width=file_data['images'][idx]['width'],
+                height=file_data['images'][idx]['height']))
         
         return data_infos
 

@@ -1,0 +1,26 @@
+MODEL:
+  BASE: "models/embeddings/emb_resnet50_fc.yaml"  
+DATA:
+  BASE: "datasets/embeddings/emb_retail.yaml"
+  ROOT_PATH: "data/"
+  TRAIN_DATA:
+    DATA_INFO: ["train/a_train_annotations.json", "train/b_annotations.json"]
+    DATA_PREFIX: ["train/a_images/", "train/b_images/"]
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  VAL_DATA:
+    DATA_INFO: ["train/a_val_annotations.json"]
+    DATA_PREFIX: ["train/a_images/"]
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  TEST_DATA:
+    DATA_INFO: ["train/a_val_annotations.json"] 
+    DATA_PREFIX: ["train/a_images/"] 
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+SCHEDULE:
+  BASE: "schedulers/schedule_efficient.yaml"
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"
+  CHECKPOINT_CONFIG:
+    interval: 2
