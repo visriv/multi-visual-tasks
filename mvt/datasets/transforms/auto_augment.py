@@ -427,7 +427,7 @@ class Rotate(object):
         """
         for key in results.get('img_fields', ['img']):
             img = results[key].copy()
-            img_rotated = imrotate(
+            img_rotated, _ = imrotate(
                 img, angle, center, scale, border_value=self.img_fill_val)
             results[key] = img_rotated.astype(img.dtype)
 
@@ -487,7 +487,7 @@ class Rotate(object):
         """Rotate the segmentation map."""
         for key in results.get('seg_fields', []):
             seg = results[key].copy()
-            results[key] = imrotate(
+            results[key], _ = imrotate(
                 seg, angle, center, scale,
                 border_value=fill_val).astype(seg.dtype)
 

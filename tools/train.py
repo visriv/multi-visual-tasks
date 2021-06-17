@@ -2,15 +2,11 @@
 # @Tme    : 2020/12/01 16:00
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
-# @File    : train.py
 
 import argparse
-import logging
 import os
 import os.path as osp
 import time
-import torch
-import torch.distributed as dist
 import sys
 sys.path.append("..")
 

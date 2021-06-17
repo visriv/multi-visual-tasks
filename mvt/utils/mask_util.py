@@ -453,7 +453,7 @@ class BitmapMasks(BaseInstanceMasks):
         if len(self.masks) == 0:
             rotated_masks = np.empty((0, *out_shape), dtype=self.masks.dtype)
         else:
-            rotated_masks = imrotate(
+            rotated_masks, _ = imrotate(
                 self.masks.transpose((1, 2, 0)),
                 angle,
                 center=center,

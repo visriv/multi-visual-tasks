@@ -335,3 +335,29 @@ def gaussian_radius(det_size, min_overlap):
     sq3 = sqrt(b3**2 - 4 * a3 * c3)
     r3 = (b3 + sq3) / (2 * a3)
     return min(r1, r2, r3)
+
+
+def get_rotated_bbox(bbox, rot_matrix, w, h):
+    min_x, min_y, max_x, max_y = tuple(bbox[:4])
+    coordinates = np.array([[min_x, min_y], [max_x, min_y],
+                            [min_x, max_y], [max_x, max_y]])  # [4, 2]
+    # pad 1 to convert from format [x, y] to homogeneous
+    # coordinates format [x, y, 1]
+    coordinates = np.concatenate(
+        (coordinates, np.ones((4, 1), coordinates.dtype)),
+        axis=1)  # [4, 3]
+    rotated_coords = np.matmul(rot_matrix, coordinates[..., np.newaxis])  # [4, 2, 1]
+    rotated_coords = rotated_coords[..., 0]  # [4, 2]
+    min_x, min_y = np.min(
+        rotated_coords[:, 0], axis=0), np.min(
+            rotated_coords[:, 1], axis=0)
+    max_x, max_y = np.max(
+        rotated_coords[:, 0], axis=0), np.max(
+            rotated_coords[:, 1], axis=0)
+    min_x, min_y = np.clip(
+        min_x, a_min=0, a_max=w), np.clip(
+            min_y, a_min=0, a_max=h)
+    max_x, max_y = np.clip(
+        max_x, a_min=min_x, a_max=w), np.clip(
+            max_y, a_min=min_y, a_max=h)
+    return np.array([min_x, min_y, max_x, max_y])

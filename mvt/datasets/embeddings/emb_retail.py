@@ -5,7 +5,9 @@ import numpy as np
 from .emb_base import EmbBaseDataset
 from ..data_builder import DATASETS
 from mvt.utils.io_util import file_load
-from mvt.utils.geometric_util import imcrop
+from mvt.utils.geometric_util import imcrop, imrotate
+from mvt.utils.bbox_util import get_rotated_bbox
+from mvt.utils.vis_util import imshow
 
 
 @DATASETS.register_module()
@@ -76,23 +78,39 @@ class EmbRetailDataset(EmbBaseDataset):
         pil_img = Image.open(img_path).convert('RGB')
         img = np.array(pil_img).astype(np.uint8)
 
-        # original bbox
-        ori_bbox = np.array(self.data_infos[idx]['bbox'])
-        x_random_offset = 0.2 * (np.random.rand() - 0.5) * ori_bbox[2]
-        y_random_offset = 0.2 * (np.random.rand() - 0.5) * ori_bbox[3]
-        width_ratio = 1 - 0.2 * (np.random.rand() - 0.5)
-        height_ratio = 1 - 0.2 * (np.random.rand() - 0.5)
+        # rotate with random angle from [-pi/6, pi/6]
+        angle = (np.random.rand() - 0.5) * 60
+        rot_img, rot_matrix = imrotate(img, angle, border_value=114, auto_bound=True)
+        # print(img.shape[:2])
+        # imshow(rot_img[...,[2,1,0]])
 
+        # original bbox
+        ori_bbox = [
+            self.data_infos[idx]['bbox'][0],
+            self.data_infos[idx]['bbox'][1],
+            self.data_infos[idx]['bbox'][0] + self.data_infos[idx]['bbox'][2] - 1,
+            self.data_infos[idx]['bbox'][1] + self.data_infos[idx]['bbox'][3] - 1
+        ]
+        rot_bbox = get_rotated_bbox(
+            ori_bbox, rot_matrix, rot_img.shape[1], rot_img.shape[0])
+        rot_width = rot_bbox[2] - rot_bbox[0] + 1
+        rot_height = rot_bbox[3] - rot_bbox[1] + 1
+        x_random_offset = 0.2 * (np.random.rand() - 0.5) * rot_width
+        y_random_offset = 0.2 * (np.random.rand() - 0.5) * rot_height
+        width_half_diff = int(rot_width * 0.15 * np.random.rand() + 0.5)
+        height_half_diff = int(rot_height * 0.15 * np.random.rand() + 0.5)
 
         crop_bbox = [
-            min(ori_bbox[0] + x_random_offset, 0),
-            min(ori_bbox[1] + y_random_offset, 0),
-            max(ori_bbox[0] + int(ori_bbox[2] * width_ratio) - 1, self.data_infos[idx]['width'] - 1),
-            max(ori_bbox[1] + int(ori_bbox[2] * height_ratio) - 1, self.data_infos[idx]['height'] - 1)
+            max(rot_bbox[0] + x_random_offset - width_half_diff, 0),
+            max(rot_bbox[1] + y_random_offset - height_half_diff, 0),
+            min(rot_bbox[2] + x_random_offset + width_half_diff, self.data_infos[idx]['width'] - 1),
+            min(rot_bbox[3] + y_random_offset + height_half_diff, self.data_infos[idx]['height'] - 1)
         ]
 
         # crop with bbox	
-        bbox_img = imcrop(img, np.array(crop_bbox))
+        bbox_img = imcrop(rot_img, np.array(crop_bbox))
+        # bbox_img = imcrop(rot_img, rot_bbox)
+        # imshow(bbox_img[..., [2, 1, 0]])
 
         results = {
             'filename': self.data_infos[idx]['filename'],

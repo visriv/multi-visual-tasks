@@ -254,7 +254,8 @@ def imrotate(img,
         matrix, (w, h),
         flags=cv2_interp_codes[interpolation],
         borderValue=border_value)
-    return rotated
+
+    return rotated, matrix
 
 
 def bbox_clip(bboxes, img_shape):
