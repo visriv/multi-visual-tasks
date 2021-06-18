@@ -129,7 +129,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
 
         gt_labels = []
         for i in range(len(self)):
-            gt_labels.append(self.getitem_info(i)['gt_label'])
+            gt_labels.append(self.getitem_info(i)['label'])
 
         gt_labels = np.array(gt_labels)
         return gt_labels
@@ -143,7 +143,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         Returns:
             int: Image category of specified index.
         """
-        cat_ids = self.getitem_info(idx)['gt_label']
+        cat_ids = self.getitem_info(idx)['label']
         if isinstance(cat_ids, list):
             return np.array(cat_ids).astype(np.int)
         elif isinstance(cat_ids, np.ndarray):

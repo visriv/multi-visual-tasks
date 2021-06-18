@@ -36,7 +36,8 @@ class MlpLocEmbHead(BaseEmbHead):
         self.fc2 = nn.Linear(self.mid_channels, self.out_channels)
 
     def init_weights(self):
-        normal_init(self.fc, mean=0, std=0.01, bias=0)
+        normal_init(self.fc1, mean=0, std=0.01, bias=0)
+        normal_init(self.fc2, mean=0, std=0.01, bias=0)
     
     def forward(self, x, bboxes):
         x = x[0].view(x[0].size(0), -1)

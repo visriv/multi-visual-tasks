@@ -6,8 +6,8 @@ DATA:
   TRAIN_DATA:
     TYPE: "Repeat" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 3
-    DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json"]
-    DATA_PREFIX: ["train/a_images/", "train/b_images/"]
+    DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json", "test/b_annotations.json"]
+    DATA_PREFIX: ["train/a_images/", "train/b_images/", "test/b_images/"]
     SAMPLES_PER_DEVICE: 32
     WORKERS_PER_DEVICE: 8
   VAL_DATA:
