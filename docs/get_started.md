@@ -143,13 +143,18 @@
     python3 tools/model_evaluation/eval_with_json_labels.py task_settings/img_det/det_yolov4_cspdarknet_retail.yaml meta/train_infos/det_yolov4_cspdarknet_retail/epoch_100.pth --out-dir meta/test_infos/det_yolov4_cspdarknet_retail --json-path meta_test_infos/a_predictions.json
     ```
 
-### Test embedding
+### Evaluate embedding
     
     Save reference embeddings and labels before evaluation:
     
     Examples:
     ```shell
-    python3 tools/model_evaluation/save_embeddings.py task_settings/img_emb/emb_resnet50_fc_retail_xu.yaml meta/train_infos/emb_resnet50_fc_retail_xu/epoch_6.pth --save-path meta/reference_embedding.pkl
+    # set validation set by reference set in task config
+    python3 tools/model_evaluation/save_embeddings.py task_settings/img_emb/emb_resnet50_fc_retail.yaml meta/train_infos/emb_resnet50_fc_retail/epoch_500.pth --save-path meta/reference_embedding.pkl
+    # set validation set by query set in task config
+    python3 tools/model_evaluation/save_embeddings.py task_settings/img_emb/emb_resnet50_fc_retail.yaml meta/train_infos/emb_resnet50_fc_retail/epoch_500.pth --save-path meta/qury_embedding.pkl
+    # run evaluation
+    python3 tools/model_evaluation/eval_embeddings.py meta/reference_embedding.pkl meta/qury_embedding.pkl
     ```
 
 ### Run demos

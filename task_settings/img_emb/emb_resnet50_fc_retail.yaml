@@ -2,7 +2,8 @@ MODEL:
   BASE: "models/embeddings/emb_resnet50_fc.yaml"  
 DATA:
   BASE: "datasets/embeddings/emb_retail.yaml"
-  ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
+  #ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
+  ROOT_PATH: "data/"
   TRAIN_DATA:
     TYPE: "Repeat" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 3
@@ -14,9 +15,9 @@ DATA:
     TYPE: "Normal"
     DATA_INFO: ["train/a_annotations.json"]
     DATA_PREFIX: ["train/a_images/"]
-    TEST_MODE: False
-    SAMPLES_PER_DEVICE: 32
-    WORKERS_PER_DEVICE: 8
+    TEST_MODE: True
+    SAMPLES_PER_DEVICE: 8
+    WORKERS_PER_DEVICE: 0
   TEST_DATA:
     TYPE: "Concat"
     DATA_INFO: ["test/a_annotations.json"]
