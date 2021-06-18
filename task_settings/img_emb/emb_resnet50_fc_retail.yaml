@@ -2,8 +2,7 @@ MODEL:
   BASE: "models/embeddings/emb_resnet50_fc.yaml"  
 DATA:
   BASE: "datasets/embeddings/emb_retail.yaml"
-  #ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
-  ROOT_PATH: "data/"
+  ROOT_PATH: "data/RetailDet"
   TRAIN_DATA:
     TYPE: "Repeat" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 3

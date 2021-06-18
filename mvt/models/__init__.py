@@ -7,5 +7,5 @@ __all__ = [
     'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'ATSS', 'SSD',
     'CascadeRCNN', 'CornerNet', 'FastRCNN', 'FasterRCNN', 'FCOS', 'FOVEA', 
     'MaskRCNN', 'RetinaNet', 'SSD', 'YOLOV3', 'YOLOV4', 'YOLOV5',
-    'ImgClsEmbedder'
+    'ImgClsEmbedder', 'ImgClsLocEmbedder'
     ]

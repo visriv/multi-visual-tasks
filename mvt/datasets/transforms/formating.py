@@ -176,7 +176,7 @@ class DefaultFormatBundle():
         # gt_label is for classfication
         for key in [
                 'proposals', 'gt_bboxes', 'gt_bboxes_ignore', 
-                'gt_labels', 'gt_label', 'label'
+                'gt_labels', 'gt_label', 'label', 'bbox'
             ]: 
             if key not in results:
                 continue

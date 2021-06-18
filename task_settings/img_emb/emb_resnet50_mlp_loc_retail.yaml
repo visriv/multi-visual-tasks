@@ -1,17 +1,17 @@
 MODEL:
-  BASE: "models/embeddings/emb_resnet50_mlp_loc.yaml"  
+  BASE: "models/embeddings/emb_resnet50_fc.yaml"  
 DATA:
-  BASE: "datasets/embeddings/emb_retail.yaml"
+  BASE: "datasets/embeddings/emb_loc_retail.yaml"
   ROOT_PATH: "/Users/qianzhiming/Desktop/data/objdet-datasets/RetailDet"
   TRAIN_TRANSFORMS:
     ImgResize: {size: 224}    
   TEST_TRANSFORMS:
     ImgResize: {size: 224}
   TRAIN_DATA:
-    TYPE: "Balanced" # "Normal" "Concat" "Repeat" "Balanced"
+    TYPE: "Concat" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 1
-    DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json", "test/b_annotations"]
-    DATA_PREFIX: ["train/a_images/", "train/b_images/", "test/b_images"]
+    DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json"]
+    DATA_PREFIX: ["train/a_images/", "train/b_images/"]
     SAMPLES_PER_DEVICE: 32
     WORKERS_PER_DEVICE: 8
   VAL_DATA:

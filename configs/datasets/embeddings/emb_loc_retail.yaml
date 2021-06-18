@@ -1,5 +1,5 @@
 DATA:
-  NAME: "EmbRetailDataset"
+  NAME: "EmbLocRetailDataset"
   ROOT_PATH: "datasets/DetRetailDataset"
   TRAIN_TRANSFORMS:
     ImgResize: {size: 128}
@@ -15,7 +15,7 @@ DATA:
       }
     DefaultFormatBundle: {}
     EmbCollect: {
-      keys: ['img', 'label', 'bbox_id']
+      keys: ['img', 'label', 'bbox', 'bbox_id']
       }
   TEST_TRANSFORMS:
     ImgResize: {size: 128}
@@ -26,7 +26,7 @@ DATA:
       }
     DefaultFormatBundle: {}
     EmbCollect: {
-      keys: ['img', 'label', 'bbox_id']
+      keys: ['img', 'label', 'bbox', 'bbox_id']
       }
   TRAIN_DATA:
     TYPE: "Balanced" # "Normal" "Concat" "Repeat" "Balanced"

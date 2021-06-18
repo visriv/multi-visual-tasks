@@ -11,7 +11,7 @@ from mvt.utils.vis_util import imshow
 
 
 @DATASETS.register_module()
-class EmbRetailDataset(EmbBaseDataset):
+class EmbLocRetailDataset(EmbBaseDataset):
     """Clarity classification"""
 
     CLASSES = (
@@ -67,7 +67,6 @@ class EmbRetailDataset(EmbBaseDataset):
         
         return data_infos
 
-    
     def prepare_data(self, idx):
         """Prepare data and run pipelines"""
         
@@ -123,6 +122,11 @@ class EmbRetailDataset(EmbBaseDataset):
             'filename': self.data_infos[idx]['filename'],
             'bbox_id': self.data_infos[idx]['bbox_id'],
             'img': bbox_img.astype(np.float32),
+	    'bbox': [
+		float(crop_bbox[0])/rot_img.shape[1], 
+		float(crop_bbox[1])/rot_img.shape[0],
+		float(crop_bbox[2])/rot_img.shape[1], 
+		float(crop_bbox[3])/rot_img.shape[0]],
             'label': self.data_infos[idx]['label'],
             'height': bbox_img.shape[0],
             'width': bbox_img.shape[1]
