@@ -32,8 +32,8 @@ DATA:
     SAMPLES_PER_DEVICE: 2
     WORKERS_PER_DEVICE: 2
   TEST_DATA:
-    DATA_PREFIX: ["train/a_images/"] 
-    DATA_INFO: ["train/a_val_annotations.json"]
+    DATA_PREFIX: ["test/a_images/"] 
+    DATA_INFO: ["test/a_annotations.json"]
     SAMPLES_PER_DEVICE: 2
     WORKERS_PER_DEVICE: 2
 SCHEDULE:

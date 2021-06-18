@@ -13,14 +13,14 @@ DATA:
     WORKERS_PER_DEVICE: 8
   VAL_DATA:
     TYPE: "Normal"
-    DATA_INFO: ["train/a_annotations.json"]
-    DATA_PREFIX: ["train/a_images/"]
+    DATA_INFO: ["test/b_annotations.json"]
+    DATA_PREFIX: ["test/b_images/"]
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 8
     WORKERS_PER_DEVICE: 0
   TEST_DATA:
     TYPE: "Concat"
-    DATA_INFO: ["test/a_annotations.json"]
+    DATA_INFO: ["test/a_det_annotations.json"]
     DATA_PREFIX: ["test/a_images/"]
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 32

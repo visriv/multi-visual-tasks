@@ -157,6 +157,24 @@
     python3 tools/model_evaluation/eval_embeddings.py meta/reference_embedding.pkl meta/qury_embedding.pkl
     ```
 
+### Create retail submision file
+    Create detection json file:
+    ```shell
+    python3 tools/model_evaluation/eval_with_json_labels.py task_settings/img_det/det_yolov4_retail_one.yaml \
+        meta/train_infos/det_yolov4_retail_one/epoch_200.pth \
+        --json-path data/test/a_det_annotations.json \
+        --out-dir meta/test_a/
+    ```
+   
+    Get predicted labels and save final submition json file:
+    ```shell
+    python3 tools/model_evaluation/pred_embedding_with_json_label.py task_settings/img_emb/emb_resnet50_fc_retail.yaml \
+        meta/emb_resnet50_fc_retail/epoch_50.pth \
+        meta/reference_test_b_embedding.pkl \
+        --json-ori data/test/a_det_annotations.json \
+        --json-out submit/out.json
+    ```
+
 ### Run demos
 
   We also provide scripts to run demos.

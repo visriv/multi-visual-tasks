@@ -90,6 +90,7 @@ def save_json(img_names, det_results, json_path):
 
     images = []
     annotations = []
+    bbox_id = 0
     for i, det_result in enumerate(det_results):
 
         img_info = {
@@ -99,6 +100,7 @@ def save_json(img_names, det_results, json_path):
         for j in range(len(det_result)):
             anno_info = {
                 "image_id": i,
+                "id": bbox_id,
                 "bbox": [
                     int(det_result[j, 0] + 0.5), 
                     int(det_result[j, 1] + 0.5), 
@@ -108,6 +110,7 @@ def save_json(img_names, det_results, json_path):
                 "score": det_result[j, 4]
             }
             annotations.append(anno_info)
+            bbox_id += 1
     predictions = {"images":images, "annotations":annotations}
 
     with open(json_path, "w") as wf:

@@ -48,8 +48,8 @@ class EmbRetailDataset(EmbBaseDataset):
 
         for i, bbox_anno in enumerate(file_data['annotations']):
             img_idx = bbox_anno['image_id']
-            iscrowd = bbox_anno['iscrowd']
-            area = bbox_anno['area']
+            iscrowd = bbox_anno.get('iscrowd', False)
+            area = bbox_anno.get('area', 20) # default value > 10
             if iscrowd or (area < 10):
                 continue
             
@@ -61,8 +61,9 @@ class EmbRetailDataset(EmbBaseDataset):
                 filename=file_data['images'][idx]['file_name'],
                 label=bbox_anno['category_id'],
                 bbox=bbox_anno['bbox'],
-                width=file_data['images'][idx]['width'],
-                height=file_data['images'][idx]['height']))
+                bbox_id=bbox_anno['id'],
+                width=file_data['images'][idx].get('width', 960),
+                height=file_data['images'][idx].get('height', 720)))
         
         return data_infos
 
@@ -120,6 +121,7 @@ class EmbRetailDataset(EmbBaseDataset):
 
         results = {
             'filename': self.data_infos[idx]['filename'],
+            'bbox_id': self.data_infos[idx]['bbox_id'],
             'img': bbox_img.astype(np.float32),
             'label': self.data_infos[idx]['label'],
             'height': bbox_img.shape[0],
