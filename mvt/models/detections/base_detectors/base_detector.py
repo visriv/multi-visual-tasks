@@ -358,7 +358,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             wait_time=wait_time,
             out_file=out_file)
         
-        valid_bbox_indices = bboxes[:, 4] > 0.3
+        valid_bbox_indices = bboxes[:, 4] > score_thr
         results = np.concatenate([bboxes, labels[..., np.newaxis]], axis=-1)
 
         return results[valid_bbox_indices]

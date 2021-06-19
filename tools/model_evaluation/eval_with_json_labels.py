@@ -23,7 +23,7 @@ def single_device_det_test(model,
                            data_loader,
                            show=False,
                            out_dir=None,
-                           show_score_thr=0.3):
+                           show_score_thr=0.05):
     model.eval()
     results = []
     img_names = []
@@ -79,7 +79,7 @@ def single_device_test_vis(model,
                            model_type='det',
                            show=False,
                            out_dir=None,
-                           show_score_thr=0.3):
+                           show_score_thr=0.05):
     if model_type == 'det':
         return single_device_det_test(model, data_loader, show, out_dir, show_score_thr)
     else:
@@ -128,7 +128,7 @@ def parse_args():
     parser.add_argument(
         '--show-score-thr',
         type=float,
-        default=0.3,
+        default=0.05,
         help='score threshold (default: 0.3)')
     args = parser.parse_args()
 

@@ -73,7 +73,8 @@ def infer_labels(outputs, ref_file):
     qry_emb = torch.from_numpy(qry_emb).cuda()
 
     mat = dist_func(qry_emb, ref_emb)
-    mat_inds = torch.argsort(mat, dim=1).data.cpu().numpy()
+    mat = mat.data.cpu().numpy()
+    mat_inds = np.argsort(mat, axis=1)
 
     ref_labels = ref_labels.reshape((ref_labels.shape[0],))
     pred_labels = ref_labels[mat_inds]
@@ -167,11 +168,11 @@ def main():
     else:
         model.CLASSES = dataset.CLASSES
 
-    #model = DataParallel(model, device_ids=[0])
-    #outputs = single_device_test(model, data_loader)
+    model = DataParallel(model, device_ids=[0])
+    outputs = single_device_test(model, data_loader)
 
-    with open('/tmp/out.pkl', 'rb') as f:
-        outputs = pickle.load(f)
+    #with open('/tmp/out.pkl', 'rb') as f:
+    #    outputs = pickle.load(f)
 
     outputs = infer_labels(outputs, args.reference)
 
