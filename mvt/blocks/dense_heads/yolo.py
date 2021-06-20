@@ -503,7 +503,7 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
 
         target_map[sampling_result.pos_inds, :4] = self.bbox_coder.encode(
             sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes,
-            anchor_strides[sampling_result.pos_inds])
+            anchor_strides[sampling_result.pos_inds]).to(torch.float32)
 
         target_map[sampling_result.pos_inds, 4] = 1
 
