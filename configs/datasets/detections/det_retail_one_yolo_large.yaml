@@ -8,10 +8,16 @@ DATA:
     JointResize: {
       img_scale: [960, 720],
       keep_ratio: False}
+    Rotate: {
+      level: 5,
+      img_fill_val: 114,
+      prob: 0.5,
+      max_rotate_angle: 30}
     Normalize: {
       mean: [114, 114, 114],
       std: [255, 255, 255],
       to_rgb: True}
+    Pad: {size_divisor: 32, pad_val: 114}
     DefaultFormatBundle: {}
     Collect: {keys: ['img', 'gt_bboxes', 'gt_labels']}
   TEST_TRANSFORMS:
@@ -25,6 +31,7 @@ DATA:
           mean: [114, 114, 114],
           std: [255, 255, 255],
           to_rgb: True},
+        Pad: {size_divisor: 32, pad_val: 114},
         ImageToTensor: {keys: ['img']},
         Collect: {keys: ['img']}}}
   TRAIN_DATA:

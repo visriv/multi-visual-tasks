@@ -1,11 +1,10 @@
 MODEL:
-  BASE: "models/detections/det_yolov4x_cspdarknet.yaml"
+  BASE: "models/detections/det_yolov5x_cspdarknet.yaml"
   BACKBONE:
-    out_indices: [4, 5]
+    out_indices: [3, 4]
   NECK:
-    in_channels: [640, 640]
+    in_channels: [640, 1280]
     out_channels: [640, 1280]
-    csp_repetition: 3
   BBOX_HEAD:
     num_classes: 116
     in_channels: [640, 1280]
