@@ -159,6 +159,7 @@ def ciou_loss(pred, target, eps=1e-7):
     """
     
     # overlap
+    target = target.float()
     lt = torch.max(pred[:, :2], target[:, :2])
     rb = torch.min(pred[:, 2:], target[:, 2:])
     wh = (rb - lt).clamp(min=0)
