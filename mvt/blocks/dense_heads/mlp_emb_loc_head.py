@@ -53,3 +53,9 @@ class MlpLocEmbHead(BaseEmbHead):
         hard_pairs = self.miner(embeddings, cat_labels)
         losses = self.loss(embeddings, cat_labels, hard_pairs)
         return dict(loss_emb=losses)
+
+    def simple_test(self, feats, bboxes):
+        """Test without augmentation."""
+        x = self(feats, bboxes)        
+        x = x.detach().cpu().numpy()
+        return x

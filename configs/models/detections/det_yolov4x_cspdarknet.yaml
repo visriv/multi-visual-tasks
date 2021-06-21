@@ -41,5 +41,5 @@ MODEL:
     conf_thr: 0.005
     nms: {
       type: 'common_nms', 
-      iou_threshold: 0.65}
+      iou_threshold: 0.45}
     max_per_img: 300
