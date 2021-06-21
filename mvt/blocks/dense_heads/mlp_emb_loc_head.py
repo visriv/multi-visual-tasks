@@ -33,7 +33,7 @@ class MlpLocEmbHead(BaseEmbHead):
     def _init_layers(self):
         self.fc1 = nn.Linear(self.in_channels, self.mid_channels)
         self.act = nn.GELU()
-        self.fc2 = nn.Linear(self.mid_channels, self.out_channels)
+        self.fc2 = nn.Linear(self.mid_channels + 4, self.out_channels)
 
     def init_weights(self):
         normal_init(self.fc1, mean=0, std=0.01, bias=0)
@@ -42,7 +42,7 @@ class MlpLocEmbHead(BaseEmbHead):
     def forward(self, x, bboxes):
         x = x[0].view(x[0].size(0), -1)
         if isinstance(bboxes, list):
-            cat_bboxs = torch.cat(bboxes)
+            cat_bboxs = torch.stack(bboxes)
         x = self.fc2(torch.cat([self.act(self.fc1(x)), cat_bboxs], dim=-1))
         return x
 
