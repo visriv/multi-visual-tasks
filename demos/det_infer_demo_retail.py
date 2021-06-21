@@ -31,18 +31,20 @@ if __name__ == '__main__':
 
     index = int(sys.argv[1])
 
-    task_config_path = 'task_settings/img_det/det_yolov4_retail_one.yaml'
-    checkpoint_path = 'meta/train_infos/det_yolov4_retail_one/epoch_200.pth'
+    # task_config_path = 'task_settings/img_det/det_yolov4_retail_one.yaml'
+    # checkpoint_path = 'meta/train_infos/det_yolov4_retail_one/epoch_200.pth'
+    task_config_path = 'task_settings/img_det/det_yolov4x_cspdarknet_retail_one.yaml'
+    checkpoint_path = 'meta/train_infos/det_yolov4x_cspdarknet_retail_one/epoch_60.pth'
 
     with_show = True
-    show_score_thr = 0.05
+    show_score_thr = 0.01
 
     print(
         'Infer the detection results from image with index {}.'.format(index))
     assert index >= 0
 
-    image_dir = 'data/test/a_images/'
-    json_file = 'data/test/a_annotations.json'
+    image_dir = 'data/RetailDet/test/a_images/'
+    json_file = 'data/RetailDet/test/a_annotations.json'
 
     img_infos = load_image_infos(json_file)
     image_file_name = img_infos[index]['file_name']

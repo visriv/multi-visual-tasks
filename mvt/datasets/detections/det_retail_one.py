@@ -19,6 +19,27 @@ class DetRetailOneDataset(DetBaseDataset):
             data_cfg, pipeline_cfg, root_path, sel_index)
 
         self.cat2label = {cat: i for i, cat in enumerate(self.CLASSES)}
+        self.ORI_CLASSES = (
+            'asamu', 'baishikele', 'baokuangli', 'aoliao', 'bingqilinniunai', 'chapai', 
+            'fenda', 'guolicheng', 'haoliyou', 'heweidao', 'hongniu', 'hongniu2', 
+            'hongshaoniurou', 'kafei', 'kaomo_gali', 'kaomo_jiaoyan', 'kaomo_shaokao', 
+            'kaomo_xiangcon', 'kele', 'laotansuancai', 'liaomian', 'lingdukele', 'maidong', 
+            'mangguoxiaolao', 'moliqingcha', 'niunai', 'qinningshui', 'quchenshixiangcao', 
+            'rousongbing', 'suanlafen', 'tangdaren', 'wangzainiunai', 'weic', 'weitanai', 
+            'weitaningmeng', 'wulongcha', 'xuebi', 'xuebi2', 'yingyangkuaixian', 'yuanqishui', 
+            'xuebi-b', 'kebike', 'tangdaren3', 'chacui', 'heweidao2', 'youyanggudong', 
+            'baishikele-2', 'heweidao3', 'yibao', 'kele-b', 'AD', 'jianjiao', 'yezhi', 
+            'libaojian', 'nongfushanquan', 'weitanaiditang', 'ufo', 'zihaiguo', 'nfc', 
+            'yitengyuan', 'xianglaniurou', 'gudasao', 'buding', 'ufo2', 'damaicha', 'chapai2', 
+            'tangdaren2', 'suanlaniurou', 'bingtangxueli', 'weitaningmeng-bottle', 'liziyuan', 
+            'yousuanru', 'rancha-1', 'rancha-2', 'wanglaoji', 'weitanai2', 'qingdaowangzi-1', 
+            'qingdaowangzi-2', 'binghongcha', 'aerbeisi', 'lujikafei', 'kele-b-2', 'anmuxi', 
+            'xianguolao', 'haitai', 'youlemei', 'weiweidounai', 'jindian', '3jia2', 'meiniye', 
+            'rusuanjunqishui', 'taipingshuda', 'yida', 'haochidian', 'wuhounaicha', 'baicha', 
+            'lingdukele-b', 'jianlibao', 'lujiaoxiang', '3+2-2', 'luxiangniurou', 'dongpeng', 
+            'dongpeng-b', 'xianxiayuban', 'niudufen', 'zaocanmofang', 'wanglaoji-c', 'mengniu', 
+            'mengniuzaocan', 'guolicheng2', 'daofandian1', 'daofandian2', 'daofandian3', 
+            'daofandian4', 'yingyingquqi', 'lefuqiu')
 
     def load_annotations(self, ann_file):
 
@@ -36,6 +57,7 @@ class DetRetailOneDataset(DetBaseDataset):
                 'ann': {
                     'bboxes': [],
                     'labels': [],
+                    'ori_labels': [],
                     'bboxes_ignore': [],
                     'labels_ignore': []
                     } 
@@ -48,6 +70,7 @@ class DetRetailOneDataset(DetBaseDataset):
                 continue
 
             label = 0
+            ori_label = file_data['annotations'][i]['category_id']
             ori_bbox = file_data['annotations'][i]['bbox']
             bbox = [
                 ori_bbox[0],
@@ -63,19 +86,23 @@ class DetRetailOneDataset(DetBaseDataset):
             else:
                 tmp[img_id]['ann']['bboxes'].append(bbox)
                 tmp[img_id]['ann']['labels'].append(label)
+                tmp[img_id]['ann']['ori_labels'].append(ori_label)
            
         for img_id in tmp:
             bboxes = tmp[img_id]['ann']['bboxes']
             labels = tmp[img_id]['ann']['labels']
+            ori_labels = tmp[img_id]['ann']['ori_labels']
             bboxes_ignore = tmp[img_id]['ann']['bboxes_ignore']
             labels_ignore = tmp[img_id]['ann']['labels_ignore']
             
             if not bboxes:
                 bboxes = np.zeros((0, 4))
                 labels = np.zeros((0, ))
+                ori_labels = np.zeros((0, ))
             else:
                 bboxes = np.array(bboxes, ndmin=2)
                 labels = np.array(labels)
+                ori_labels = np.array(ori_labels)
             if not bboxes_ignore:
                 bboxes_ignore = np.zeros((0, 4))
                 labels_ignore = np.zeros((0, ))
@@ -85,6 +112,7 @@ class DetRetailOneDataset(DetBaseDataset):
 
             tmp[img_id]['ann']['bboxes'] = bboxes
             tmp[img_id]['ann']['labels'] = labels
+            tmp[img_id]['ann']['ori_labels'] = ori_labels
             tmp[img_id]['ann']['bboxes_ignore'] = bboxes_ignore
             tmp[img_id]['ann']['labels_ignore'] = labels_ignore
 
@@ -128,7 +156,7 @@ class DetRetailOneDataset(DetBaseDataset):
             list[int]: All categories in the image of specified index.
         """
 
-        return self.data_infos[idx]['ann']['labels']
+        return self.data_infos[idx]['ann']['ori_labels']
     
     def evaluate(self,
                  results,

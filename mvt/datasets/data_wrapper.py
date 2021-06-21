@@ -199,7 +199,10 @@ class ClassBalancedDataset(object):
         self.dataset = dataset
         self.oversample_thr = oversample_thr
         self.filter_empty_gt = filter_empty_gt
-        self.CLASSES = dataset.CLASSES
+        if hasattr(self.dataset, 'ORI_CLASSES'):
+            self.CLASSES = dataset.ORI_CLASSES
+        else:
+             self.CLASSES = dataset.CLASSES
 
         repeat_factors = self._get_repeat_factors(dataset, oversample_thr)
         repeat_indices = []

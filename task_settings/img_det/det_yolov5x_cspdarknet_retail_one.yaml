@@ -6,7 +6,7 @@ MODEL:
     in_channels: [640, 1280]
     out_channels: [640, 1280]
   BBOX_HEAD:
-    num_classes: 116
+    num_classes: 1
     in_channels: [640, 1280]
     anchor_generator: {
       type: 'YOLOV4AnchorGenerator',

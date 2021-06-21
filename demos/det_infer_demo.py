@@ -22,10 +22,10 @@ if __name__ == '__main__':
     save_path = os.path.join(save_dir, image_file_name) # None for no saving
 
     task_config_path = 'task_settings/img_det/det_yolov4x_cspdarknet_retail_one.yaml'
-    checkpoint_path = 'meta/train_infos/det_yolov4x_cspdarknet_retail_one/epoch_30.pth'
+    checkpoint_path = 'meta/train_infos/det_yolov4x_cspdarknet_retail_one/epoch_60.pth'
         
     with_show = True
-    show_score_thr = 0.88
+    show_score_thr = 0.3
     
     # get config
     get_task_cfg(cfg, task_config_path)
