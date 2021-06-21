@@ -8,7 +8,7 @@ DATA:
   TEST_TRANSFORMS:
     ImgResize: {size: 224}
   TRAIN_DATA:
-    TYPE: "Concat" # "Normal" "Concat" "Repeat" "Balanced"
+    TYPE: "Balanced" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 1
     DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json", "test/b_annotations.json"]
     DATA_PREFIX: ["train/a_images/", "train/b_images/", "test/b_images/"]

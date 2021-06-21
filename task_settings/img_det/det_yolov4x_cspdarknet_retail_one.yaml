@@ -1,21 +1,22 @@
 MODEL:
   BASE: "models/detections/det_yolov4x_cspdarknet.yaml"
   BACKBONE:
-    out_indices: [4, 5]
+    out_indices: [3, 4, 5]
   NECK:
-    in_channels: [640, 640]
-    out_channels: [640, 1280]
+    in_channels: [320, 640, 640]
+    out_channels: [320, 640, 1280]
     csp_repetition: 3
   BBOX_HEAD:
     num_classes: 1
-    in_channels: [640, 1280]
+    in_channels: [320, 640, 1280]
     anchor_generator: {
       type: 'YOLOV4AnchorGenerator',
-      base_sizes: [[[48, 90], [114, 66], [108, 175]],
-                   [[18, 20], [28, 36], [60, 33]]],
-      strides: [16, 32]}
+      base_sizes: [[[18, 20], [28, 36], [60, 33]],
+                   [[48, 90], [114, 66], [68, 105]],
+                   [[108, 175], [192, 143], [159, 201]]],
+      strides: [8, 16, 32]}
     bbox_coder: {type: 'YOLOV4BBoxCoder'}
-    featmap_strides: [16, 32]
+    featmap_strides: [8, 16, 32]
     loss_cls: {
       type: 'CrossEntropyLoss',
       use_sigmoid: True,
@@ -31,7 +32,7 @@ DATA:
   BASE: "datasets/detections/det_retail_one_yolo_large.yaml"
   ROOT_PATH: "data/RetailDet"
   TRAIN_DATA:
-    TYPE: "Balanced" # "Normal" "Concat" "Repeat" "Balanced"
+    TYPE: "Concat" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 1
     DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json", "test/b_annotations.json"]
     DATA_PREFIX: ["train/a_images/", "train/b_images", "test/b_images"]

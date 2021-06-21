@@ -10,8 +10,8 @@ MODEL:
     in_channels: [640, 1280]
     anchor_generator: {
       type: 'YOLOV4AnchorGenerator',
-      base_sizes: [[[48, 90], [114, 66], [108, 175]],
-                   [[18, 20], [28, 36], [60, 33]]],
+      base_sizes: [[[18, 20], [28, 36], [60, 33]],
+                   [[48, 90], [114, 66], [108, 175]]],
       strides: [16, 32]}
     bbox_coder: {type: 'YOLOV4BBoxCoder'}
     featmap_strides: [16, 32]
