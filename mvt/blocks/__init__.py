@@ -21,7 +21,7 @@ __all__ = [
     'Shared2FCBBoxHead',  'Shared4Conv1FCBBoxHead', 'DoubleConvFCBBoxHead', 
     'SingleRoIExtractor', 'GenericRoIExtractor', 'MaskTestMixin', 'GridHead',
     'MaskPointHead', 'FCNMaskHead','MaskIoUHead', 'FusedSemanticHead', 'CoarseMaskHead',
-    'LinearEmbHead', 'MlpEmbHead'
+    'LinearEmbHead', 'MlpEmbHead', 'ArcMarginHead' 
 
     'CrossEntropyLoss', 'AssociativeEmbeddingLoss', 'FocalLoss', 'GHMC', 'GHMR', 
     'IoULoss', 'BoundedIoULoss', 'GIoULoss', 'DIoULoss', 'CIoULoss', 

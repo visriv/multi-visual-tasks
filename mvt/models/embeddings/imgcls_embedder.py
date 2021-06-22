@@ -20,6 +20,9 @@ class ImgClsEmbedder(BaseEmbedder):
 
         self.head = build_head(cfg.EMB_HEAD)
 
+        if len(cfg.CLS_HEAD) > 0:
+            self.cls_head = build_head(cfg.CLS_HEAD)
+
         if "PRETRAINED_MODEL_PATH" in cfg:
             if cfg.PRETRAINED_MODEL_PATH != "":
                 self.init_weights(pretrained=cfg.PRETRAINED_MODEL_PATH)
@@ -38,6 +41,9 @@ class ImgClsEmbedder(BaseEmbedder):
             else:
                 self.neck.init_weights()
         self.head.init_weights()
+
+        if self.with_cls_head:
+            self.cls_head.init_weights()
 
     def extract_feat(self, img):
         """Directly extract features from the backbone + neck
@@ -78,8 +84,15 @@ class ImgClsEmbedder(BaseEmbedder):
         x = self.extract_feat(x)
 
         losses = dict()
-        loss = self.head.forward_train(x, label)
+        if self.with_cls_head:
+            loss, embeddings = self.head.forward_train(x, label, output_emb=True)
+        else:
+            loss = self.head.forward_train(x, label)
         losses.update(loss)
+
+        if self.with_cls_head:
+            loss_cls = self.cls_head.forward_train(embeddings, label)
+            losses.update(loss_cls)
 
         return losses
     
@@ -94,5 +107,4 @@ class ImgClsEmbedder(BaseEmbedder):
     def simple_test(self, x, **kwargs):
         """Test without augmentation."""
         x = self.extract_feat(x)
-        return self.head.simple_test(x)
-    
+        return self.head.simple_test(x) 

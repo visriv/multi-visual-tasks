@@ -18,6 +18,10 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
     def with_neck(self):
         return hasattr(self, 'neck') and self.neck is not None
 
+    @property
+    def with_cls_head(self):
+        return hasattr(self, 'cls_head') and self.cls_head is not None
+
     @abstractmethod
     def extract_feat(self, datas):
         pass

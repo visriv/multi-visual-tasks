@@ -44,10 +44,13 @@ class MlpEmbHead(BaseEmbHead):
         x = self.fc2(self.act(self.fc1(x)))
         return x
 
-    def forward_train(self, feats, labels):
+    def forward_train(self, feats, labels, output_emb=False):
         embeddings = self(feats)
         if isinstance(labels, list):
             cat_labels = torch.cat(labels)
         hard_pairs = self.miner(embeddings, cat_labels)
         losses = self.loss(embeddings, cat_labels, hard_pairs)
-        return dict(loss_emb=losses)
+        if output_emb:
+            return dict(loss_emb=losses), embeddings
+        else:
+            return dict(loss_emb=losses)

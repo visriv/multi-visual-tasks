@@ -183,11 +183,11 @@ def main():
     else:
         model.CLASSES = dataset.CLASSES
 
-    #model = DataParallel(model, device_ids=[0])
-    #outputs = single_device_test(model, data_loader)
+    model = DataParallel(model, device_ids=[0])
+    outputs = single_device_test(model, data_loader)
 
-    with open('/tmp/out.pkl', 'rb') as f:
-        outputs = pickle.load(f)
+    #with open('/tmp/out.pkl', 'rb') as f:
+    #    outputs = pickle.load(f)
 
     outputs = infer_labels(outputs, args.reference)
 
