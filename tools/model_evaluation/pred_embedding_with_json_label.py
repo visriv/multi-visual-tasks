@@ -90,7 +90,22 @@ def infer_labels(outputs, ref_file):
 
         pred_labels_top_k = []
         for i in range(pred_labels.shape[0]):
-            pred = np.argmax(np.bincount(pred_labels[i, :k]))
+            # pred = np.argmax(np.bincount(pred_labels[i, :k]))
+            row = pred_labels[i, :k]
+            count = {}
+            for x in row:
+                if x not in count:
+                    count[x] = 1
+                else:
+                    count[x] += 1
+            
+            pred = row[0]
+            m = count[pred]
+            for lb in count:
+                if count[lb] > m:
+                    m = count[lb]
+                    pred = lb
+
             pred_labels_top_k.append(pred)
 
         result['labels_top_{}'.format(k)] = np.array(pred_labels_top_k)
@@ -168,11 +183,11 @@ def main():
     else:
         model.CLASSES = dataset.CLASSES
 
-    model = DataParallel(model, device_ids=[0])
-    outputs = single_device_test(model, data_loader)
+    #model = DataParallel(model, device_ids=[0])
+    #outputs = single_device_test(model, data_loader)
 
-    #with open('/tmp/out.pkl', 'rb') as f:
-    #    outputs = pickle.load(f)
+    with open('/tmp/out.pkl', 'rb') as f:
+        outputs = pickle.load(f)
 
     outputs = infer_labels(outputs, args.reference)
 
