@@ -30,7 +30,7 @@ DATA:
           height: 720,
           always_apply: True},
         RandomScale: {
-          scale_limit: 0.5,
+          scale_limit: 0.2,
           interpolation: 1,
           always_apply: True},
         CenterCrop: {
@@ -38,10 +38,7 @@ DATA:
           height: 480,
           always_apply: True},
         HorizontalFlip: {p: 0.5}}}
-    HueSaturationValueJitter: {
-      hue_ratio: 0.015,
-      saturation_ratio: 0.7,
-      value_ratio: 0.4}
+    PhotoMetricDistortion: {}
     Normalize: {
       mean: [114, 114, 114],
       std: [255, 255, 255],
