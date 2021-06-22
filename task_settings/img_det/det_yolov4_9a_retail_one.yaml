@@ -1,0 +1,61 @@
+MODEL:
+  BASE: "models/detections/det_yolov4_cspdarknet.yaml"
+  PRETRAINED_MODEL_PATH: ""
+  BBOX_HEAD:
+    num_classes: 1
+    anchor_generator: {
+      type: 'YOLOAnchorGenerator',
+      base_sizes: [[[74,102], [58, 69], [48,30]],
+                   [[46,56], [41, 68], [38,50]],
+                   [[34,43], [28, 42], [26,34]]],
+      strides: [32, 16, 8]}
+
+  TEST_CFG:
+    nms_pre: 1000
+    min_bbox_size: 0
+    score_thr: 0.05
+    conf_thr: 0.005
+    nms: {
+      type: 'common_nms', 
+      iou_threshold: 0.5 }
+    max_per_img: 100
+DATA:
+  BASE: "datasets/detections/det_retail_one_yolo.yaml"
+  ROOT_PATH: "data/"
+  TRAIN_TRANSFORMS:
+    JointResize: {
+      img_scale: [[416, 416]],
+      keep_ratio: False}
+  TRAIN_DATA:
+    DATA_PREFIX: ["train/a_images/", "test/b_images/"] 
+    DATA_INFO: ["train/a_annotations.json", "test/b_annotations.json"]
+    SAMPLES_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 4
+  VAL_DATA:
+    DATA_PREFIX: ["train/a_images/"] 
+    DATA_INFO: ["train/a_val_annotations.json"]
+    SAMPLES_PER_DEVICE: 2
+    WORKERS_PER_DEVICE: 2
+  TEST_DATA:
+    DATA_PREFIX: ["test/a_images/"] 
+    DATA_INFO: ["test/a_annotations.json"]
+    SAMPLES_PER_DEVICE: 2
+    WORKERS_PER_DEVICE: 2
+SCHEDULE:
+  BASE: "schedulers/schedule_yolo.yaml"
+  TOTAL_EPOCHS: 200
+  OPTIMIZER:
+    lr: 0.001
+  LR_POLICY:
+    policy: "CosineAnnealing"
+    min_lr_ratio: 0.2
+RUNTIME:
+  BASE: "runtimes/local_runtime.yaml"
+  CHECKPOINT_CONFIG:
+    interval: 5
+  LOG_CONFIG:
+    interval: 20
+    hooks: {
+      TextLoggerHook: {ignore_last: False},
+      TensorboardLoggerHook: {}
+    }
