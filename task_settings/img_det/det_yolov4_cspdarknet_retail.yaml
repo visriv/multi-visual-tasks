@@ -5,7 +5,7 @@ MODEL:
     num_classes: 116
 DATA:
   BASE: "datasets/detections/det_retail_yolo.yaml"
-  ROOT_PATH: "/home/qzm/Work/Data/RetailDet"
+  ROOT_PATH: "data/RetailDet"
   TRAIN_DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4

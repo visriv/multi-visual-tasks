@@ -11,9 +11,9 @@ MODEL:
     in_channels: [320, 640, 1280]
     anchor_generator: {
       type: 'YOLOV4AnchorGenerator',
-      base_sizes: [[[18, 20], [28, 36], [60, 33]],
-                   [[48, 90], [114, 66], [68, 105]],
-                   [[108, 175], [192, 143], [159, 201]]],
+      base_sizes: [[[30, 25], [36, 34], [36, 45]],
+                   [[64, 32], [56, 56], [60, 72]],
+                   [[108, 80], [172, 143], [180, 240]]],
       strides: [8, 16, 32]}
     bbox_coder: {type: 'YOLOV4BBoxCoder'}
     featmap_strides: [8, 16, 32]
@@ -28,8 +28,13 @@ MODEL:
     loss_bbox: {
       type: 'CIoULoss',
       loss_weight: 3.2}
+  TEST_CFG:
+    nms: {
+      type: 'common_nms', 
+      iou_threshold: 0.5}
+    max_per_img: 300
 DATA:
-  BASE: "datasets/detections/det_retail_one_yolo_large.yaml"
+  BASE: "datasets/detections/det_retail_one_yolo_mid.yaml"
   ROOT_PATH: "data/RetailDet"
   TRAIN_DATA:
     TYPE: "Concat" # "Normal" "Concat" "Repeat" "Balanced"

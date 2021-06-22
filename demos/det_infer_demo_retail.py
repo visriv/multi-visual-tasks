@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # task_config_path = 'task_settings/img_det/det_yolov4_retail_one.yaml'
     # checkpoint_path = 'meta/train_infos/det_yolov4_retail_one/epoch_200.pth'
     task_config_path = 'task_settings/img_det/det_yolov4x_cspdarknet_retail_one.yaml'
-    checkpoint_path = 'meta/train_infos/det_yolov4x_cspdarknet_retail_one/epoch_100.pth'
+    checkpoint_path = 'meta/train_infos/det_yolov4x_cspdarknet_retail_one/epoch_52.pth'
 
     with_show = True
     show_score_thr = 0.3
