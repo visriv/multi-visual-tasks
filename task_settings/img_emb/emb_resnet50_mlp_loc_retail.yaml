@@ -2,7 +2,7 @@ MODEL:
   BASE: "models/embeddings/emb_resnet50_mlp_loc.yaml"  
 DATA:
   BASE: "datasets/embeddings/emb_loc_retail.yaml"
-  ROOT_PATH: "data/"
+  ROOT_PATH: "data/RetailDet"
   TRAIN_TRANSFORMS:
     ImgResize: {size: 224}    
   TEST_TRANSFORMS:
