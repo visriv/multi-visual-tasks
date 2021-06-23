@@ -3,9 +3,9 @@ import argparse
 import json
 import os.path as osp
 import pickle
+from collections import Counter
 
 import numpy as np
-from collections import Counter
 import torch
 
 from configs import cfg
@@ -111,7 +111,7 @@ def infer_labels(outputs, ref_file):
     return result
 
 
-def save_json(outputs, json_ori, json_out, top_k=1):
+def save_json(outputs, json_ori, json_out, score_thr=0.1, top_k=1):
     bbox_ids = outputs['bbox_ids']
     labels = outputs['labels_top_{}'.format(top_k)]
     pred_dict = {}
@@ -121,10 +121,17 @@ def save_json(outputs, json_ori, json_out, top_k=1):
     with open(json_ori, 'r') as f:
         data_ori = json.load(f)
 
+    ann_new = []
     for ann in data_ori['annotations']:
         assert ann['id'] in pred_dict
+        if ann['score'] < score_thr:
+            continue
+
         label = pred_dict[ann['id']]
         ann['category_id'] = int(label)
+        ann_new.append(ann)
+
+    data_ori['annotations'] = ann_new
 
     json_out = json_out.replace('.json', '_top_{}.json'.format(top_k))
     with open(json_out, 'w') as wf:
@@ -134,17 +141,16 @@ def save_json(outputs, json_ori, json_out, top_k=1):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description=
-        'Run embedding model on testing data and output final json file')
+        description='Run embedding model on testing data and output final json file')
     parser.add_argument('task_config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('reference', help='reference embedding file')
-    parser.add_argument('--json-ori',
-                        required=True,
+    parser.add_argument('--json-ori', required=True,
                         help='path of json file output from detection')
-    parser.add_argument('--json-out',
-                        required=True,
+    parser.add_argument('--json-out', required=True,
                         help='path to save final submition file')
+    parser.add_argument('--score-thr', type=float, default=0.05,
+                        help='score threshold (default: 0.05)')
     args = parser.parse_args()
 
     return args
@@ -157,7 +163,8 @@ def main():
             task_settings/img_emb/emb_resnet50_fc_retail.yaml \
             meta/emb_resnet50_fc_retail/epoch_50.pth meta/reference_test_b_embedding.pkl \
             --json-ori data/test/a_det_annotations.json \
-            --json-out submit/out.json
+            --json-out submit/out.json \
+            --score-thr 0.1
     """
     args = parse_args()
 
@@ -193,7 +200,8 @@ def main():
     outputs = infer_labels(outputs, args.reference)
 
     for k in RANK_LIST:
-        save_json(outputs, args.json_ori, args.json_out, top_k=k)
+        save_json(outputs, args.json_ori, args.json_out,
+                  score_thr=args.score_thr, top_k=k)
 
 
 if __name__ == '__main__':

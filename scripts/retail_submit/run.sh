@@ -1,8 +1,9 @@
 #! /usr/bin/env bash
 opt=$1
 
+score_thr=0.1
 det_epoch=200
-det_name=det_yolov4_retail_one
+det_name=det_yolov4_9a_retail_one
 
 det_cfg=task_settings/img_det/${det_name}.yaml
 det_model=meta/train_infos/${det_name}/epoch_${det_epoch}.pth
@@ -14,11 +15,13 @@ emb_name=emb_resnet50_mlp_loc_retail
 #emb_epoch=36
 #emb_name=emb_resnet50_mlp_retail
 
+tag=${det_name}_${det_epoch}_${emb_name}_${emb_epoch}
+
 emb_cfg=task_settings/img_emb/${emb_name}.yaml
 emb_model=meta/${emb_name}/epoch_${emb_epoch}.pth
-emb_ref=meta/reference_test_b_embedding.pkl
+emb_ref=meta/emb_test_b_${tag}.pkl
 
-submit_json=submit/submit_${det_name}_${det_epoch}_${emb_name}_${emb_epoch}.json
+submit_json=submit/submit_${tag}.json
 
 function step_1 {
     echo -e "Step 1: Running detetor ..."
@@ -60,7 +63,8 @@ function step_3 {
     python3 tools/model_evaluation/pred_embedding_with_json_label.py \
         ${emb_cfg} ${emb_model} ${emb_ref} \
         --json-ori ${det_json} \
-        --json-out ${submit_json}
+        --json-out ${submit_json} \
+        --score-thr ${score_thr}
 }
 
 case $opt in
