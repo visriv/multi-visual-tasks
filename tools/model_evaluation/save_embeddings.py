@@ -27,6 +27,8 @@ def single_device_emb_test(model, data_loader, save_path=None):
         data['img_metas'] = data['img_metas'].data[0]
         data['img'] = data['img'].data[0]
         data['label'] = data['label'].data[0]
+        if 'bbox' in data:
+            data['bbox'] = data['bbox'].data[0]
 
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
@@ -47,7 +49,7 @@ def single_device_emb_test(model, data_loader, save_path=None):
 
     with open(save_path, "wb") as wf:
         pickle.dump(outputs, wf)
-        print('Ebeddings have been saved at {}'.format(save_path))
+        print('Embeddings have been saved at {}'.format(save_path))
 
 
 def single_device_test(model, data_loader, save_path=None):

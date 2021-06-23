@@ -2,7 +2,7 @@ MODEL:
   BASE: "models/embeddings/emb_resnet50_mlp_loc.yaml"  
 DATA:
   BASE: "datasets/embeddings/emb_loc_retail.yaml"
-  ROOT_PATH: "data/RetailDet"
+  ROOT_PATH: "data/"
   TRAIN_TRANSFORMS:
     ImgResize: {size: 224}    
   TEST_TRANSFORMS:
@@ -16,18 +16,18 @@ DATA:
     WORKERS_PER_DEVICE: 2
   VAL_DATA:
     TYPE: "Normal"
-    DATA_INFO: ["train/a_annotations.json"]
-    DATA_PREFIX: ["train/a_images/"]
-    TEST_MODE: False
-    SAMPLES_PER_DEVICE: 2
-    WORKERS_PER_DEVICE: 2
+    DATA_INFO: ["test/b_annotations.json"]
+    DATA_PREFIX: ["test/b_images/"]
+    TEST_MODE: True
+    SAMPLES_PER_DEVICE: 32
+    WORKERS_PER_DEVICE: 8
   TEST_DATA:
     TYPE: "Concat"
-    DATA_INFO: ["test/a_annotations.json"]
+    DATA_INFO: ["test/a_det_annotations.json"]
     DATA_PREFIX: ["test/a_images/"]
     TEST_MODE: True
-    SAMPLES_PER_DEVICE: 2
-    WORKERS_PER_DEVICE: 2
+    SAMPLES_PER_DEVICE: 32
+    WORKERS_PER_DEVICE: 8
 SCHEDULE:
   BASE: "schedulers/schedule_efficient.yaml"
 RUNTIME:

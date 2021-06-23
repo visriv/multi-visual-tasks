@@ -93,6 +93,6 @@ class ImgClsLocEmbedder(BaseEmbedder):
 
     def simple_test(self, x, bbox, **kwargs):
         """Test without augmentation."""
-        x = self.extract_feat(x, bbox)
-        return self.head.simple_test(x)
+        x = self.extract_feat(x)
+        return self.head.simple_test(x, bbox)
     
