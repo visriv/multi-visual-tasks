@@ -29,6 +29,8 @@ def single_device_test(model, data_loader):
     for _, data in enumerate(data_loader):
         data['img_metas'] = data['img_metas'].data[0]
         data['img'] = data['img'].data[0]
+        if 'bbox' in data:
+            data['bbox'] = data['bbox'].data[0]
         bbox_id_batch = data['bbox_id'].data.cpu().numpy()
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
@@ -69,11 +71,18 @@ def infer_labels(outputs, ref_file):
     qry_ids = outputs['bbox_ids']
 
     dist_func = LpDistance()
-    ref_emb = torch.from_numpy(ref_emb).cuda()
-    qry_emb = torch.from_numpy(qry_emb).cuda()
+    if torch.cuda.is_available():
+        ref_emb = torch.from_numpy(ref_emb).cuda()
+        qry_emb = torch.from_numpy(qry_emb).cuda()
 
-    mat = dist_func(qry_emb, ref_emb)
-    mat = mat.data.cpu().numpy()
+        mat = dist_func(qry_emb, ref_emb)
+        mat = mat.data.cpu().numpy()
+    else:
+        ref_emb = torch.from_numpy(ref_emb)
+        qry_emb = torch.from_numpy(qry_emb)
+
+        mat = dist_func(qry_emb, ref_emb)
+        mat = mat.data.numpy()
     mat_inds = np.argsort(mat, axis=1)
 
     ref_labels = ref_labels.reshape((ref_labels.shape[0],))

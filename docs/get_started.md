@@ -169,10 +169,11 @@
     Get predicted labels and save final submition json file:
     ```shell
     python3 tools/model_evaluation/pred_embedding_with_json_label.py task_settings/img_emb/emb_resnet50_fc_retail.yaml \
-        meta/emb_resnet50_fc_retail/epoch_50.pth \
+        meta/train_infos/emb_resnet50_fc_retail/epoch_50.pth \
         meta/reference_test_b_embedding.pkl \
         --json-ori data/test/a_det_annotations.json \
         --json-out submit/out.json
+    python3 tools/model_evaluation/pred_embedding_with_json_label.py task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml meta/train_infos/emb_resnet50_mlp_loc_retail/epoch_41.pth meta/reference_test_b_embedding.pkl --json-ori data/RetailDet/test/a_det_annotations.json --json-out submit/out.json
     ```
 
 ### Run demos

@@ -83,12 +83,6 @@ class EmbLocRetailDataset(EmbBaseDataset):
         pil_img = Image.open(img_path).convert('RGB')
         img = np.array(pil_img).astype(np.uint8)
 
-        # rotate with random angle from [-pi/6, pi/6]
-        angle = (np.random.rand() - 0.5) * 60
-        rot_img, rot_matrix = imrotate(img, angle, border_value=114, auto_bound=True)
-        # print(img.shape[:2])
-        # imshow(rot_img[...,[2,1,0]])
-
         # original bbox
         ori_bbox = [
             self.data_infos[idx]['bbox'][0],
@@ -96,24 +90,43 @@ class EmbLocRetailDataset(EmbBaseDataset):
             self.data_infos[idx]['bbox'][0] + self.data_infos[idx]['bbox'][2] - 1,
             self.data_infos[idx]['bbox'][1] + self.data_infos[idx]['bbox'][3] - 1
         ]
-        rot_bbox = get_rotated_bbox(
-            ori_bbox, rot_matrix, rot_img.shape[1], rot_img.shape[0])
-        rot_width = rot_bbox[2] - rot_bbox[0] + 1
-        rot_height = rot_bbox[3] - rot_bbox[1] + 1
-        x_random_offset = 0.2 * (np.random.rand() - 0.5) * rot_width
-        y_random_offset = 0.2 * (np.random.rand() - 0.5) * rot_height
-        width_half_diff = int(rot_width * 0.2 * np.random.rand() + 0.5)
-        height_half_diff = int(rot_height * 0.2 * np.random.rand() + 0.5)
+        
+        if not self.test_mode:
+            # rotate with random angle from [-pi/6, pi/6]
+            angle = (np.random.rand() - 0.5) * 60
+            img, rot_matrix = imrotate(img, angle, border_value=114, auto_bound=True)
+            # print(img.shape[:2])
+            # imshow(rot_img[...,[2,1,0]])
+            rot_bbox = get_rotated_bbox(
+                ori_bbox, rot_matrix, img.shape[1], img.shape[0])
+            rot_width = rot_bbox[2] - rot_bbox[0] + 1
+            rot_height = rot_bbox[3] - rot_bbox[1] + 1
+            x_random_offset = 0.2 * (np.random.rand() - 0.5) * rot_width
+            y_random_offset = 0.2 * (np.random.rand() - 0.5) * rot_height
+            width_half_diff = int(rot_width * 0.2 * np.random.rand() + 0.5)
+            height_half_diff = int(rot_height * 0.2 * np.random.rand() + 0.5)
 
-        crop_bbox = [
-            max(rot_bbox[0] + x_random_offset - width_half_diff, 0),
-            max(rot_bbox[1] + y_random_offset - height_half_diff, 0),
-            min(rot_bbox[2] + x_random_offset + width_half_diff, rot_img.shape[1] - 1),
-            min(rot_bbox[3] + y_random_offset + height_half_diff, rot_img.shape[0] - 1)
-        ]
+            crop_bbox = [
+                max(rot_bbox[0] + x_random_offset - width_half_diff, 0),
+                max(rot_bbox[1] + y_random_offset - height_half_diff, 0),
+                min(rot_bbox[2] + x_random_offset + width_half_diff, img.shape[1] - 1),
+                min(rot_bbox[3] + y_random_offset + height_half_diff, img.shape[0] - 1)
+            ]
+        else:
+            x_random_offset = 0
+            y_random_offset = 0
+            width_half_diff = int(self.data_infos[idx]['bbox'][2] * 0.1 + 0.5)
+            height_half_diff = int(self.data_infos[idx]['bbox'][2] * 0.1 + 0.5)
+
+            crop_bbox = [
+                max(ori_bbox[0] + x_random_offset - width_half_diff, 0),
+                max(ori_bbox[1] + y_random_offset - height_half_diff, 0),
+                min(ori_bbox[2] + x_random_offset + width_half_diff, img.shape[1] - 1),
+                min(ori_bbox[3] + y_random_offset + height_half_diff, img.shape[0] - 1)
+            ]
 
         # crop with bbox	
-        bbox_img = imcrop(rot_img, np.array(crop_bbox))
+        bbox_img = imcrop(img, np.array(crop_bbox))
         # bbox_img = imcrop(rot_img, rot_bbox)
         # imshow(bbox_img[..., [2, 1, 0]])
         # print(bbox_img.shape[0], bbox_img.shape[1])
@@ -122,11 +135,11 @@ class EmbLocRetailDataset(EmbBaseDataset):
             'filename': self.data_infos[idx]['filename'],
             'bbox_id': self.data_infos[idx]['bbox_id'],
             'img': bbox_img.astype(np.float32),
-	    'bbox': [
-		float(crop_bbox[0])/rot_img.shape[1], 
-		float(crop_bbox[1])/rot_img.shape[0],
-		float(crop_bbox[2])/rot_img.shape[1], 
-		float(crop_bbox[3])/rot_img.shape[0]],
+            'bbox': [
+                float(crop_bbox[0])/img.shape[1], 
+                float(crop_bbox[1])/img.shape[0],
+                float(crop_bbox[2])/img.shape[1], 
+                float(crop_bbox[3])/img.shape[0]],
             'label': self.data_infos[idx]['label'],
             'height': bbox_img.shape[0],
             'width': bbox_img.shape[1]
