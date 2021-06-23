@@ -43,6 +43,7 @@ class MlpLocEmbHead(BaseEmbHead):
         x = x[0].view(x[0].size(0), -1)
         if isinstance(bboxes, list):
             cat_bboxs = torch.stack(bboxes)
+
         x = self.fc2(torch.cat([self.act(self.fc1(x)), cat_bboxs], dim=-1))
         return x
 

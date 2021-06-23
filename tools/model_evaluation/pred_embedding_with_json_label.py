@@ -16,7 +16,7 @@ from mvt.utils.config_util import get_dataset_global_args, get_task_cfg
 from mvt.utils.misc_util import ProgressBar
 from mvt.utils.parallel_util import DataParallel
 
-RANK_LIST = [1, 3, 5, 10, 20, 50, 100]
+RANK_LIST = [1, 3, 5, 10, 20, 50]
 
 
 def single_device_test(model, data_loader):
@@ -32,6 +32,7 @@ def single_device_test(model, data_loader):
         if 'bbox' in data:
             data['bbox'] = data['bbox'].data[0]
         bbox_id_batch = data['bbox_id'].data.cpu().numpy()
+
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
 
@@ -107,7 +108,7 @@ def infer_labels(outputs, ref_file):
                     count[x] = 1
                 else:
                     count[x] += 1
-            
+
             pred = row[0]
             m = count[pred]
             for lb in count:
@@ -195,7 +196,7 @@ def main():
     model = DataParallel(model, device_ids=[0])
     outputs = single_device_test(model, data_loader)
 
-    #with open('/tmp/out.pkl', 'rb') as f:
+    # with open('/tmp/out.pkl', 'rb') as f:
     #    outputs = pickle.load(f)
 
     outputs = infer_labels(outputs, args.reference)

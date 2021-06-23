@@ -49,7 +49,7 @@ def single_device_emb_test(model, data_loader, save_path=None):
 
     with open(save_path, "wb") as wf:
         pickle.dump(outputs, wf)
-        print('Ebeddings have been saved at {}'.format(save_path))
+        print('Embeddings have been saved at {}'.format(save_path))
 
 
 def single_device_test(model, data_loader, save_path=None):
