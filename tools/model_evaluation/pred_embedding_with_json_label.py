@@ -5,6 +5,7 @@ import os.path as osp
 import pickle
 
 import numpy as np
+from collections import Counter
 import torch
 
 from configs import cfg
@@ -86,7 +87,7 @@ def infer_labels(outputs, ref_file):
         mat = mat.data.numpy()
     mat_inds = np.argsort(mat, axis=1)
 
-    ref_labels = ref_labels.reshape((ref_labels.shape[0],))
+    ref_labels = ref_labels.reshape((ref_labels.shape[0], ))
     pred_labels = ref_labels[mat_inds]
 
     result = {}
@@ -100,22 +101,9 @@ def infer_labels(outputs, ref_file):
 
         pred_labels_top_k = []
         for i in range(pred_labels.shape[0]):
-            # pred = np.argmax(np.bincount(pred_labels[i, :k]))
-            row = pred_labels[i, :k]
-            count = {}
-            for x in row:
-                if x not in count:
-                    count[x] = 1
-                else:
-                    count[x] += 1
-
-            pred = row[0]
-            m = count[pred]
-            for lb in count:
-                if count[lb] > m:
-                    m = count[lb]
-                    pred = lb
-
+            top_k = pred_labels[i, :k]
+            votes = Counter(top_k)
+            pred = votes.most_common(1)[0][0]
             pred_labels_top_k.append(pred)
 
         result['labels_top_{}'.format(k)] = np.array(pred_labels_top_k)
@@ -146,14 +134,17 @@ def save_json(outputs, json_ori, json_out, top_k=1):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Run embedding model on testing data and output final json file')
+        description=
+        'Run embedding model on testing data and output final json file')
     parser.add_argument('task_config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
     parser.add_argument('reference', help='reference embedding file')
-    parser.add_argument(
-        '--json-ori', required=True, help='path of json file output from detection')
-    parser.add_argument(
-        '--json-out', required=True, help='path to save final submition file')
+    parser.add_argument('--json-ori',
+                        required=True,
+                        help='path of json file output from detection')
+    parser.add_argument('--json-out',
+                        required=True,
+                        help='path to save final submition file')
     args = parser.parse_args()
 
     return args
@@ -174,8 +165,8 @@ def main():
 
     # build the dataloader
     dataset_args = get_dataset_global_args(cfg.DATA)
-    dataset = build_dataset(
-        cfg.DATA.TEST_DATA, cfg.DATA.TEST_TRANSFORMS, dataset_args)
+    dataset = build_dataset(cfg.DATA.TEST_DATA, cfg.DATA.TEST_TRANSFORMS,
+                            dataset_args)
     data_loader = build_dataloader(
         dataset,
         samples_per_device=cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
