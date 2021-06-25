@@ -3,9 +3,11 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-import os
-import yaml
 import logging
+import os
+from pathlib import Path
+
+import yaml
 from yacs.config import CfgNode
 
 
@@ -23,23 +25,28 @@ def merge_dict_into_cfg(cfg, meta_dict):
             merge_dict_into_cfg(cfg[dict_key], meta_dict[dict_key])
         else:
             cfg[dict_key] = meta_dict[dict_key]
- 
+
+
 def merge_file_into_cfg(cfg, meta_yaml_file):
     """Merge yaml file into cfg"""
     with open(meta_yaml_file) as fb:
         meta_data = yaml.load(fb)
-    merge_dict_into_cfg(cfg, meta_data)   
+    merge_dict_into_cfg(cfg, meta_data)
+
 
 def _dict_update(meta_dict, additional_dict, task_data, mode):
     """Update two dicts for task file"""
     additional_dict[mode] = {}
     for data_key in task_data[mode]:
         if data_key == "BASE":
-            with open(os.path.join("configs", task_data[mode]["BASE"])) as fd:
+            mvt_root = Path(os.getenv('MVT_ROOT', './'))
+            cfg_path = mvt_root / 'configs' / task_data[mode]["BASE"]
+            with open(str(cfg_path)) as fd:
                 data_info = yaml.load(fd, Loader=yaml.FullLoader)
             meta_dict[mode] = data_info[mode]
         else:
             additional_dict[mode][data_key] = task_data[mode][data_key]
+
 
 def update_meta_dict(dst_dict, src_dict):
     """Update the meta dict by removing meaningless items"""
@@ -55,6 +62,7 @@ def update_meta_dict(dst_dict, src_dict):
         else:
             dst_dict[item_key] = src_dict[item_key]
 
+
 def get_task_cfg(cfg, task_yaml_file):
     """Get the cfg from the task yaml file"""
     with open(task_yaml_file) as fb:
@@ -67,7 +75,7 @@ def get_task_cfg(cfg, task_yaml_file):
             raise TypeError("The first level attribute in task file "
                             "should be a dict!")
         if task_key == "MODEL":
-            _dict_update(meta_dict, additional_dict, task_data, "MODEL")                
+            _dict_update(meta_dict, additional_dict, task_data, "MODEL")
         elif task_key == "DATA":
             _dict_update(meta_dict, additional_dict, task_data, "DATA")
         elif task_key == "SCHEDULE":
@@ -80,11 +88,12 @@ def get_task_cfg(cfg, task_yaml_file):
     # print("add dict:", additional_dict)
     update_meta_dict(meta_dict, additional_dict)
     # print("merge dict:", meta_dict)
-    merge_dict_into_cfg(cfg, meta_dict)    
+    merge_dict_into_cfg(cfg, meta_dict)
+
 
 def convert_to_dict(cfg_node, key_list=[]):
     """Convert cfg to dict"""
-    if not isinstance(cfg_node, CfgNode):        
+    if not isinstance(cfg_node, CfgNode):
         return cfg_node
     else:
         cfg_dict = dict(cfg_node)
@@ -92,17 +101,20 @@ def convert_to_dict(cfg_node, key_list=[]):
             cfg_dict[k] = convert_to_dict(v, key_list + [k])
     return cfg_dict
 
+
 def get_dataset_global_args(cfg):
     """Get the global settings for the training and testing dataset"""
     global_info = {}
     global_info["type"] = cfg.NAME
-    global_info["root_path"] = cfg.ROOT_PATH    
+    global_info["root_path"] = cfg.ROOT_PATH
     return global_info
+
 
 def _assert_with_logging(cond, msg):
     if not cond:
         logging.debug(msg)
     assert cond, msg
+
 
 def get_dict_from_list(src_list):
     """Get dict from a list. 
@@ -117,5 +129,5 @@ def get_dict_from_list(src_list):
     dst_dict = {}
     for src_key, src_value in zip(src_list[0::2], src_list[1::2]):
         dst_dict[src_key] = src_value
-    
+
     return dst_dict

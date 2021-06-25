@@ -43,8 +43,6 @@ def single_device_emb_test(model, data_loader, save_path=None):
 
     results = np.array(results)
     labels = np.array(labels)
-    print(results.shape)
-    print(labels.shape)
     outputs = {'embeddings': results, 'labels': labels}
 
     with open(save_path, "wb") as wf:

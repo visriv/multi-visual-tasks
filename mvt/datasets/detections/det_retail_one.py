@@ -1,3 +1,4 @@
+import os
 import os.path as osp
 import numpy as np
 
@@ -44,7 +45,8 @@ class DetRetailOneDataset(DetBaseDataset):
     def load_annotations(self, ann_file):
 
         data_infos = []
-        file_data = file_load(ann_file)
+        mvt_root = os.getenv('MVT_ROOT', './')
+        file_data = file_load(osp.join(mvt_root, ann_file))
         anno_len = len(file_data['annotations'])
         tmp = {}
         for img_info in file_data['images']:
