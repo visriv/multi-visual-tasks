@@ -1,3 +1,4 @@
+import os
 from torch import nn
 
 from .base_embedder import BaseEmbedder
@@ -22,7 +23,9 @@ class ImgClsLocEmbedder(BaseEmbedder):
 
         if "PRETRAINED_MODEL_PATH" in cfg:
             if cfg.PRETRAINED_MODEL_PATH != "":
-                self.init_weights(pretrained=cfg.PRETRAINED_MODEL_PATH)
+                mvt_root = os.getenv('MVT_ROOT', './')
+                path = os.path.join(mvt_root, cfg.PRETRAINED_MODEL_PATH)
+                self.init_weights(pretrained=path)
             else:
                 self.init_weights()
         else:

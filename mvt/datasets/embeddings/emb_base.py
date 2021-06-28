@@ -1,12 +1,15 @@
 import copy
+import os
 from abc import ABCMeta, abstractmethod
-import numpy as np
 from os import path as osp
+
+import numpy as np
 from torch.utils.data import Dataset
 from yacs.config import CfgNode
 
-from ..transforms import Compose
 from mvt.utils.io_util import list_from_file
+
+from ..transforms import Compose
 
 
 class EmbBaseDataset(Dataset, metaclass=ABCMeta):
@@ -67,12 +70,19 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         if not (self.data_prefix is None or osp.isabs(self.data_prefix)):
             self.data_prefix = osp.join(self.data_root, self.data_prefix)
 
+        mvt_root = os.getenv('MVT_ROOT')
+        if mvt_root and not osp.isabs(self.ann_file):
+            self.ann_file = osp.join(mvt_root, self.ann_file)
+
+        if mvt_root and not osp.isabs(self.data_prefix):
+            self.data_prefix = osp.join(mvt_root, self.data_prefix)
+
         # load annotations (and proposals)
         self.data_infos = self.load_annotations()
 
         # set group flag for the sampler
         self._set_group_flag()
-        
+
     def get_pipeline_list(self):
         """get the list of pipelines"""
 
@@ -91,11 +101,13 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
                         sub_item = {}
                         if len(sub_vt) > 0:
                             if not isinstance(sub_vt, CfgNode):
-                                raise TypeError("transform items must be a CfgNode")
+                                raise TypeError(
+                                    "transform items must be a CfgNode")
                         sub_item["type"] = sub_kt
                         for sub_ka, sub_va in sub_vt.items():
                             if isinstance(sub_va, CfgNode):
-                                raise TypeError("Only support two built-in layers")
+                                raise TypeError(
+                                    "Only support two built-in layers")
                             sub_item[sub_ka] = sub_va
                         pipeline_item[k_a].append(sub_item)
                 else:
@@ -160,7 +172,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
 
         return len(self.data_infos)
 
-    def getitem_info(self, index):        
+    def getitem_info(self, index):
         return self.data_infos[index]
 
     def __getitem__(self, idx):
@@ -193,7 +205,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
             raise ValueError(f'Unsupported type {type(classes)} of classes.')
 
         return class_names
-    
+
     def _set_group_flag(self):
         """Set flag according to image aspect ratio.
 
@@ -238,7 +250,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
             if metric == 'accuracy':
                 acc = np.sum(results == labels) / len(labels)
                 eval_result = {f'accuracy': acc}
-            
+
             eval_results.update(eval_result)
 
         return eval_results
