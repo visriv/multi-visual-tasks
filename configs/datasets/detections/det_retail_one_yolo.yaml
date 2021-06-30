@@ -38,10 +38,10 @@ DATA:
         ImageToTensor: {keys: ['img']},
         Collect: {keys: ['img']}}}
   TRAIN_DATA:
-    TYPE: "Concat" # "Normal" "Concat" "Repeat" "Balanced"
+    TYPE: "Concat"
     FLAG: 1
-    DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json"]
-    DATA_PREFIX: ["train/a_images/", "train/a_annotations.json"]
+    DATA_INFO: ["train/a_annotations.json"]
+    DATA_PREFIX: ["train/a_images/"]
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
   VAL_DATA:

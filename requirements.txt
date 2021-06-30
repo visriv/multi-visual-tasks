@@ -1,14 +1,8 @@
-torch==1.7.1
-torchvision==0.8.2
 pyyaml
 yacs
 tqdm
 opencv-python
 yapf
-lxml
 pycocotools
-timm
 terminaltables
 tensorboard
-albumentations
-imagecorruptions
