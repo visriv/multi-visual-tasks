@@ -13,7 +13,6 @@ import warnings
 import inspect
 from abc import ABCMeta, abstractmethod
 from cv2 import IMREAD_COLOR, IMREAD_GRAYSCALE, IMREAD_UNCHANGED
-from lxml.etree import Element, ElementTree, SubElement
 
 try:
     from PIL import Image
@@ -442,51 +441,6 @@ def download_and_extract_archive(url,
     print(f'Extracting {archive} to {extract_root}')
     extract_archive(archive, extract_root, remove_finished)
 
-
-def write_det_xml(out_file, width, height, bboxes, labels, dataset_name):
-
-    node_root = Element('annotation')
-
-    node_folder = SubElement(node_root, 'folder')
-    node_folder.text = 'images'
-
-    node_filename = SubElement(node_root, 'filename')
-    node_filename.text = os.path.basename(out_file)[:-4] + '.jpg'
-
-    node_size = SubElement(node_root, 'size')
-    node_width = SubElement(node_size, 'width')
-    node_width.text = str(width)
-    node_height = SubElement(node_size, 'height')
-    node_height.text = str(height)
-    class_names = get_classes(dataset_name)
-
-    for i in range(len(bboxes)):
-        node_object = SubElement(node_root, 'object')
-
-        node_name = SubElement(node_object, 'name')
-        node_name.text = class_names[labels[i]]
-
-        node_truncated = SubElement(node_object, 'truncated')
-        node_truncated.text = '0'
-
-        node_difficult = SubElement(node_object, 'difficult')
-        node_difficult.text = '0'
-
-        node_bndbox = SubElement(node_object, 'bndbox')
-        node_xmin = SubElement(node_bndbox, 'xmin')
-        node_xmin.text = str(bboxes[i][0])
-        node_ymin = SubElement(node_bndbox, 'ymin')
-        node_ymin.text = str(bboxes[i][1])
-        node_xmax = SubElement(node_bndbox, 'xmax')
-        node_xmax.text = str(bboxes[i][2])
-        node_ymax = SubElement(node_bndbox, 'ymax')
-        node_ymax.text = str(bboxes[i][3])
-
-    # xml_str = tostring(node_root, pretty_print=True)
-    tree = ElementTree(node_root)
-    tree.write(out_file, pretty_print=True, xml_declaration=False, encoding='utf-8')
-
-
 class BaseStorageBackend(metaclass=ABCMeta):
     """Abstract class of storage backends.
     All backends need to implement two apis: ``get()`` and ``get_text()``.
@@ -501,161 +455,6 @@ class BaseStorageBackend(metaclass=ABCMeta):
     @abstractmethod
     def get_text(self, filepath):
         pass
-
-
-class CephBackend(BaseStorageBackend):
-    """Ceph storage backend.
-    Args:
-        path_mapping (dict|None): path mapping dict from local path to Petrel
-            path. When ``path_mapping={'src': 'dst'}``, ``src`` in ``filepath``
-            will be replaced by ``dst``. Default: None.
-    """
-
-    def __init__(self, path_mapping=None):
-        try:
-            import ceph
-            warnings.warn('Ceph is deprecate in favor of Petrel.')
-        except ImportError:
-            raise ImportError('Please install ceph to enable CephBackend.')
-
-        self._client = ceph.S3Client()
-        assert isinstance(path_mapping, dict) or path_mapping is None
-        self.path_mapping = path_mapping
-
-    def get(self, filepath):
-        filepath = str(filepath)
-        if self.path_mapping is not None:
-            for k, v in self.path_mapping.items():
-                filepath = filepath.replace(k, v)
-        value = self._client.Get(filepath)
-        value_buf = memoryview(value)
-        return value_buf
-
-    def get_text(self, filepath):
-        raise NotImplementedError
-
-
-class PetrelBackend(BaseStorageBackend):
-    """Petrel storage backend (for internal use).
-    Args:
-        path_mapping (dict|None): path mapping dict from local path to Petrel
-            path. When `path_mapping={'src': 'dst'}`, `src` in `filepath` will
-            be replaced by `dst`. Default: None.
-        enable_mc (bool): whether to enable memcached support. Default: True.
-    """
-
-    def __init__(self, path_mapping=None, enable_mc=True):
-        try:
-            from petrel_client import client
-        except ImportError:
-            raise ImportError('Please install petrel_client to enable '
-                              'PetrelBackend.')
-
-        self._client = client.Client(enable_mc=enable_mc)
-        assert isinstance(path_mapping, dict) or path_mapping is None
-        self.path_mapping = path_mapping
-
-    def get(self, filepath):
-        filepath = str(filepath)
-        if self.path_mapping is not None:
-            for k, v in self.path_mapping.items():
-                filepath = filepath.replace(k, v)
-        value = self._client.Get(filepath)
-        value_buf = memoryview(value)
-        return value_buf
-
-    def get_text(self, filepath):
-        raise NotImplementedError
-
-
-class MemcachedBackend(BaseStorageBackend):
-    """Memcached storage backend.
-    Attributes:
-        server_list_cfg (str): Config file for memcached server list.
-        client_cfg (str): Config file for memcached client.
-        sys_path (str | None): Additional path to be appended to `sys.path`.
-            Default: None.
-    """
-
-    def __init__(self, server_list_cfg, client_cfg, sys_path=None):
-        if sys_path is not None:
-            import sys
-            sys.path.append(sys_path)
-        try:
-            import mc
-        except ImportError:
-            raise ImportError(
-                'Please install memcached to enable MemcachedBackend.')
-
-        self.server_list_cfg = server_list_cfg
-        self.client_cfg = client_cfg
-        self._client = mc.MemcachedClient.GetInstance(self.server_list_cfg,
-                                                      self.client_cfg)
-        # mc.pyvector servers as a point which points to a memory cache
-        self._mc_buffer = mc.pyvector()
-
-    def get(self, filepath):
-        try:
-            import mc
-        except ImportError:
-            raise ImportError(
-                'Please install memcached to enable MemcachedBackend.')
-        filepath = str(filepath)
-        self._client.Get(filepath, self._mc_buffer)
-        value_buf = mc.ConvertBuffer(self._mc_buffer)
-        return value_buf
-
-    def get_text(self, filepath):
-        raise NotImplementedError
-
-
-class LmdbBackend(BaseStorageBackend):
-    """Lmdb storage backend.
-    Args:
-        db_path (str): Lmdb database path.
-        readonly (bool, optional): Lmdb environment parameter. If True,
-            disallow any write operations. Default: True.
-        lock (bool, optional): Lmdb environment parameter. If False, when
-            concurrent access occurs, do not lock the database. Default: False.
-        readahead (bool, optional): Lmdb environment parameter. If False,
-            disable the OS filesystem readahead mechanism, which may improve
-            random read performance when a database is larger than RAM.
-            Default: False.
-    Attributes:
-        db_path (str): Lmdb database path.
-    """
-
-    def __init__(self,
-                 db_path,
-                 readonly=True,
-                 lock=False,
-                 readahead=False,
-                 **kwargs):
-        try:
-            import lmdb
-        except ImportError:
-            raise ImportError('Please install lmdb to enable LmdbBackend.')
-
-        self.db_path = str(db_path)
-        self._client = lmdb.open(
-            self.db_path,
-            readonly=readonly,
-            lock=lock,
-            readahead=readahead,
-            **kwargs)
-
-    def get(self, filepath):
-        """Get values according to the filepath.
-        Args:
-            filepath (str | obj:`Path`): Here, filepath is the lmdb key.
-        """
-        filepath = str(filepath)
-        with self._client.begin(write=False) as txn:
-            value_buf = txn.get(filepath.encode('ascii'))
-        return value_buf
-
-    def get_text(self, filepath):
-        raise NotImplementedError
 
 
 class HardDiskBackend(BaseStorageBackend):
@@ -687,10 +486,6 @@ class FileClient:
 
     _backends = {
         'disk': HardDiskBackend,
-        'ceph': CephBackend,
-        'memcached': MemcachedBackend,
-        'lmdb': LmdbBackend,
-        'petrel': PetrelBackend,
     }
 
     def __init__(self, backend='disk', **kwargs):

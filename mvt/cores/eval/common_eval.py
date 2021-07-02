@@ -4,9 +4,6 @@
 # @Email   : zhimingqian@tencent.com
 # @File    : det_eval.py
 
-import os
-import torch
-import torch.nn as nn
 from multiprocessing import Pool
 import numpy as np
 from terminaltables import AsciiTable

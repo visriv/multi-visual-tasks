@@ -1,8 +1,8 @@
-pyyaml
 yacs
+scipy
 tqdm
 opencv-python
-yapf
 pycocotools
 terminaltables
 tensorboard
+yapf
