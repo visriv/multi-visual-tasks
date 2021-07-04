@@ -3,7 +3,7 @@ import os
 import pickle
 import sys
 from pathlib import Path
-
+from collections import Counter
 import numpy as np
 
 if 'MVT_ROOT' in os.environ:
@@ -161,21 +161,22 @@ def emb_single_device_test(model, data_loader, with_label=False):
 
 def run_det_task(cfg_path, model_path, json_path, score_thr):
     print('Running detection task ...')
-    get_task_cfg(cfg, cfg_path)
+    det_cfg = cfg.clone()
+    get_task_cfg(det_cfg, cfg_path)
 
     # build the dataloader
-    dataset_args = get_dataset_global_args(cfg.DATA)
+    dataset_args = get_dataset_global_args(det_cfg.DATA)
     dataset = build_dataset(
-        cfg.DATA.TEST_DATA, cfg.DATA.TEST_TRANSFORMS, dataset_args)
+        det_cfg.DATA.TEST_DATA, det_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader = build_dataloader(
         dataset,
-        samples_per_device=cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
+        samples_per_device=det_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
+        workers_per_device=det_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
     # build the model and load checkpoint
-    model = build_model(cfg.MODEL)
+    model = build_model(det_cfg.MODEL)
 
     checkpoint = load_checkpoint(model, model_path, map_location='cpu')
 
@@ -279,22 +280,23 @@ def save_submit_json(outputs, det_json_path, out_json_path, score_thr=0.1, top_k
 def run_emb_task(cfg_path, model_path, det_json_path,
                  out_json_path, score_thr, top_k_list=[1]):
     print('Running embedding task ...')
-    get_task_cfg(cfg, cfg_path)
+    emb_cfg = cfg.clone()
+    get_task_cfg(emb_cfg, cfg_path)
 
     # build the dataloader
-    dataset_args = get_dataset_global_args(cfg.DATA)
+    dataset_args = get_dataset_global_args(emb_cfg.DATA)
 
     dataset_ref = build_dataset(
-        cfg.DATA.VAL_DATA, cfg.DATA.TEST_TRANSFORMS, dataset_args)
+        emb_cfg.DATA.VAL_DATA, emb_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader_ref = build_dataloader(
         dataset_ref,
-        samples_per_device=cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
+        samples_per_device=emb_cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
+        workers_per_device=emb_cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
     # build the model and load checkpoint
-    model = build_model(cfg.MODEL)
+    model = build_model(emb_cfg.MODEL)
 
     checkpoint = load_checkpoint(model, model_path, map_location='cpu')
 
@@ -309,11 +311,11 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         model, data_loader_ref, with_label=True)
 
     dataset_qry = build_dataset(
-        cfg.DATA.TEST_DATA, cfg.DATA.TEST_TRANSFORMS, dataset_args)
+        emb_cfg.DATA.TEST_DATA, emb_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader_qry = build_dataloader(
         dataset_qry,
-        samples_per_device=cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
+        samples_per_device=emb_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
+        workers_per_device=emb_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
@@ -338,10 +340,10 @@ def run():
     det_score_thr = 0.1
 
     run_det_task(str(det_cfg_path), str(det_model_path),
-                str(det_json_path), det_score_thr)
+                 str(det_json_path), det_score_thr)
 
     emb_cfg_path = mvt_path / 'task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
-    emb_model_path = mvt_path / 'meta/emb_resnet50_mlp_loc_retail/epoch_50.pth'
+    emb_model_path = mvt_path / 'meta/train_infos/emb_resnet50_mlp_loc_retail/epoch_50.pth'
     out_json_path = mvt_path / 'submit/out.json'
 
     run_emb_task(

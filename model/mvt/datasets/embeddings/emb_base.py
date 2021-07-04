@@ -166,6 +166,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         """Prepare data and run pipelines"""
 
         results = copy.deepcopy(self.getitem_info(idx))
+        results['img_prefix'] = self.data_prefix
         return self.pipeline(results)
 
     def __len__(self):
@@ -235,22 +236,22 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         eval_results = {f'accuracy': 10.0}
         return eval_results
 
-        if isinstance(metric, str):
-            metrics = [metric]
-        else:
-            metrics = metric
-        allowed_metrics = ['accuracy']
-        eval_results = {}
-        for metric in metrics:
-            if metric not in allowed_metrics:
-                raise KeyError(f'metric {metric} is not supported.')
-            results = np.vstack(results)
-            labels = self.get_gt_labels()
-            assert len(labels) == len(results)
-            if metric == 'accuracy':
-                acc = np.sum(results == labels) / len(labels)
-                eval_result = {f'accuracy': acc}
+        # if isinstance(metric, str):
+        #     metrics = [metric]
+        # else:
+        #     metrics = metric
+        # allowed_metrics = ['accuracy']
+        # eval_results = {}
+        # for metric in metrics:
+        #     if metric not in allowed_metrics:
+        #         raise KeyError(f'metric {metric} is not supported.')
+        #     results = np.vstack(results)
+        #     labels = self.get_gt_labels()
+        #     assert len(labels) == len(results)
+        #     if metric == 'accuracy':
+        #         acc = np.sum(results == labels) / len(labels)
+        #         eval_result = {f'accuracy': acc}
 
-            eval_results.update(eval_result)
+        #     eval_results.update(eval_result)
 
-        return eval_results
+        # return eval_results

@@ -1,5 +1,6 @@
 .DS_Store
 /meta
+model_files/
 meta/
 .vscode/
 # Byte-compiled / optimized / DLL files
