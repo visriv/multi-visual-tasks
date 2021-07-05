@@ -1,4 +1,4 @@
-from mvt.utils.reg_util import Registry
+from model.mvt.utils.reg_util import Registry
 
 HOOKS = Registry('hook')
 

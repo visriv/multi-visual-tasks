@@ -4,7 +4,7 @@ import torch.nn as nn
 
 from .cnn_layer import ConvModule
 from .ops_builder import PLUGIN_LAYERS
-from mvt.utils.init_util import constant_init, normal_init
+from model.mvt.utils.init_util import constant_init, normal_init
 
 
 class _NonLocalNd(nn.Module, metaclass=ABCMeta):
