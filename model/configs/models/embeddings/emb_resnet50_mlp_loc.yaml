@@ -1,7 +1,7 @@
 MODEL:
   TYPE: "emb"
   NAME: "ImgClsLocEmbedder"
-  PRETRAINED_MODEL_PATH: "meta/models/resnet50-19c8e357.pth"
+  PRETRAINED_MODEL_PATH: ""
   BACKBONE:
     type: "ResNet"
     depth: 50
