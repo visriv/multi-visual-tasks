@@ -5,15 +5,13 @@ import tempfile
 import time
 import torch
 import torch.distributed as dist
-import numpy as np
 
-from mvt.utils.misc_util import ProgressBar
-from mvt.utils.photometric_util import tensor2imgs
-from mvt.utils.misc_util import get_dist_info
-from mvt.utils.mask_util import encode_mask_results
-from mvt.utils.io_util import imread, file_load, obj_dump
-from mvt.utils.geometric_util import imresize
-from mvt.utils.path_util import mkdir_or_exist
+from model.mvt.utils.misc_util import ProgressBar
+from model.mvt.utils.photometric_util import tensor2imgs
+from model.mvt.utils.misc_util import get_dist_info
+from model.mvt.utils.io_util import file_load, obj_dump
+from model.mvt.utils.geometric_util import imresize
+from model.mvt.utils.path_util import mkdir_or_exist
 
 
 #----------------------------------------------------------------------------- 
@@ -68,10 +66,6 @@ def single_device_det_test(model,
                     out_file=out_file,
                     score_thr=show_score_thr)
 
-        # encode mask results
-        if isinstance(result[0], tuple):
-            result = [(bbox_results, encode_mask_results(mask_results))
-                      for bbox_results, mask_results in result]
         results.extend(result)
 
         for _ in range(batch_size):
@@ -128,10 +122,6 @@ def multi_device_det_test(model, data_loader, tmpdir=None, gpu_collect=False):
             for i in range(len(data['img_metas'])):
                 data['img_metas'][i] = data['img_metas'][i].data[0]
             result = model(return_loss=False, rescale=True, **data)
-            # encode mask results
-            if isinstance(result[0], tuple):
-                result = [(bbox_results, encode_mask_results(mask_results))
-                          for bbox_results, mask_results in result]
         results.extend(result)
 
         if rank == 0:

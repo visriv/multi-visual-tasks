@@ -6,7 +6,6 @@
 import logging
 import os
 from pathlib import Path
-
 import yaml
 from yacs.config import CfgNode
 
@@ -40,7 +39,7 @@ def _dict_update(meta_dict, additional_dict, task_data, mode):
     for data_key in task_data[mode]:
         if data_key == "BASE":
             mvt_root = Path(os.getenv('MVT_ROOT', './'))
-            cfg_path = mvt_root / 'configs' / task_data[mode]["BASE"]
+            cfg_path = mvt_root / 'model/configs' / task_data[mode]["BASE"]
             with open(str(cfg_path)) as fd:
                 data_info = yaml.load(fd, Loader=yaml.FullLoader)
             meta_dict[mode] = data_info[mode]

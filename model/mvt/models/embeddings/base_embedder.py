@@ -4,8 +4,8 @@ import torch
 import torch.distributed as dist
 import torch.nn as nn
 
-from mvt.utils.log_util import print_log
-from mvt.utils.fp16_util import auto_fp16
+from model.mvt.utils.log_util import print_log
+from model.mvt.utils.fp16_util import auto_fp16
 
 
 class BaseEmbedder(nn.Module, metaclass=ABCMeta):

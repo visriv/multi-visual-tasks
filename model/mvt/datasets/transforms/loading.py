@@ -3,9 +3,8 @@ import numpy as np
 import pycocotools.mask as maskUtils
 
 from ..data_wrapper import PIPELINES
-from mvt.utils.io_util import imfrombytes
-from mvt.utils.io_util import FileClient
-from mvt.utils.mask_util import BitmapMasks, PolygonMasks
+from model.mvt.utils.io_util import imfrombytes
+from model.mvt.utils.io_util import FileClient
 
 
 @PIPELINES.register_module()
@@ -317,70 +316,6 @@ class LoadAnnotations():
                 valid_polygons.append(polygon)
         return valid_polygons
 
-    def _load_masks(self, results):
-        """Private function to load mask annotations.
-
-        Args:
-            results (dict): Result dict from :obj:`CustomDataset`.
-
-        Returns:
-            dict: The dict contains loaded mask annotations.
-                If ``self.poly2mask`` is set ``True``, `gt_mask` will contain
-                :obj:`PolygonMasks`. Otherwise, :obj:`BitmapMasks` is used.
-        """
-
-        h, w = results['img_info']['height'], results['img_info']['width']
-        gt_masks = results['ann_info']['masks']
-        if self.poly2mask:
-            gt_masks = BitmapMasks(
-                [self._poly2mask(mask, h, w) for mask in gt_masks], h, w)
-        else:
-            gt_masks = PolygonMasks(
-                [self.process_polygons(polygons) for polygons in gt_masks], h,
-                w)
-        results['gt_masks'] = gt_masks
-        results['mask_fields'].append('gt_masks')
-        return results
-
-    def _load_semantic_seg(self, results):
-        """Private function to load semantic segmentation annotations.
-
-        Args:
-            results (dict): Result dict from :obj:`dataset`.
-
-        Returns:
-            dict: The dict contains loaded semantic segmentation annotations.
-        """
-
-        if self.file_client is None:
-            self.file_client = FileClient(**self.file_client_args)
-
-        filename = osp.join(results['seg_prefix'],
-                            results['ann_info']['seg_map'])
-        img_bytes = self.file_client.get(filename)
-
-        # results['gt_semantic_seg'] = imfrombytes(
-        #     img_bytes, flag='unchanged').squeeze()
-        # results['seg_fields'].append('gt_semantic_seg')
-        gt_semantic_seg = imfrombytes(
-            img_bytes, flag='unchanged',
-            backend=self.imdecode_backend).squeeze().astype(np.uint8)
-
-        # modify if custom classes
-        if results.get('label_map', None) is not None:
-            for old_id, new_id in results['label_map'].items():
-                gt_semantic_seg[gt_semantic_seg == old_id] = new_id
-
-        # reduce zero_label
-        if self.reduce_zero_label:
-            # avoid using underflow conversion
-            gt_semantic_seg[gt_semantic_seg == 0] = 255
-            gt_semantic_seg = gt_semantic_seg - 1
-        gt_semantic_seg[gt_semantic_seg == 254] = 255
-        results['gt_semantic_seg'] = gt_semantic_seg
-        results['seg_fields'].append('gt_semantic_seg')
-        return results
-
     def __call__(self, results):
         """Call function to load multiple types annotations.
 
@@ -398,10 +333,7 @@ class LoadAnnotations():
                 return None
         if self.with_label:
             results = self._load_labels(results)
-        if self.with_mask:
-            results = self._load_masks(results)
-        if self.with_seg:
-            results = self._load_semantic_seg(results)
+        
         return results
 
     def __repr__(self):
@@ -409,8 +341,6 @@ class LoadAnnotations():
         repr_str = self.__class__.__name__
         repr_str += f'(with_bbox={self.with_bbox}, '
         repr_str += f'with_label={self.with_label}, '
-        repr_str += f'with_mask={self.with_mask}, '
-        repr_str += f'with_seg={self.with_seg})'
         repr_str += f'poly2mask={self.poly2mask})'
         repr_str += f'poly2mask={self.file_client_args})'
         return repr_str

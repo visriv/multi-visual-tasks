@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import torch
 import torch.nn as nn
 
-from mvt.cores import ops
+from model.mvt.cores import ops
 
 
 class BaseRoIExtractor(nn.Module, metaclass=ABCMeta):

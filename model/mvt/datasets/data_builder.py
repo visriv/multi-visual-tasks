@@ -3,12 +3,8 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-import copy
-import platform
-import random
 from functools import partial
 from torch.utils.data import DataLoader, RandomSampler
-import numpy as np
 import resource
 
 from .data_sampler import (DistributedGroupSampler,
@@ -16,9 +12,9 @@ from .data_sampler import (DistributedGroupSampler,
                            GroupSampler)
 from .data_wrapper import (ConcatDataset, RepeatDataset, 
                            ClassBalancedDataset, DATASETS)
-from mvt.utils.reg_util import Registry, build_data_from_cfg
-from mvt.utils.runtime_util import worker_init_fn, collate
-from mvt.utils.misc_util import get_dist_info
+from model.mvt.utils.reg_util import build_data_from_cfg
+from model.mvt.utils.runtime_util import worker_init_fn, collate
+from model.mvt.utils.misc_util import get_dist_info
 
 
 # --------------------------------------------------------------------------- #

@@ -2,8 +2,8 @@ from torch import nn
 
 from .base_embedder import BaseEmbedder
 from ..model_builder import EMBEDDERS
-from mvt.blocks.block_builder import build_backbone, build_head, build_neck
-from mvt.utils.fp16_util import auto_fp16
+from model.mvt.blocks.block_builder import build_backbone, build_head, build_neck
+from model.mvt.utils.fp16_util import auto_fp16
 
 
 @EMBEDDERS.register_module()

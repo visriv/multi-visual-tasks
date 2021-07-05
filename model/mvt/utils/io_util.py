@@ -9,7 +9,6 @@ import shutil
 import gzip
 import tarfile
 import zipfile
-import warnings
 import inspect
 from abc import ABCMeta, abstractmethod
 from cv2 import IMREAD_COLOR, IMREAD_GRAYSCALE, IMREAD_UNCHANGED
@@ -22,7 +21,6 @@ except ImportError:
 from .handlers import JsonHandler, PickleHandler, YamlHandler
 from .misc_util import is_str
 from .path_util import check_file_exist, mkdir_or_exist
-from .data_util import get_classes
 
 file_handlers = {
     'json': JsonHandler(),

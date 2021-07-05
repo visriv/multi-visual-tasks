@@ -5,10 +5,10 @@ import torch.nn as nn
 from ..block_builder import HEADS, build_loss
 from .base_det_head import BaseDetHead
 from .dense_test_mixins import BBoxTestMixin
-from mvt.cores.ops import ConvModule
-from mvt.utils.init_util import bias_init_with_prob, normal_init
-from mvt.utils.fp16_util import force_fp32
-from mvt.utils.misc_util import multi_apply
+from model.mvt.cores.ops import ConvModule
+from model.mvt.utils.init_util import bias_init_with_prob, normal_init
+from model.mvt.utils.fp16_util import force_fp32
+from model.mvt.utils.misc_util import multi_apply
 
 
 @HEADS.register_module()

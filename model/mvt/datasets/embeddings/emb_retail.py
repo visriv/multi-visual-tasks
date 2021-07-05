@@ -4,10 +4,10 @@ import numpy as np
 
 from .emb_base import EmbBaseDataset
 from ..data_builder import DATASETS
-from mvt.utils.io_util import file_load
-from mvt.utils.geometric_util import imcrop, imrotate
-from mvt.utils.bbox_util import get_rotated_bbox
-from mvt.utils.vis_util import imshow
+from model.mvt.utils.io_util import file_load
+from model.mvt.utils.geometric_util import imcrop, imrotate
+from model.mvt.utils.bbox_util import get_rotated_bbox
+from model.mvt.utils.vis_util import imshow
 
 
 @DATASETS.register_module()

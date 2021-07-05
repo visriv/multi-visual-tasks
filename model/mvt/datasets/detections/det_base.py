@@ -1,17 +1,14 @@
 import os
 import os.path as osp
-import struct
-import warnings
-from threading import local
 
 import numpy as np
 from torch.utils.data import Dataset
 from yacs.config import CfgNode
 
-from mvt.cores.eval.common_eval import eval_map, eval_recalls
-from mvt.datasets.data_wrapper import DATASETS
-from mvt.datasets.transforms import Compose
-from mvt.utils.io_util import file_load, list_from_file
+from model.mvt.cores.eval.common_eval import eval_map, eval_recalls
+from model.mvt.datasets.data_wrapper import DATASETS
+from model.mvt.datasets.transforms import Compose
+from model.mvt.utils.io_util import file_load, list_from_file
 
 
 @DATASETS.register_module()

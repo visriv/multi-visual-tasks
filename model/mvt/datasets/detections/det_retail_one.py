@@ -2,10 +2,10 @@ import os
 import os.path as osp
 import numpy as np
 
-from mvt.utils.io_util import file_load
-from mvt.datasets.data_wrapper import DATASETS
-from mvt.datasets.detections.det_base import DetBaseDataset
-from mvt.cores.eval.common_eval import eval_map, eval_recalls
+from model.mvt.utils.io_util import file_load
+from model.mvt.datasets.data_wrapper import DATASETS
+from model.mvt.datasets.detections.det_base import DetBaseDataset
+from model.mvt.cores.eval.common_eval import eval_map, eval_recalls
 
 
 @DATASETS.register_module()

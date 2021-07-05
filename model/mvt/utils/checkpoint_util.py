@@ -9,10 +9,10 @@ import torchvision
 from torch.optim import Optimizer
 from torch.utils import model_zoo
 
-from mvt.utils.io_util import file_load
-from mvt.utils.path_util import mkdir_or_exist
-from mvt.utils.misc_util import get_dist_info
-from mvt.cores.core_module import is_module_wrapper
+from model.mvt.utils.io_util import file_load
+from model.mvt.utils.path_util import mkdir_or_exist
+from model.mvt.utils.misc_util import get_dist_info
+from model.mvt.cores.core_module import is_module_wrapper
 
 
 def load_state_dict(module, state_dict, strict=False, logger=None):

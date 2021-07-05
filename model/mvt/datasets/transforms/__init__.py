@@ -9,21 +9,21 @@ from .loading import (LoadAnnotations, LoadImageFromFile, LoadImageFromWebcam,
                       LoadMultiChannelImageFromFiles, LoadProposals)
 from .test_time_aug import MultiScaleFlipAug
 from .transforms import (Albu, CutOut, Expand, MinIoURandomCrop, Normalize,
-                         Pad, PhotoMetricDistortion, RandomCenterCropPad, GenerateHeatMap,
-                         JointRandomCrop, JointRandomFlip, JointResize, SegRescale,
+                         Pad, PhotoMetricDistortion, RandomCenterCropPad,
+                         JointRandomCrop, JointRandomFlip, JointResize,
                          RandomGrayscale, ImgResize, ImgRandomFlip, ImgCenterCrop,
-                         ImgRandomCrop, ImgRandomResizedCrop, SegRandomCrop)
+                         ImgRandomCrop, ImgRandomResizedCrop)
 
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor',
     'Transpose', 'Collect', 'EmbCollect', 'DefaultFormatBundle', 'LoadAnnotations',
     'LoadImageFromFile', 'LoadImageFromWebcam',
     'LoadMultiChannelImageFromFiles', 'LoadProposals', 'MultiScaleFlipAug',
-    'JointResize', 'JointRandomFlip', 'Pad', 'JointRandomCrop', 'Normalize', 'SegRescale',
+    'JointResize', 'JointRandomFlip', 'Pad', 'JointRandomCrop', 'Normalize', 
     'MinIoURandomCrop', 'Expand', 'PhotoMetricDistortion', 'Albu',
     'InstaBoost', 'RandomCenterCropPad', 'AutoAugment', 'CutOut', 'Shear',
     'Rotate', 'ColorTransform', 'EqualizeTransform', 'BrightnessTransform',
-    'ContrastTransform', 'Translate', 'SegRandomCrop',  'GenerateHeatMap',
+    'ContrastTransform', 'Translate', 
     'RandomGrayscale', 'ImgResize', 'ImgRandomFlip', 'ImgCenterCrop',
     'ImgRandomCrop', 'ImgRandomResizedCrop', 
 ]

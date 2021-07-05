@@ -68,8 +68,8 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   Examples:
 
     ```shell
-    python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_det/det_yolov4_cspdarknet_retail.yaml
-    python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_emb/emb_resnet50_fc_retail.yaml
+    python3 ./tools/train.py --work-dir model_files/ --no-test model/task_settings/img_det/det_yolov4_9a_retail_one.yaml
+    python3 ./tools/train.py --work-dir model_files/ --no-test model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml
     ```
 
 ### Train with multiple GPUs
@@ -80,14 +80,14 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   or
 
   ```shell
-  python3 -m torch.distributed.launch --nproc_per_node=${GPU} --master_port=${PORT}  tools/train.py --load-from ${CHECKPOINT} --no-test --launcher pytorch ${CONFIG} 
+  python3 -m torch.distributed.launch --nproc_per_node=${GPU} --master_port=${PORT}  tools/train.py --work-dir ${WORK_DIR} --load-from ${CHECKPOINT} --no-test --launcher pytorch ${CONFIG} 
   ```
   Examples:
 
     Similar to training cases with a single GPU, here gives a few examples.
 
     ```shell
-    CUDA_VISIBLE_DEVICES=4,5,6,7 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29500  tools/train.py --no-test --launcher pytorch task_settings/img_det/det_yolov4_cspdarknet_retail.yaml
+    CUDA_VISIBLE_DEVICES=4,5,6,7 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29500  tools/train.py --work-dir model_files/ --no-test --launcher pytorch model/task_settings/img_det/det_yolov4_9a_retail_one.yaml
     ```
 
 ### Evaluate a dataset
@@ -122,7 +122,7 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   Examples:
 
     ```shell
-    python3 ./tools/test.py task_settings/img_det/det_faster_rcnn_r50_fpn_coco.yaml  meta/train_infos/det_faster_rcnn_r50_fpn_coco/epoch_24.pth --eval 'mAP' --out 'meta/test_infos/det_faster_rcnn_r50_fpn_coco_eval.pkl' --show-dir 'meta/test_infos/det_faster_rcnn_r50_fpn_coco_eval'
+    python3 ./tools/test.py task_settings/img_det/det_yolov4_9a_retail_one.yaml  model_files/det_yolov4_9a_retail_one/epoch_200.pth --eval 'mAP' --out 'model_files/det_yolov4_9a_retail_one_eval.pkl' --show-dir 'data/det_yolov4_9a_retail_one_eval'
     ```
 
 ### Test a dataset

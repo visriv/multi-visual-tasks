@@ -1,15 +1,15 @@
 import torch
 from yacs.config import CfgNode
 
-from ..block_builder import HEADS, build_head, build_roi_extractor
 from .base_roi_head import BaseRoIHead
-from .test_mixins import BBoxTestMixin, MaskTestMixin
-from mvt.cores.bbox import bbox2result, bbox2roi
-from mvt.cores.core_bbox import build_assigner, build_sampler
+from .test_mixins import BBoxTestMixin
+from ..block_builder import HEADS, build_head, build_roi_extractor
+from model.mvt.cores.bbox import bbox2result, bbox2roi
+from model.mvt.cores.core_bbox import build_assigner, build_sampler
 
 
 @HEADS.register_module()
-class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
+class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
     """Simplest base roi head including one bbox head and one mask head."""
 
     def init_assigner_sampler(self):

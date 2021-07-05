@@ -18,16 +18,16 @@ else:
 
 import torch
 
-from configs import cfg
-from mvt.cores.metric_ops import LpDistance
-from mvt.datasets.data_builder import build_dataloader, build_dataset
-from mvt.models.model_builder import build_model
-from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.utils.config_util import get_dataset_global_args, get_task_cfg
-from mvt.utils.geometric_util import imresize
-from mvt.utils.misc_util import ProgressBar
-from mvt.utils.parallel_util import DataParallel
-from mvt.utils.photometric_util import tensor2imgs
+from model.configs import cfg
+from model.mvt.cores.metric_ops import LpDistance
+from model.mvt.datasets.data_builder import build_dataloader, build_dataset
+from model.mvt.models.model_builder import build_model
+from model.mvt.utils.checkpoint_util import load_checkpoint
+from model.mvt.utils.config_util import get_dataset_global_args, get_task_cfg
+from model.mvt.utils.geometric_util import imresize
+from model.mvt.utils.misc_util import ProgressBar
+from model.mvt.utils.parallel_util import DataParallel
+from model.mvt.utils.photometric_util import tensor2imgs
 
 
 def det_single_device_test(model, data_loader, score_thr=0.05):
@@ -330,11 +330,11 @@ def run_emb_task(cfg_path, model_path, det_json_path,
 
 def run():
     mvt_path = Path(MVT_ROOT)
-    det_cfg_path = mvt_path / 'task_settings/img_det/det_yolov4_9a_retail_one.yaml'
-    det_model_path = mvt_path / 'meta/train_infos/det_yolov4_9a_retail_one/epoch_200.pth'
+    det_cfg_path = mvt_path / 'model/task_settings/img_det/det_yolov4_9a_retail_one.yaml'
+    det_model_path = mvt_path / 'model_files/det_yolov4_9a_retail_one/epoch_200.pth'
 
-    #det_cfg_path = mvt_path / 'task_settings/img_det/det_yolov4_retail_one.yaml'
-    #det_model_path = mvt_path / 'meta/train_infos/det_yolov4_retail_one/epoch_200.pth'
+    #det_cfg_path = mvt_path / 'model/task_settings/img_det/det_yolov4_retail_one.yaml'
+    #det_model_path = mvt_path / 'model_files/det_yolov4_retail_one/epoch_200.pth'
 
     det_json_path = mvt_path / 'data/test/a_det_annotations.json'
     det_score_thr = 0.1
@@ -342,8 +342,8 @@ def run():
     run_det_task(str(det_cfg_path), str(det_model_path),
                  str(det_json_path), det_score_thr)
 
-    emb_cfg_path = mvt_path / 'task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
-    emb_model_path = mvt_path / 'meta/train_infos/emb_resnet50_mlp_loc_retail/epoch_50.pth'
+    emb_cfg_path = mvt_path / 'model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
+    emb_model_path = mvt_path / 'model_files/emb_resnet50_mlp_loc_retail/epoch_50.pth'
     out_json_path = mvt_path / 'submit/out.json'
 
     run_emb_task(

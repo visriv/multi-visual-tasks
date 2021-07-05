@@ -1,9 +1,9 @@
 import numpy as np
 import torch
-
-from mvt.cores.ops import nms
-from mvt.cores.bbox import bbox_mapping_back
 from math import sqrt
+
+from model.mvt.cores.ops import nms
+from model.mvt.cores.bbox import bbox_mapping_back
 
 
 def bbox_overlaps_np(bboxes1, bboxes2, mode='iou', eps=1e-6, keep_order=False):

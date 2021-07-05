@@ -3,7 +3,6 @@ from torch import nn
 
 class BaseClsHead(nn.Module):
     """Classification head.
-
     Args:
         out_channels (int): Number of classes.
         in_channels (int): Number of channels in the input feature map.

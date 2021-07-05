@@ -4,9 +4,9 @@ import numpy as np
 from PIL import Image
 
 from .det_base import DetBaseDataset
-from mvt.cores.eval.common_eval import eval_map, eval_recalls
-from mvt.datasets.data_wrapper import DATASETS
-from mvt.utils.io_util import list_from_file
+from model.mvt.cores.eval.common_eval import eval_map, eval_recalls
+from model.mvt.datasets.data_wrapper import DATASETS
+from model.mvt.utils.io_util import list_from_file
 
 
 @DATASETS.register_module()

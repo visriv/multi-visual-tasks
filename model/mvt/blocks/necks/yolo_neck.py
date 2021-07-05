@@ -6,10 +6,10 @@ import torch.nn.functional as F
 from collections import OrderedDict
 
 from ..block_builder import NECKS
-from mvt.cores.ops import ConvModule
-from mvt.utils.init_util import xavier_init
-from mvt.cores.layer_ops import brick as vn_layer
-from mvt.blocks.backbones.darknetcsp import BottleneckCSP, BottleneckCSP2, Conv
+from model.mvt.cores.ops import ConvModule
+from model.mvt.utils.init_util import xavier_init
+from model.mvt.cores.layer_ops import brick as vn_layer
+from model.mvt.blocks.backbones.darknetcsp import BottleneckCSP, BottleneckCSP2, Conv
 
 
 class DetectionBlock(nn.Module):

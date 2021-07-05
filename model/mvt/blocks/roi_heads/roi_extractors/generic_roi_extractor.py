@@ -1,7 +1,7 @@
 from .base_roi_extractor import BaseRoIExtractor
-from mvt.cores.ops import build_plugin_layer
-from mvt.utils.fp16_util import force_fp32
-from mvt.blocks.block_builder import ROI_EXTRACTORS
+from model.mvt.cores.ops import build_plugin_layer
+from model.mvt.utils.fp16_util import force_fp32
+from model.mvt.blocks.block_builder import ROI_EXTRACTORS
 
 
 @ROI_EXTRACTORS.register_module()

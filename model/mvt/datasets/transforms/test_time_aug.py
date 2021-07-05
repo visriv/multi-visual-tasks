@@ -1,7 +1,7 @@
 import warnings
 
-from ..data_wrapper import PIPELINES
 from .compose import Compose
+from ..data_wrapper import PIPELINES
 from mvt.utils.misc_util import is_list_of
 
 

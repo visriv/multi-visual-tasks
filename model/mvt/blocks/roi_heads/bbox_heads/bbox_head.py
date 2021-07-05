@@ -3,12 +3,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.utils import _pair
 
-from mvt.utils.fp16_util import auto_fp16, force_fp32
-from mvt.cores.core_bbox import build_bbox_coder
-from mvt.utils.misc_util import multi_apply
-from mvt.cores.ops import multiclass_nms
-from mvt.blocks.block_builder import HEADS, build_loss
-from mvt.utils.metric_util import accuracy
+from model.mvt.utils.fp16_util import auto_fp16, force_fp32
+from model.mvt.cores.core_bbox import build_bbox_coder
+from model.mvt.utils.misc_util import multi_apply
+from model.mvt.cores.ops import multiclass_nms
+from model.mvt.blocks.block_builder import HEADS, build_loss
+from model.mvt.utils.metric_util import accuracy
 
 
 @HEADS.register_module()

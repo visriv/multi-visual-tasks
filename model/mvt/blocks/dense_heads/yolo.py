@@ -10,14 +10,14 @@ from collections import OrderedDict
 from .base_det_head import BaseDetHead
 from .dense_test_mixins import BBoxTestMixin
 from ..block_builder import HEADS, build_loss
-from mvt.cores.layer_ops import brick as vn_layer
-from mvt.cores.ops import ConvModule, multiclass_nms
-from mvt.utils.fp16_util import force_fp32
-from mvt.utils.init_util import normal_init
-from mvt.cores.anchor import images_to_levels
-from mvt.cores.core_anchor import build_anchor_generator
-from mvt.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
-from mvt.utils.misc_util import multi_apply
+from model.mvt.cores.layer_ops import brick as vn_layer
+from model.mvt.cores.ops import ConvModule, multiclass_nms
+from model.mvt.utils.fp16_util import force_fp32
+from model.mvt.utils.init_util import normal_init
+from model.mvt.cores.anchor import images_to_levels
+from model.mvt.cores.core_anchor import build_anchor_generator
+from model.mvt.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
+from model.mvt.utils.misc_util import multi_apply
 
 
 @HEADS.register_module()

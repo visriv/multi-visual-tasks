@@ -6,11 +6,11 @@ import torch
 import torch.distributed as dist
 import torch.nn as nn
 
-from mvt.utils.fp16_util import auto_fp16
-from mvt.utils.log_util import print_log, get_root_logger
-from mvt.utils.io_util import imread
-from mvt.utils.misc_util import concat_list
-from mvt.utils.vis_util import imshow_det_bboxes
+from model.mvt.utils.fp16_util import auto_fp16
+from model.mvt.utils.log_util import print_log, get_root_logger
+from model.mvt.utils.io_util import imread
+from model.mvt.utils.misc_util import concat_list
+from model.mvt.utils.vis_util import imshow_det_bboxes
 
 
 class BaseDetector(nn.Module, metaclass=ABCMeta):

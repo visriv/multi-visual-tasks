@@ -1,7 +1,7 @@
 import torch
 
-from ...core_bbox import BBOX_ASSIGNERS, build_iou_calculator
 from .max_iou_assigner import MaxIoUAssigner
+from ...core_bbox import BBOX_ASSIGNERS, build_iou_calculator
 
 
 @BBOX_ASSIGNERS.register_module()

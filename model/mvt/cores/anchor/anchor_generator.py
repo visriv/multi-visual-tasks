@@ -2,8 +2,9 @@
 import numpy as np
 import torch
 from torch.nn.modules.utils import _pair
-from mvt.utils.misc_util import is_list_of
+
 from ..core_anchor import ANCHOR_GENERATORS
+from model.mvt.utils.misc_util import is_list_of
 
 
 @ANCHOR_GENERATORS.register_module()

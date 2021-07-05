@@ -4,11 +4,11 @@ import torch.nn as nn
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from ..block_builder import BACKBONES
-from mvt.cores.ops import ConvModule
-from mvt.cores.ops import build_activation_layer
-from mvt.cores.ops import build_norm_layer
-from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.utils.init_util import constant_init, kaiming_init
+from model.mvt.cores.ops import ConvModule
+from model.mvt.cores.ops import build_activation_layer
+from model.mvt.cores.ops import build_norm_layer
+from model.mvt.utils.checkpoint_util import load_checkpoint
+from model.mvt.utils.init_util import constant_init, kaiming_init
 
 
 class Conv(ConvModule):

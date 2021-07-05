@@ -1,8 +1,8 @@
 import torch
 
-from ...core_bbox import BBOX_SAMPLERS
-from ..bbox_transforms import bbox2roi
 from .base_sampler import BaseSampler
+from ..bbox_transforms import bbox2roi
+from ...core_bbox import BBOX_SAMPLERS
 
 
 @BBOX_SAMPLERS.register_module()

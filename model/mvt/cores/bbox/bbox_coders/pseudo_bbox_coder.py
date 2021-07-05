@@ -1,5 +1,5 @@
-from ...core_bbox import BBOX_CODERS
 from .base_bbox_coder import BaseBBoxCoder
+from ...core_bbox import BBOX_CODERS
 
 
 @BBOX_CODERS.register_module()

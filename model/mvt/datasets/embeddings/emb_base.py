@@ -2,14 +2,12 @@ import copy
 import os
 from abc import ABCMeta, abstractmethod
 from os import path as osp
-
 import numpy as np
 from torch.utils.data import Dataset
 from yacs.config import CfgNode
 
-from mvt.utils.io_util import list_from_file
-
 from ..transforms import Compose
+from model.mvt.utils.io_util import list_from_file
 
 
 class EmbBaseDataset(Dataset, metaclass=ABCMeta):

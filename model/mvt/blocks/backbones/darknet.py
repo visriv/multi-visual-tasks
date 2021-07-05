@@ -1,16 +1,15 @@
 # Copyright (c) 2019 Western Digital Corporation or its affiliates.
 
 import logging
-
 import torch.nn as nn
-from mvt.cores.ops import ConvModule
-from mvt.utils.init_util import constant_init, kaiming_init
-from mvt.utils.checkpoint_util import load_checkpoint
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from .resnet import ResBlock
 from ..block_builder import BACKBONES
-from mvt.cores.layer_ops import brick as vn_layer
+from model.mvt.cores.ops import ConvModule
+from model.mvt.utils.init_util import constant_init, kaiming_init
+from model.mvt.utils.checkpoint_util import load_checkpoint
+from model.mvt.cores.layer_ops import brick as vn_layer
 
 
 @BACKBONES.register_module()
