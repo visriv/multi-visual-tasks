@@ -153,8 +153,9 @@ def emb_single_device_test(model, data_loader, with_label=False):
         outputs['bbox_ids'] = bbox_ids
         cache_path = '/tmp/emb_qry.pkl'
 
-    with open(cache_path, 'wb') as f:
-        pickle.dump(outputs, f)
+    # uncomment for fast debug
+    #with open(cache_path, 'wb') as f:
+    #    pickle.dump(outputs, f)
 
     return outputs
 
@@ -344,7 +345,7 @@ def run():
 
     emb_cfg_path = mvt_path / 'model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
     emb_model_path = mvt_path / 'model_files/emb_resnet50_mlp_loc_retail/epoch_50.pth'
-    out_json_path = mvt_path / 'submit/out.json'
+    out_json_path = mvt_path / 'submit/output.json'
 
     run_emb_task(
         str(emb_cfg_path), str(emb_model_path),
