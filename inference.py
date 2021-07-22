@@ -171,7 +171,7 @@ def run_det_task(cfg_path, model_path, json_path, score_thr):
         det_cfg.DATA.TEST_DATA, det_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader = build_dataloader(
         dataset,
-        samples_per_device=det_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
+        samples_per_device=8, # det_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
         workers_per_device=0, # det_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
@@ -294,7 +294,7 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         emb_cfg.DATA.VAL_DATA, emb_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader_ref = build_dataloader(
         dataset_ref,
-        samples_per_device=emb_cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
+        samples_per_device=32, # emb_cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
         workers_per_device=0, # emb_cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
@@ -318,7 +318,7 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         emb_cfg.DATA.TEST_DATA, emb_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader_qry = build_dataloader(
         dataset_qry,
-        samples_per_device=emb_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
+        samples_per_device=32, # emb_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
         workers_per_device= 0, # emb_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
@@ -373,8 +373,7 @@ def run():
     det_json_path = mvt_path / 'data/test/a_det_annotations.json'
     det_score_thr = 0.1
 
-    #run_det_task(str(det_cfg_path), str(det_model_path),
-    #             str(det_json_path), det_score_thr)
+    run_det_task(str(det_cfg_path), str(det_model_path), str(det_json_path), det_score_thr)
 
     ref_json_path = mvt_path / 'data/test/b_annotations.json'
     qry_json_path = mvt_path / 'data/test/a_annotations.json'
