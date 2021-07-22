@@ -1,4 +1,4 @@
-from mvt.utils.parallel_util import allreduce_params
+from model.mvt.utils.parallel_util import allreduce_params
 from ..core_hook import HOOKS, Hook
 
 

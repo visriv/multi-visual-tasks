@@ -310,7 +310,7 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         model.CLASSES = dataset_ref.CLASSES
 
     model = DataParallel(model, device_ids=[0])
-
+    print('(1/3) computing reference embeddings ...')
     outputs_ref = emb_single_device_test(
         model, data_loader_ref, with_label=True)
 
@@ -322,10 +322,12 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         workers_per_device= 0, # emb_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
-
+    
+    print('(2/3) computing query embeddings ...')
     outputs_qry = emb_single_device_test(
         model, data_loader_qry, with_label=False)
 
+    print('(3/3) inferring query labels ...')
     outputs = infer_labels(outputs_qry, outputs_ref, label_mapping, top_k_list)
 
     save_submit_json(
@@ -353,7 +355,10 @@ def get_label_mapping(ref_json_path, qry_json_path):
     for ref_cat in ref_cat_list:
         cid = int(ref_cat['id'])
         name = ref_cat['name']
-        mapping_dict[cid] = qry_dict[name]
+        if name in qry_dict:
+            mapping_dict[cid] = qry_dict[name]
+        else:
+            mapping_dict[cid] = 0 # TODO: how to deal with this?
 
     return mapping_dict
 
@@ -368,8 +373,8 @@ def run():
     det_json_path = mvt_path / 'data/test/a_det_annotations.json'
     det_score_thr = 0.1
 
-    run_det_task(str(det_cfg_path), str(det_model_path),
-                 str(det_json_path), det_score_thr)
+    #run_det_task(str(det_cfg_path), str(det_model_path),
+    #             str(det_json_path), det_score_thr)
 
     ref_json_path = mvt_path / 'data/test/b_annotations.json'
     qry_json_path = mvt_path / 'data/test/a_annotations.json'

@@ -2,7 +2,7 @@ import math
 
 from ..core_hook import HOOKS
 from .optimizer import Fp16OptimizerHook
-from mvt.utils.parallel_util import get_dist_info
+from model.mvt.utils.parallel_util import get_dist_info
 
 
 @HOOKS.register_module()
