@@ -200,7 +200,7 @@ def infer_labels(qry_outputs, ref_outputs, label_mapping, rank_list):
     Args:
         qry_outputs (dict): query outputs
         ref_outputs (dict): reference outputs
-        label_mapping (ndarray): mapping from reference label to query label
+        label_mapping (dict): mapping from reference label to query label
     Returns:
         outputs: query bbox indices with assigned labels
     """
@@ -349,13 +349,13 @@ def get_label_mapping(ref_json_path, qry_json_path):
         name = qry_cat['name']
         qry_dict[name] = cid
     
-    mapping = np.zeros((len(ref_cat_list),))
+    mapping_dict = {}
     for ref_cat in ref_cat_list:
         cid = int(ref_cat['id'])
         name = ref_cat['name']
-        mapping[cid] = qry_dict[name]
+        mapping_dict[cid] = qry_dict[name]
 
-    return mapping
+    return mapping_dict
 
 def run():
     mvt_path = Path(MVT_ROOT)

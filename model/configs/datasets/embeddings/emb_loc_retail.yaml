@@ -34,7 +34,7 @@ DATA:
     DATA_INFO: ["train/a_annotations.json", "train/b_annotations.json", "test/b_annotations.json"]
     DATA_PREFIX: ["train/a_images/", "train/b_images/", "test/b_images/"]
     SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 0
   VAL_DATA:
     TYPE: "Concat"
     FLAG: 1
@@ -42,7 +42,7 @@ DATA:
     DATA_PREFIX: ["train/a_images/"]
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 0
   TEST_DATA:
     TYPE: "Concat"
     FLAG: 1
@@ -50,4 +50,4 @@ DATA:
     DATA_PREFIX: ["test/a_images/"] 
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 4
-    WORKERS_PER_DEVICE: 4
+    WORKERS_PER_DEVICE: 0
