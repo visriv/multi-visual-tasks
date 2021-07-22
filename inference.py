@@ -154,8 +154,8 @@ def emb_single_device_test(model, data_loader, with_label=False):
         outputs['bbox_ids'] = bbox_ids
         cache_path = '/tmp/emb_qry.pkl'
 
-    with open(cache_path, 'wb') as f:
-        pickle.dump(outputs, f)
+    #with open(cache_path, 'wb') as f:
+    #    pickle.dump(outputs, f)
 
     return outputs
 
@@ -193,13 +193,14 @@ def run_det_task(cfg_path, model_path, json_path, score_thr):
     save_det_json(outputs['img_names'], outputs['detections'], json_path)
 
 
-def infer_labels(qry_outputs, ref_outputs, rank_list):
+def infer_labels(qry_outputs, ref_outputs, label_mapping, rank_list):
     """
     Get predicted labels
 
     Args:
         qry_outputs (dict): query outputs
         ref_outputs (dict): reference outputs
+        label_mapping (ndarray): mapping from reference label to query label
     Returns:
         outputs: query bbox indices with assigned labels
     """
@@ -243,6 +244,8 @@ def infer_labels(qry_outputs, ref_outputs, rank_list):
             top_k = pred_labels[i, :k]
             votes = Counter(top_k)
             pred = votes.most_common(1)[0][0]
+            # convert to query label
+            pred = label_mapping[pred]
             pred_labels_top_k.append(pred)
 
         result['labels_top_{}'.format(k)] = np.array(pred_labels_top_k)
@@ -279,7 +282,7 @@ def save_submit_json(outputs, det_json_path, out_json_path, score_thr=0.1, top_k
 
 
 def run_emb_task(cfg_path, model_path, det_json_path,
-                 out_json_path, score_thr, top_k_list=[1]):
+                 out_json_path, label_mapping, score_thr, top_k_list=[1]):
     print('Running embedding task ...')
     emb_cfg = cfg.clone()
     get_task_cfg(emb_cfg, cfg_path)
@@ -323,11 +326,36 @@ def run_emb_task(cfg_path, model_path, det_json_path,
     outputs_qry = emb_single_device_test(
         model, data_loader_qry, with_label=False)
 
-    outputs = infer_labels(outputs_qry, outputs_ref, top_k_list)
+    outputs = infer_labels(outputs_qry, outputs_ref, label_mapping, top_k_list)
 
     save_submit_json(
         outputs, det_json_path, out_json_path, score_thr, top_k=1)
 
+
+def get_label_mapping(ref_json_path, qry_json_path):
+
+    with open(ref_json_path, 'r') as f:
+        ref_data = json.load(f)
+
+    with open(qry_json_path, 'r') as f:
+        qry_data = json.load(f)
+
+    ref_cat_list = ref_data['categories']
+    qry_cat_list = qry_data['categories']
+
+    qry_dict = {}
+    for qry_cat in qry_cat_list:
+        cid = int(qry_cat['id'])
+        name = qry_cat['name']
+        qry_dict[name] = cid
+    
+    mapping = np.zeros((len(ref_cat_list),))
+    for ref_cat in ref_cat_list:
+        cid = int(ref_cat['id'])
+        name = ref_cat['name']
+        mapping[cid] = qry_dict[name]
+
+    return mapping
 
 def run():
     mvt_path = Path(MVT_ROOT)
@@ -343,6 +371,10 @@ def run():
     run_det_task(str(det_cfg_path), str(det_model_path),
                  str(det_json_path), det_score_thr)
 
+    ref_json_path = mvt_path / 'data/test/b_annotations.json'
+    qry_json_path = mvt_path / 'data/test/a_annotations.json'
+    label_mapping = get_label_mapping(ref_json_path, qry_json_path)
+
     emb_cfg_path = mvt_path / 'model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
     emb_model_path = mvt_path / 'model_files/emb_resnet50_mlp_loc_retail/epoch_50.pth'
     out_json_path = mvt_path / 'submit/output.json'
@@ -350,6 +382,7 @@ def run():
     run_emb_task(
         str(emb_cfg_path), str(emb_model_path),
         str(det_json_path), str(out_json_path),
+        label_mapping=label_mapping,
         score_thr=det_score_thr, top_k_list=[1])
 
 

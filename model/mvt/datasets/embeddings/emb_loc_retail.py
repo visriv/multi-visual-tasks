@@ -13,7 +13,9 @@ from model.mvt.utils.bbox_util import get_rotated_bbox
 class EmbLocRetailDataset(EmbBaseDataset):
     """Clarity classification"""
 
-    CLASSES = (
+    CLASSES = None
+    """
+        (
         'asamu', 'baishikele', 'baokuangli', 'aoliao', 'bingqilinniunai', 'chapai', 
         'fenda', 'guolicheng', 'haoliyou', 'heweidao', 'hongniu', 'hongniu2', 
         'hongshaoniurou', 'kafei', 'kaomo_gali', 'kaomo_jiaoyan', 'kaomo_shaokao', 
@@ -34,6 +36,7 @@ class EmbLocRetailDataset(EmbBaseDataset):
         'dongpeng-b', 'xianxiayuban', 'niudufen', 'zaocanmofang', 'wanglaoji-c', 'mengniu', 
         'mengniuzaocan', 'guolicheng2', 'daofandian1', 'daofandian2', 'daofandian3', 
         'daofandian4', 'yingyingquqi', 'lefuqiu')
+    """
 
     def load_annotations(self):
         """Load data_infos"""
