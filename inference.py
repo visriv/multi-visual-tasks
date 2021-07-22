@@ -17,6 +17,7 @@ else:
     print('Add {} to PYTHONPATH'.format(MVT_ROOT))
 
 import torch
+torch.multiprocessing.set_sharing_strategy('file_system')
 
 from model.configs import cfg
 from model.mvt.cores.metric_ops import LpDistance
@@ -153,9 +154,8 @@ def emb_single_device_test(model, data_loader, with_label=False):
         outputs['bbox_ids'] = bbox_ids
         cache_path = '/tmp/emb_qry.pkl'
 
-    # uncomment for fast debug
-    #with open(cache_path, 'wb') as f:
-    #    pickle.dump(outputs, f)
+    with open(cache_path, 'wb') as f:
+        pickle.dump(outputs, f)
 
     return outputs
 
@@ -172,7 +172,7 @@ def run_det_task(cfg_path, model_path, json_path, score_thr):
     data_loader = build_dataloader(
         dataset,
         samples_per_device=det_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=det_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
+        workers_per_device=0, # det_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
@@ -292,7 +292,7 @@ def run_emb_task(cfg_path, model_path, det_json_path,
     data_loader_ref = build_dataloader(
         dataset_ref,
         samples_per_device=emb_cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=emb_cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
+        workers_per_device=0, # emb_cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
@@ -316,7 +316,7 @@ def run_emb_task(cfg_path, model_path, det_json_path,
     data_loader_qry = build_dataloader(
         dataset_qry,
         samples_per_device=emb_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=emb_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
+        workers_per_device= 0, # emb_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
