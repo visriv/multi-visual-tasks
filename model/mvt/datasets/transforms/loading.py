@@ -69,6 +69,7 @@ class LoadImageFromFile():
 
         results['filename'] = filename
         results['ori_filename'] = results['img_info']['filename']
+        results['img_id'] = results['img_info']['id']
         results['img'] = img
         results['img_shape'] = img.shape
         results['ori_shape'] = img.shape
@@ -108,6 +109,7 @@ class LoadImageFromWebcam(LoadImageFromFile):
 
         results['filename'] = None
         results['ori_filename'] = None
+        results['img_id'] = None
         results['img'] = img
         results['img_shape'] = img.shape
         results['ori_shape'] = img.shape
@@ -177,6 +179,7 @@ class LoadMultiChannelImageFromFiles():
 
         results['filename'] = filename
         results['ori_filename'] = results['img_info']['filename']
+        results['img_id'] = results['img_info']['id']
         results['img'] = img
         results['img_shape'] = img.shape
         results['ori_shape'] = img.shape
