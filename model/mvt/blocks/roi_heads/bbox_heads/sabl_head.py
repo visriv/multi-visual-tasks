@@ -5,7 +5,6 @@ import torch.nn.functional as F
 
 from mvt.cores.ops import ConvModule, multiclass_nms
 from mvt.utils.init_util import kaiming_init, normal_init, xavier_init
-from mvt.utils.fp16_util import force_fp32
 from mvt.utils.misc_util import multi_apply
 from mvt.cores.core_bbox import build_bbox_coder
 from mvt.blocks.block_builder import HEADS, build_loss
@@ -459,7 +458,6 @@ class SABLHead(nn.Module):
 
         return losses
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred'))
     def get_bboxes(self,
                    rois,
                    cls_score,
@@ -501,7 +499,6 @@ class SABLHead(nn.Module):
 
             return det_bboxes, det_labels
 
-    @force_fp32(apply_to=('bbox_preds', ))
     def refine_bboxes(self, rois, labels, bbox_preds, pos_is_gts, img_metas):
         """Refine bboxes during training.
 
@@ -547,7 +544,6 @@ class SABLHead(nn.Module):
 
         return bboxes_list
 
-    @force_fp32(apply_to=('bbox_pred', ))
     def regress_by_class(self, rois, label, bbox_pred, img_meta):
         """Regress the bbox for the predicted class. Used in Cascade R-CNN.
 

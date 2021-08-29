@@ -6,21 +6,19 @@
 import argparse
 import os
 import torch
-from yacs.config import CfgNode
 
-from configs import cfg
-from mvt.cores.ops import fuse_conv_bn
-from mvt.utils.parallel_util import (
+from model.configs import cfg
+from model.mvt.cores.ops import fuse_conv_bn
+from model.mvt.utils.parallel_util import (
     DataParallel, DistributedDataParallel, init_dist)
-from mvt.utils.misc_util import get_dist_info
-from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.utils.fp16_util import wrap_fp16_model
-from mvt.engines.evaluator import multi_device_test, single_device_test
-from mvt.datasets.data_builder import build_dataloader, build_dataset
-from mvt.models.model_builder import build_model
-from mvt.utils.config_util import (
+from model.mvt.utils.misc_util import get_dist_info
+from model.mvt.utils.checkpoint_util import load_checkpoint
+from model.mvt.engines.evaluator import multi_device_test, single_device_test
+from model.mvt.datasets.data_builder import build_dataloader, build_dataset
+from model.mvt.models.model_builder import build_model
+from model.mvt.utils.config_util import (
     get_task_cfg, get_dataset_global_args, get_dict_from_list, convert_to_dict)
-from mvt.utils.io_util import obj_dump
+from model.mvt.utils.io_util import obj_dump
 
 
 def parse_args():
@@ -118,10 +116,6 @@ def main():
 
     # build the model and load checkpoint
     model = build_model(cfg.MODEL)
-    if "FP16" in cfg.SCHEDULE:
-        if isinstance(cfg.SCHEDULE.FP16, CfgNode): 
-            # fp16_cfg = convert_to_dict(cfg.SCHEDULE.FP16)
-            wrap_fp16_model(model)
 
     print('Loading checkpoint from: ', args.checkpoint)    
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')

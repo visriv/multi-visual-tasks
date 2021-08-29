@@ -3,7 +3,6 @@ import torch.nn as nn
 from .fcn_mask_head import FCNMaskHead
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import constant_init, xavier_init
-from mvt.utils.fp16_util import auto_fp16
 from mvt.blocks.block_builder import HEADS
 
 
@@ -76,7 +75,6 @@ class CoarseMaskHead(FCNMaskHead):
                 xavier_init(m)
         constant_init(self.fc_logits, 0.001)
 
-    @auto_fp16()
     def forward(self, x):
         for conv in self.convs:
             x = conv(x)

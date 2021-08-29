@@ -1,8 +1,5 @@
 import os.path as osp
-import platform
-import shutil
 import time
-import warnings
 
 import torch
 from .base_runner import BaseRunner
@@ -43,7 +40,11 @@ class EpochBasedRunner(BaseRunner):
         for i, data_batch in enumerate(self.data_loader):
             self._inner_iter = i
             self.call_hook('before_train_iter')
-            self.run_iter(data_batch, train_mode=True)
+            if self.fp16:
+                with torch.cuda.amp.autocast():
+                    self.run_iter(data_batch, train_mode=True)
+            else:
+                self.run_iter(data_batch, train_mode=True)
             self.call_hook('after_train_iter')
             self._iter += 1
 

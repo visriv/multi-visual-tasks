@@ -3,7 +3,6 @@ from torch import nn
 from .base_embedder import BaseEmbedder
 from ..model_builder import EMBEDDERS
 from mvt.blocks.block_builder import build_backbone, build_head, build_neck
-from mvt.utils.fp16_util import auto_fp16
 
 
 @EMBEDDERS.register_module()
@@ -53,8 +52,7 @@ class ImgClsEmbedder(BaseEmbedder):
         if self.with_neck:
             x = self.neck(x)
         return x
-    
-    @auto_fp16(apply_to=('img', 'label',))
+
     def forward(self, img, label, return_loss=True, **kwargs):
         """
         Calls either forward_train or forward_test depending on whether

@@ -6,7 +6,7 @@ from mvt.utils.parallel_util import CustomDataParallel
 from mvt.utils.parallel_util import CustomDistributedDataParallel
 from mvt.cores.core_hook import HOOKS
 from mvt.cores.hook import (DistSamplerSeedHook, 
-                            Fp16OptimizerHook, OptimizerHook,
+                            OptimizerHook,
                             EvalHook, DistEvalHook)
 from mvt.cores.runner import EpochBasedRunner
 from mvt.cores.core_optimizer import build_optimizer
@@ -99,33 +99,25 @@ def train_processor(cfg,
 
     # build runner
     optimizer = build_optimizer(model, cfg.SCHEDULE.OPTIMIZER)
+    fp16 = cfg.SCHEDULE.OPTIMIZER_CONFIG.get('fp16', False)
+    print("Set fp16 as: ", fp16)
     runner = EpochBasedRunner(
         model,
+        fp16=fp16,
         optimizer=optimizer,
         work_dir=cfg.RUNTIME.WORK_DIR,
         logger=logger,
-        meta=meta)
+        meta=meta,
+    )
     # an ugly workaround to make .log and .log.json filenames the same
     runner.timestamp = timestamp
-    
-    # fp16 setting
-    if "FP16" in cfg.SCHEDULE:
-        if isinstance(cfg.SCHEDULE.FP16, CfgNode): 
-            fp16_cfg = convert_to_dict(cfg.SCHEDULE.FP16)
-        else:
-            fp16_cfg = None
-    else:
-        fp16_cfg = None
 
     # optimizer setting
     optim_config_dict = convert_to_dict(cfg.SCHEDULE.OPTIMIZER_CONFIG)
     for item in optim_config_dict:
         if optim_config_dict[item] == "":
             optim_config_dict[item] = None       
-    if fp16_cfg is not None:
-        optimizer_config = Fp16OptimizerHook(
-            **optim_config_dict, **fp16_cfg, distributed=distributed)
-    elif 'type' not in optim_config_dict:
+    if 'type' not in optim_config_dict:
         optimizer_config = OptimizerHook(**optim_config_dict)
     else:
         optimizer_config = optim_config_dict

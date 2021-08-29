@@ -10,12 +10,10 @@ SCHEDULE:
       bias_decay_mult: 0., 
       norm_decay_mult: 0.}
   OPTIMIZER_CONFIG:
-    type: 'Fp16GradAccumulateOptimizerHook'
-    nominal_batch_size: 64
     grad_clip: {
       max_norm: 35,
       norm_type: 2}
-    loss_scale: 'dynamic'
+    fp16: False
   LR_POLICY:
     policy: "CosineAnnealing"
-    min_lr_ratio: 0.2
+    min_lr_ratio: 0.01

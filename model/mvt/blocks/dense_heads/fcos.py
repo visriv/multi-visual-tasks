@@ -5,7 +5,6 @@ import torch.nn.functional as F
 from ..block_builder import HEADS, build_loss
 from .anchor_free import AnchorFreeHead
 from mvt.cores.ops import Scale, multiclass_nms
-from mvt.utils.fp16_util import force_fp32
 from mvt.utils.init_util import normal_init
 from mvt.cores.bbox import distance2bbox
 from mvt.utils.misc_util import multi_apply
@@ -155,7 +154,6 @@ class FCOSHead(AnchorFreeHead):
             bbox_pred = bbox_pred.exp()
         return cls_score, bbox_pred, centerness
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'centernesses'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -250,7 +248,6 @@ class FCOSHead(AnchorFreeHead):
             loss_bbox=loss_bbox,
             loss_centerness=loss_centerness)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'centernesses'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

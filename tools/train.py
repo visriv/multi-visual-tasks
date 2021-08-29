@@ -10,18 +10,18 @@ import time
 import sys
 sys.path.append("..")
 
-from configs import cfg
-from mvt.utils.config_util import (get_task_cfg, convert_to_dict, 
+from model.configs import cfg
+from model.mvt.utils.config_util import (get_task_cfg, convert_to_dict, 
                                    get_dataset_global_args,
                                    get_dict_from_list)
-from mvt.utils.parallel_util import init_dist
-from mvt.utils.log_util import get_root_logger, get_git_hash
-from mvt.utils.runtime_util import collect_env
-from mvt.utils.runtime_util import set_random_seed
-from mvt.models.model_builder import build_model
-from mvt.datasets.data_builder import build_dataset
-from mvt.engines.trainer import train_processor
-from mvt.utils.path_util import PathManagerBase
+from model.mvt.utils.parallel_util import init_dist
+from model.mvt.utils.log_util import get_root_logger
+from model.mvt.utils.runtime_util import collect_env
+from model.mvt.utils.runtime_util import set_random_seed
+from model.mvt.models.model_builder import build_model
+from model.mvt.datasets.data_builder import build_dataset
+from model.mvt.engines.trainer import train_processor
+from model.mvt.utils.path_util import PathManagerBase
 
 
 def parse_args():

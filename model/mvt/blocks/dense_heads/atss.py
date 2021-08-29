@@ -7,7 +7,6 @@ from .anchor import AnchorHead
 from mvt.utils.init_util import bias_init_with_prob, normal_init
 from mvt.cores.ops import ConvModule, Scale
 from mvt.cores.ops import multiclass_nms
-from mvt.utils.fp16_util import force_fp32
 from mvt.cores.anchor import anchor_inside_flags, images_to_levels
 from mvt.cores.core_anchor import build_anchor_generator
 from mvt.cores.core_bbox import build_assigner, build_sampler
@@ -229,7 +228,6 @@ class ATSSHead(AnchorHead):
 
         return loss_cls, loss_bbox, loss_centerness, centerness_targets.sum()
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'centernesses'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -324,7 +322,6 @@ class ATSSHead(AnchorHead):
         assert not torch.isnan(centerness).any()
         return centerness
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds', 'centernesses'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

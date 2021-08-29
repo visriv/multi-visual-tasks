@@ -5,7 +5,6 @@ import torch.distributed as dist
 import torch.nn as nn
 
 from mvt.utils.log_util import print_log
-from mvt.utils.fp16_util import auto_fp16
 
 
 class BaseEmbedder(nn.Module, metaclass=ABCMeta):
@@ -61,7 +60,6 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
         else:
             raise NotImplementedError('Test has not been implemented')
 
-    @auto_fp16(apply_to=('datas', ))
     def forward(self, datas, return_loss=True, **kwargs):
         """
         Calls either forward_train or forward_test depending on whether

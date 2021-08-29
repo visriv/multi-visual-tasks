@@ -4,7 +4,6 @@ import torch.nn as nn
 from torch.nn.modules.utils import _pair
 
 from mvt.utils.init_util import kaiming_init, normal_init
-from mvt.utils.fp16_util import force_fp32
 from mvt.blocks.block_builder import HEADS, build_loss
 
 
@@ -87,7 +86,6 @@ class MaskIoUHead(nn.Module):
         mask_iou = self.fc_mask_iou(x)
         return mask_iou
 
-    @force_fp32(apply_to=('mask_iou_pred', ))
     def loss(self, mask_iou_pred, mask_iou_targets):
         pos_inds = mask_iou_targets > 0
         if pos_inds.sum() > 0:
@@ -97,7 +95,6 @@ class MaskIoUHead(nn.Module):
             loss_mask_iou = mask_iou_pred.sum() * 0
         return dict(loss_mask_iou=loss_mask_iou)
 
-    @force_fp32(apply_to=('mask_pred', ))
     def get_targets(self, sampling_results, gt_masks, mask_pred, mask_targets,
                     rcnn_train_cfg):
         """Compute target of mask IoU.
@@ -173,7 +170,6 @@ class MaskIoUHead(nn.Module):
             area_ratios = pos_proposals.new_zeros((0, ))
         return area_ratios
 
-    @force_fp32(apply_to=('mask_iou_pred', ))
     def get_mask_scores(self, mask_iou_pred, det_bboxes, det_labels):
         """Get the mask scores.
 

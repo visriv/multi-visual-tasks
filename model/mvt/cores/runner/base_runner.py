@@ -44,6 +44,7 @@ class BaseRunner(metaclass=ABCMeta):
 
     def __init__(self,
                  model,
+                 fp16=False,
                  optimizer=None,
                  work_dir=None,
                  logger=None,
@@ -75,6 +76,7 @@ class BaseRunner(metaclass=ABCMeta):
             raise TypeError(
                 f'meta must be a dict or None, but got {type(meta)}')
 
+        self.fp16 = fp16
         self.model = model
         self.optimizer = optimizer
         self.logger = logger

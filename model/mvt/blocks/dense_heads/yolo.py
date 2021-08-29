@@ -12,7 +12,6 @@ from .dense_test_mixins import BBoxTestMixin
 from ..block_builder import HEADS, build_loss
 from mvt.cores.layer_ops import brick as vn_layer
 from mvt.cores.ops import ConvModule, multiclass_nms
-from mvt.utils.fp16_util import force_fp32
 from mvt.utils.init_util import normal_init
 from mvt.cores.anchor import images_to_levels
 from mvt.cores.core_anchor import build_anchor_generator
@@ -184,7 +183,6 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
 
         return tuple(pred_maps),
 
-    @force_fp32(apply_to=('pred_maps', ))
     def get_bboxes(self,
                    pred_maps,
                    img_metas,
@@ -328,7 +326,6 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         else:
             return (multi_lvl_bboxes, multi_lvl_cls_scores, multi_lvl_conf_scores)
 
-    @force_fp32(apply_to=('pred_maps', ))
     def loss(self,
              pred_maps,
              gt_bboxes,

@@ -4,7 +4,6 @@ import torch.nn.functional as F
 from ..block_builder import NECKS
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import xavier_init
-from mvt.utils.fp16_util import auto_fp16
 
 
 @NECKS.register_module()
@@ -162,7 +161,6 @@ class FPN(nn.Module):
             if isinstance(m, nn.Conv2d):
                 xavier_init(m, distribution='uniform')
 
-    @auto_fp16()
     def forward(self, inputs):
         """Forward function."""
         if not isinstance(inputs, tuple):
