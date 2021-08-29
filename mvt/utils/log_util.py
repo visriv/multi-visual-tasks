@@ -48,11 +48,12 @@ def get_logger(name, log_file=None, log_level=logging.INFO):
 
     # only rank 0 will add a FileHandler
     if rank == 0 and log_file is not None:
-        file_handler = logging.FileHandler(log_file, 'w')
+        file_handler = logging.FileHandler(log_file, "w")
         handlers.append(file_handler)
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     for handler in handlers:
         handler.setFormatter(formatter)
         handler.setLevel(log_level)
@@ -84,15 +85,16 @@ def print_log(msg, logger=None, level=logging.INFO):
         print(msg)
     elif isinstance(logger, logging.Logger):
         logger.log(level, msg)
-    elif logger == 'silent':
+    elif logger == "silent":
         pass
     elif isinstance(logger, str):
         _logger = get_logger(logger)
         _logger.log(level, msg)
     else:
         raise TypeError(
-            'logger should be either a logging.Logger object, str, '
-            f'"silent" or None, but got {type(logger)}')
+            "logger should be either a logging.Logger object, str, "
+            f'"silent" or None, but got {type(logger)}'
+        )
 
 
 def get_root_logger(log_file=None, log_level=logging.INFO):
@@ -104,7 +106,7 @@ def get_root_logger(log_file=None, log_level=logging.INFO):
     Returns:
         :obj:`logging.Logger`: The obtained logger
     """
-    logger = get_logger(name='obj_reg_mvt', log_file=log_file, log_level=log_level)
+    logger = get_logger(name="obj_reg_mvt", log_file=log_file, log_level=log_level)
 
     return logger
 
@@ -112,20 +114,19 @@ def get_root_logger(log_file=None, log_level=logging.INFO):
 def _minimal_ext_cmd(cmd):
     # construct minimal environment
     env = {}
-    for k in ['SYSTEMROOT', 'PATH', 'HOME']:
+    for k in ["SYSTEMROOT", "PATH", "HOME"]:
         v = os.environ.get(k)
         if v is not None:
             env[k] = v
     # LANGUAGE is used on win32
-    env['LANGUAGE'] = 'C'
-    env['LANG'] = 'C'
-    env['LC_ALL'] = 'C'
-    out = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, env=env).communicate()[0]
+    env["LANGUAGE"] = "C"
+    env["LANG"] = "C"
+    env["LC_ALL"] = "C"
+    out = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=env).communicate()[0]
     return out
 
 
-def get_git_hash(fallback='unknown', digits=None):
+def get_git_hash(fallback="unknown", digits=None):
     """Get the git hash of the current repo.
     Args:
         fallback (str, optional): The fallback string when git hash is
@@ -137,11 +138,11 @@ def get_git_hash(fallback='unknown', digits=None):
     """
 
     if digits is not None and not isinstance(digits, int):
-        raise TypeError('digits must be None or an integer')
+        raise TypeError("digits must be None or an integer")
 
     try:
-        out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
-        sha = out.strip().decode('ascii')
+        out = _minimal_ext_cmd(["git", "rev-parse", "HEAD"])
+        sha = out.strip().decode("ascii")
         if digits is not None:
             sha = sha[:digits]
     except OSError:

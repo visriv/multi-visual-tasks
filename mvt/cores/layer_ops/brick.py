@@ -7,7 +7,7 @@ import torch.nn.functional as F
 def yolo_init_weight(model):
     for m in model.modules():
         if isinstance(m, nn.Conv2d):
-            nn.init.kaiming_normal_(m.weight, a=0.1, mode='fan_in')
+            nn.init.kaiming_normal_(m.weight, a=0.1, mode="fan_in")
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)
         elif isinstance(m, nn.BatchNorm2d):
@@ -19,7 +19,7 @@ def yolo_init_weight(model):
 
 
 class Conv2dBatchLeaky(nn.Module):
-    """ This convenience layer groups a 2D convolution, a batchnorm and a leaky ReLU.
+    """This convenience layer groups a 2D convolution, a batchnorm and a leaky ReLU.
     They are executed in a sequential manner.
     Args:
         in_channels (int): Number of input channels
@@ -46,13 +46,20 @@ class Conv2dBatchLeaky(nn.Module):
 
         # Layer
         self.layers = nn.Sequential(
-            nn.Conv2d(self.in_channels, self.out_channels, self.kernel_size, self.stride, self.padding, bias=False),
+            nn.Conv2d(
+                self.in_channels,
+                self.out_channels,
+                self.kernel_size,
+                self.stride,
+                self.padding,
+                bias=False,
+            ),
             nn.BatchNorm2d(self.out_channels),  # , eps=1e-6, momentum=0.01),
-            nn.LeakyReLU(self.leaky_slope, inplace=True)
+            nn.LeakyReLU(self.leaky_slope, inplace=True),
         )
 
     def __repr__(self):
-        s = '{name} ({in_channels}, {out_channels}, kernel_size={kernel_size}, stride={stride}, padding={padding}, negative_slope={leaky_slope})'
+        s = "{name} ({in_channels}, {out_channels}, kernel_size={kernel_size}, stride={stride}, padding={padding}, negative_slope={leaky_slope})"
         return s.format(name=self.__class__.__name__, **self.__dict__)
 
     def forward(self, x):
@@ -62,8 +69,15 @@ class Conv2dBatchLeaky(nn.Module):
 
 # tiny yolov4专用
 class ResConv2dBatchLeaky(nn.Module):
-
-    def __init__(self, in_channels, inter_channels, kernel_size, stride=1, leaky_slope=0.1, return_extra=False):
+    def __init__(
+        self,
+        in_channels,
+        inter_channels,
+        kernel_size,
+        stride=1,
+        leaky_slope=0.1,
+        return_extra=False,
+    ):
         super(ResConv2dBatchLeaky, self).__init__()
 
         self.return_extra = return_extra
@@ -77,16 +91,28 @@ class ResConv2dBatchLeaky(nn.Module):
             self.padding = int(kernel_size / 2)
         self.leaky_slope = leaky_slope
 
-        self.layers0 = Conv2dBatchLeaky(self.in_channels // 2, self.inter_channels, self.kernel_size, self.stride,
-                                        leaky_slope)
-        self.layers1 = Conv2dBatchLeaky(self.inter_channels, self.inter_channels, self.kernel_size, self.stride,
-                                        leaky_slope)
-        self.layers2 = Conv2dBatchLeaky(self.in_channels, self.in_channels, 1, 1, leaky_slope)
+        self.layers0 = Conv2dBatchLeaky(
+            self.in_channels // 2,
+            self.inter_channels,
+            self.kernel_size,
+            self.stride,
+            leaky_slope,
+        )
+        self.layers1 = Conv2dBatchLeaky(
+            self.inter_channels,
+            self.inter_channels,
+            self.kernel_size,
+            self.stride,
+            leaky_slope,
+        )
+        self.layers2 = Conv2dBatchLeaky(
+            self.in_channels, self.in_channels, 1, 1, leaky_slope
+        )
 
     def forward(self, x):
         y0 = x
         channel = x.shape[1]
-        x0 = x[:, channel // 2:, ...]
+        x0 = x[:, channel // 2 :, ...]
         x1 = self.layers0(x0)
         x2 = self.layers1(x1)
         x3 = torch.cat((x2, x1), dim=1)
@@ -109,7 +135,7 @@ class Mish(nn.Module):
 
 
 class Conv2dBatchMish(nn.Module):
-    """ This convenience layer groups a 2D convolution, a batchnorm and a leaky ReLU.
+    """This convenience layer groups a 2D convolution, a batchnorm and a leaky ReLU.
     They are executed in a sequential manner.
     Args:
         in_channels (int): Number of input channels
@@ -135,13 +161,20 @@ class Conv2dBatchMish(nn.Module):
 
         # Layer
         self.layers = nn.Sequential(
-            nn.Conv2d(self.in_channels, self.out_channels, self.kernel_size, self.stride, self.padding, bias=False),
+            nn.Conv2d(
+                self.in_channels,
+                self.out_channels,
+                self.kernel_size,
+                self.stride,
+                self.padding,
+                bias=False,
+            ),
             nn.BatchNorm2d(self.out_channels),
-            Mish()
+            Mish(),
         )
 
     def __repr__(self):
-        s = '{name} ({in_channels}, {out_channels}, kernel_size={kernel_size}, stride={stride}, padding={padding})'
+        s = "{name} ({in_channels}, {out_channels}, kernel_size={kernel_size}, stride={stride}, padding={padding})"
         return s.format(name=self.__class__.__name__, **self.__dict__)
 
     def forward(self, x):
@@ -159,7 +192,7 @@ class Resblock(nn.Module):
 
         self.block = nn.Sequential(
             Conv2dBatchMish(channels, hidden_channels, 1),
-            Conv2dBatchMish(hidden_channels, channels, 3)
+            Conv2dBatchMish(hidden_channels, channels, 3),
         )
 
     def forward(self, x):
@@ -180,7 +213,7 @@ class Resblock_body(nn.Module):
             self.split_conv1 = Conv2dBatchMish(out_channels, out_channels, 1)
             self.blocks_conv = nn.Sequential(
                 Resblock(channels=out_channels, hidden_channels=out_channels // 2),
-                Conv2dBatchMish(out_channels, out_channels, 1)
+                Conv2dBatchMish(out_channels, out_channels, 1),
             )
             self.concat_conv = Conv2dBatchMish(out_channels * 2, out_channels, 1)
         else:
@@ -189,7 +222,7 @@ class Resblock_body(nn.Module):
 
             self.blocks_conv = nn.Sequential(
                 *[Resblock(out_channels // 2) for _ in range(num_blocks)],
-                Conv2dBatchMish(out_channels // 2, out_channels // 2, 1)
+                Conv2dBatchMish(out_channels // 2, out_channels // 2, 1),
             )
             self.concat_conv = Conv2dBatchMish(out_channels, out_channels, 1)
 
@@ -208,7 +241,9 @@ class SpatialPyramidPooling(nn.Module):
     def __init__(self, pool_sizes=[5, 9, 13]):
         super(SpatialPyramidPooling, self).__init__()
 
-        self.maxpools = nn.ModuleList([nn.MaxPool2d(pool_size, 1, pool_size // 2) for pool_size in pool_sizes])
+        self.maxpools = nn.ModuleList(
+            [nn.MaxPool2d(pool_size, 1, pool_size // 2) for pool_size in pool_sizes]
+        )
 
     def forward(self, x):
         features = [maxpool(x) for maxpool in self.maxpools[::-1]]
@@ -243,13 +278,12 @@ class MakeNConv(nn.Module):
 
 
 class Transition(nn.Module):
-
     def __init__(self, nchannels):
         super().__init__()
         half_nchannels = int(nchannels / 2)
         layers = [
             Conv2dBatchLeaky(nchannels, half_nchannels, 1, 1),
-            nn.Upsample(scale_factor=2)
+            nn.Upsample(scale_factor=2),
         ]
 
         self.features = nn.Sequential(*layers)
@@ -281,7 +315,7 @@ class FuseStage(nn.Module):
 
 # yolov2
 class PaddedMaxPool2d(nn.Module):
-    """ Maxpool layer with a replicating padding.
+    """Maxpool layer with a replicating padding.
     Args:
         kernel_size (int or tuple): Kernel size for maxpooling
         stride (int or tuple, optional): The stride of the window; Default ``kernel_size``
@@ -297,15 +331,21 @@ class PaddedMaxPool2d(nn.Module):
         self.dilation = dilation
 
     def __repr__(self):
-        return f'{self.__class__.__name__} (kernel_size={self.kernel_size}, stride={self.stride}, padding={self.padding}, dilation={self.dilation})'
+        return f"{self.__class__.__name__} (kernel_size={self.kernel_size}, stride={self.stride}, padding={self.padding}, dilation={self.dilation})"
 
     def forward(self, x):
-        x = F.max_pool2d(F.pad(x, self.padding, mode='replicate'), self.kernel_size, self.stride, 0, self.dilation)
+        x = F.max_pool2d(
+            F.pad(x, self.padding, mode="replicate"),
+            self.kernel_size,
+            self.stride,
+            0,
+            self.dilation,
+        )
         return x
 
 
 class Reorg(nn.Module):
-    """ This layer reorganizes a tensor according to a stride.
+    """This layer reorganizes a tensor according to a stride.
     The dimensions 2,3 will be sliced by the stride and then stacked in dimension 1. (input must have 4 dimensions)
     Args:
         stride (int): stride to divide the input tensor
@@ -314,28 +354,34 @@ class Reorg(nn.Module):
     def __init__(self, stride=2):
         super(Reorg, self).__init__()
         if not isinstance(stride, int):
-            raise TypeError(f'stride is not an int [{type(stride)}]')
+            raise TypeError(f"stride is not an int [{type(stride)}]")
         self.stride = stride
         self.darknet = True
 
     def __repr__(self):
-        return f'{self.__class__.__name__} (stride={self.stride}, darknet_compatible_mode={self.darknet})'
+        return f"{self.__class__.__name__} (stride={self.stride}, darknet_compatible_mode={self.darknet})"
 
     def forward(self, x):
-        assert (x.data.dim() == 4)
+        assert x.data.dim() == 4
         B = x.data.size(0)
         C = x.data.size(1)
         H = x.data.size(2)
         W = x.data.size(3)
 
         if H % self.stride != 0:
-            raise ValueError(f'Dimension mismatch: {H} is not divisible by {self.stride}')
+            raise ValueError(
+                f"Dimension mismatch: {H} is not divisible by {self.stride}"
+            )
         if W % self.stride != 0:
-            raise ValueError(f'Dimension mismatch: {W} is not divisible by {self.stride}')
+            raise ValueError(
+                f"Dimension mismatch: {W} is not divisible by {self.stride}"
+            )
 
         # darknet compatible version from: https://github.com/thtrieu/darkflow/issues/173#issuecomment-296048648
         if self.darknet:
-            x = x.view(B, C // (self.stride ** 2), H, self.stride, W, self.stride).contiguous()
+            x = x.view(
+                B, C // (self.stride ** 2), H, self.stride, W, self.stride
+            ).contiguous()
             x = x.permute(0, 3, 5, 1, 2, 4).contiguous()
             x = x.view(B, -1, H // self.stride, W // self.stride)
         else:
@@ -355,7 +401,7 @@ class StageBlock(nn.Module):
         super().__init__()
         self.features = nn.Sequential(
             Conv2dBatchLeaky(nchannels, int(nchannels / 2), 1, 1),
-            Conv2dBatchLeaky(int(nchannels / 2), nchannels, 3, 1)
+            Conv2dBatchLeaky(int(nchannels / 2), nchannels, 3, 1),
         )
 
     def forward(self, data):
@@ -392,7 +438,7 @@ class HeadBody(nn.Module):
             Conv2dBatchLeaky(half_nchannels, in_nchannels, 3, 1),
             Conv2dBatchLeaky(in_nchannels, half_nchannels, 1, 1),
             Conv2dBatchLeaky(half_nchannels, in_nchannels, 3, 1),
-            Conv2dBatchLeaky(in_nchannels, half_nchannels, 1, 1)
+            Conv2dBatchLeaky(in_nchannels, half_nchannels, 1, 1),
         ]
         self.feature = nn.Sequential(*layers)
 
@@ -420,25 +466,30 @@ import numpy as np
 
 
 class WeightLoader:
-    """ Load darknet weight files into pytorch layers """
+    """Load darknet weight files into pytorch layers"""
 
     def __init__(self, filename):
-        with open(filename, 'rb') as fp:
+        with open(filename, "rb") as fp:
             self.header = np.fromfile(fp, count=3, dtype=np.int32).tolist()
             ver_num = self.header[0] * 100 + self.header[1] * 10 + self.header[2]
-            print(f'Loading weight file: version {self.header[0]}.{self.header[1]}.{self.header[2]}')
+            print(
+                f"Loading weight file: version {self.header[0]}.{self.header[1]}.{self.header[2]}"
+            )
 
             if ver_num <= 19:
                 print(
-                    'Weight file uses sizeof to compute variable size, which might lead to undefined behaviour. (choosing int=int32, float=float32)')
+                    "Weight file uses sizeof to compute variable size, which might lead to undefined behaviour. (choosing int=int32, float=float32)"
+                )
                 self.seen = int(np.fromfile(fp, count=1, dtype=np.int32)[0])
             elif ver_num <= 29:
                 print(
-                    'Weight file uses sizeof to compute variable size, which might lead to undefined behaviour. (choosing int=int32, float=float32, size_t=int64)')
+                    "Weight file uses sizeof to compute variable size, which might lead to undefined behaviour. (choosing int=int32, float=float32, size_t=int64)"
+                )
                 self.seen = int(np.fromfile(fp, count=1, dtype=np.int64)[0])
             else:
                 print(
-                    'New weight file syntax! Loading of weights might not work properly. Please submit an issue with the weight file version number. [Run with DEBUG logging level]')
+                    "New weight file syntax! Loading of weights might not work properly. Please submit an issue with the weight file version number. [Run with DEBUG logging level]"
+                )
                 self.seen = int(np.fromfile(fp, count=1, dtype=np.int64)[0])
 
             self.buf = np.fromfile(fp, dtype=np.float32)
@@ -447,7 +498,7 @@ class WeightLoader:
         self.size = self.buf.size
 
     def load_layer(self, layer):
-        """ Load weights for a layer from the weights file """
+        """Load weights for a layer from the weights file"""
         if type(layer) == nn.Conv2d:
             self._load_conv(layer)
         elif type(layer) == Conv2dBatchLeaky:
@@ -457,48 +508,77 @@ class WeightLoader:
         elif type(layer) == nn.Linear:
             self._load_fc(layer)
         else:
-            raise NotImplementedError(f'The layer you are trying to load is not supported [{type(layer)}]')
+            raise NotImplementedError(
+                f"The layer you are trying to load is not supported [{type(layer)}]"
+            )
 
     def _load_conv(self, model):
         num_b = model.bias.numel()
-        model.bias.data.copy_(torch.from_numpy(self.buf[self.start:self.start + num_b])
-                              .view_as(model.bias.data))
+        model.bias.data.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_b]).view_as(
+                model.bias.data
+            )
+        )
         self.start += num_b
 
         num_w = model.weight.numel()
-        model.weight.data.copy_(torch.from_numpy(self.buf[self.start:self.start + num_w])
-                                .view_as(model.weight.data))
+        model.weight.data.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_w]).view_as(
+                model.weight.data
+            )
+        )
         self.start += num_w
 
     def _load_convbatch(self, model):
         num_b = model.layers[1].bias.numel()
-        model.layers[1].bias.data.copy_(torch.from_numpy(self.buf[self.start:self.start + num_b])
-                                        .view_as(model.layers[1].bias.data))
+        model.layers[1].bias.data.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_b]).view_as(
+                model.layers[1].bias.data
+            )
+        )
         self.start += num_b
-        model.layers[1].weight.data.copy_(torch.from_numpy(self.buf[self.start:self.start + num_b])
-                                          .view_as(model.layers[1].weight.data))
+        model.layers[1].weight.data.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_b]).view_as(
+                model.layers[1].weight.data
+            )
+        )
         self.start += num_b
-        model.layers[1].running_mean.copy_(torch.from_numpy(self.buf[self.start:self.start + num_b])
-                                           .view_as(model.layers[1].running_mean))
+        model.layers[1].running_mean.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_b]).view_as(
+                model.layers[1].running_mean
+            )
+        )
         self.start += num_b
-        model.layers[1].running_var.copy_(torch.from_numpy(self.buf[self.start:self.start + num_b])
-                                          .view_as(model.layers[1].running_var))
+        model.layers[1].running_var.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_b]).view_as(
+                model.layers[1].running_var
+            )
+        )
         self.start += num_b
 
         num_w = model.layers[0].weight.numel()
-        model.layers[0].weight.data.copy_(torch.from_numpy(self.buf[self.start:self.start + num_w])
-                                          .view_as(model.layers[0].weight.data))
+        model.layers[0].weight.data.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_w]).view_as(
+                model.layers[0].weight.data
+            )
+        )
         self.start += num_w
 
     def _load_fc(self, model):
         num_b = model.bias.numel()
-        model.bias.data.copy_(torch.from_numpy(self.buf[self.start:self.start + num_b])
-                              .view_as(model.bias.data))
+        model.bias.data.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_b]).view_as(
+                model.bias.data
+            )
+        )
         self.start += num_b
 
         num_w = model.weight.numel()
-        model.weight.data.copy_(torch.from_numpy(self.buf[self.start:self.start + num_w])
-                                .view_as(model.weight.data))
+        model.weight.data.copy_(
+            torch.from_numpy(self.buf[self.start : self.start + num_w]).view_as(
+                model.weight.data
+            )
+        )
         self.start += num_w
 
 
@@ -529,7 +609,9 @@ def autopad(k, p=None):  # kernel, padding
 
 class Conv(nn.Module):
     # Standard convolution
-    def __init__(self, c1, c2, k=1, s=1, p=None, g=1, act=True):  # ch_in, ch_out, kernel, stride, padding, groups
+    def __init__(
+        self, c1, c2, k=1, s=1, p=None, g=1, act=True
+    ):  # ch_in, ch_out, kernel, stride, padding, groups
         super(Conv, self).__init__()
         self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p), groups=g, bias=False)
         self.bn = nn.BatchNorm2d(c2, eps=0.001, momentum=0.01)
@@ -552,12 +634,24 @@ class Concat(nn.Module):
 
 class Focus(nn.Module):
     # Focus wh information into c-space
-    def __init__(self, c1, c2, k=1, s=1, p=None, g=1, act=True):  # ch_in, ch_out, kernel, stride, padding, groups
+    def __init__(
+        self, c1, c2, k=1, s=1, p=None, g=1, act=True
+    ):  # ch_in, ch_out, kernel, stride, padding, groups
         super(Focus, self).__init__()
         self.conv = Conv(c1 * 4, c2, k, s, p, g, act)
 
     def forward(self, x):  # x(b,c,w,h) -> y(b,4c,w/2,h/2)
-        return self.conv(torch.cat([x[..., ::2, ::2], x[..., 1::2, ::2], x[..., ::2, 1::2], x[..., 1::2, 1::2]], 1))
+        return self.conv(
+            torch.cat(
+                [
+                    x[..., ::2, ::2],
+                    x[..., 1::2, ::2],
+                    x[..., ::2, 1::2],
+                    x[..., 1::2, 1::2],
+                ],
+                1,
+            )
+        )
 
 
 class SPP(nn.Module):
@@ -567,7 +661,9 @@ class SPP(nn.Module):
         c_ = c1 // 2  # hidden channels
         self.cv1 = Conv(c1, c_, 1, 1)
         self.cv2 = Conv(c_ * (len(k) + 1), c2, 1, 1)
-        self.m = nn.ModuleList([nn.MaxPool2d(kernel_size=x, stride=1, padding=x // 2) for x in k])
+        self.m = nn.ModuleList(
+            [nn.MaxPool2d(kernel_size=x, stride=1, padding=x // 2) for x in k]
+        )
 
     def forward(self, x):
         x = self.cv1(x)
@@ -576,7 +672,9 @@ class SPP(nn.Module):
 
 class Bottleneck(nn.Module):
     # Standard bottleneck
-    def __init__(self, c1, c2, shortcut=True, g=1, e=0.5):  # ch_in, ch_out, shortcut, groups, expansion
+    def __init__(
+        self, c1, c2, shortcut=True, g=1, e=0.5
+    ):  # ch_in, ch_out, shortcut, groups, expansion
         super(Bottleneck, self).__init__()
         c_ = int(c2 * e)  # hidden channels
         self.cv1 = Conv(c1, c_, 1, 1)
@@ -589,7 +687,9 @@ class Bottleneck(nn.Module):
 
 class BottleneckCSP(nn.Module):
     # CSP Bottleneck https://github.com/WongKinYiu/CrossStagePartialNetworks
-    def __init__(self, c1, c2, n=1, shortcut=True, g=1, e=0.5):  # ch_in, ch_out, number, shortcut, groups, expansion
+    def __init__(
+        self, c1, c2, n=1, shortcut=True, g=1, e=0.5
+    ):  # ch_in, ch_out, number, shortcut, groups, expansion
         super(BottleneckCSP, self).__init__()
         c_ = int(c2 * e)  # hidden channels
         self.cv1 = Conv(c1, c_, 1, 1)
@@ -597,9 +697,13 @@ class BottleneckCSP(nn.Module):
         self.cv3 = nn.Conv2d(c_, c_, 1, 1, bias=False)
         self.cv4 = Conv(2 * c_, c2, 1, 1)
         # BN的后面两个参数要非常注意，必须保持一致，否则效果不对劲
-        self.bn = nn.BatchNorm2d(2 * c_, eps=0.001, momentum=0.01)  # applied to cat(cv2, cv3)
+        self.bn = nn.BatchNorm2d(
+            2 * c_, eps=0.001, momentum=0.01
+        )  # applied to cat(cv2, cv3)
         self.act = nn.LeakyReLU(0.1, inplace=True)
-        self.m = nn.Sequential(*[Bottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)])
+        self.m = nn.Sequential(
+            *[Bottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)]
+        )
 
     def forward(self, x):
         y1 = self.cv3(self.m(self.cv1(x)))

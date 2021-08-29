@@ -16,10 +16,9 @@ class SEBottleneck(Bottleneck):
 
     def __init__(self, inplanes, planes, se_ratio=16, **kwargs):
         super(SEBottleneck, self).__init__(inplanes, planes, **kwargs)
-        self.se_layer = SELayer(planes*self.expansion, ratio=se_ratio)
+        self.se_layer = SELayer(planes * self.expansion, ratio=se_ratio)
 
     def forward(self, x):
-
         def _inner_forward(x):
             identity = x
 
@@ -119,12 +118,12 @@ class SEResNet(ResNet):
     arch_settings = {
         50: (SEBottleneck, (3, 4, 6, 3)),
         101: (SEBottleneck, (3, 4, 23, 3)),
-        152: (SEBottleneck, (3, 8, 36, 3))
+        152: (SEBottleneck, (3, 8, 36, 3)),
     }
 
     def __init__(self, depth, se_ratio=16, **kwargs):
         if depth not in self.arch_settings:
-            raise KeyError(f'invalid depth {depth} for SEResNet')
+            raise KeyError(f"invalid depth {depth} for SEResNet")
         self.se_ratio = se_ratio
         super(SEResNet, self).__init__(depth, **kwargs)
 

@@ -11,7 +11,7 @@ class NASFPN(nn.Module):
 
     Implementation of `NAS-FPN: Learning Scalable Feature Pyramid Architecture
     for Object Detection <https://arxiv.org/abs/1904.07392>`_
-    
+
     Args:
         in_channels (List[int]): Number of input channels per scale.
         out_channels (int): Number of output channels (used at each scale)
@@ -27,15 +27,17 @@ class NASFPN(nn.Module):
             If True, its actual mode is specified by `extra_convs_on_inputs`.
     """
 
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 num_outs,
-                 stack_times,
-                 start_level=0,
-                 end_level=-1,
-                 add_extra_convs=False,
-                 norm_cfg=None):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        num_outs,
+        stack_times,
+        start_level=0,
+        end_level=-1,
+        add_extra_convs=False,
+        norm_cfg=None,
+    ):
         super(NASFPN, self).__init__()
         assert isinstance(in_channels, list)
         self.in_channels = in_channels
@@ -61,11 +63,8 @@ class NASFPN(nn.Module):
         self.lateral_convs = nn.ModuleList()
         for i in range(self.start_level, self.backbone_end_level):
             l_conv = ConvModule(
-                in_channels[i],
-                out_channels,
-                1,
-                norm_cfg=norm_cfg,
-                act_cfg=None)
+                in_channels[i], out_channels, 1, norm_cfg=norm_cfg, act_cfg=None
+            )
             self.lateral_convs.append(l_conv)
 
         # add extra downsample layers (stride-2 pooling or conv)
@@ -73,51 +72,58 @@ class NASFPN(nn.Module):
         self.extra_downsamples = nn.ModuleList()
         for i in range(extra_levels):
             extra_conv = ConvModule(
-                out_channels, out_channels, 1, norm_cfg=norm_cfg, act_cfg=None)
-            self.extra_downsamples.append(
-                nn.Sequential(extra_conv, nn.MaxPool2d(2, 2)))
+                out_channels, out_channels, 1, norm_cfg=norm_cfg, act_cfg=None
+            )
+            self.extra_downsamples.append(nn.Sequential(extra_conv, nn.MaxPool2d(2, 2)))
 
         # add NAS FPN connections
         self.fpn_stages = nn.ModuleList()
         for _ in range(self.stack_times):
             stage = nn.ModuleDict()
             # gp(p6, p4) -> p4_1
-            stage['gp_64_4'] = GlobalPoolingCell(
+            stage["gp_64_4"] = GlobalPoolingCell(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                out_norm_cfg=norm_cfg)
+                out_norm_cfg=norm_cfg,
+            )
             # sum(p4_1, p4) -> p4_2
-            stage['sum_44_4'] = SumCell(
+            stage["sum_44_4"] = SumCell(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                out_norm_cfg=norm_cfg)
+                out_norm_cfg=norm_cfg,
+            )
             # sum(p4_2, p3) -> p3_out
-            stage['sum_43_3'] = SumCell(
+            stage["sum_43_3"] = SumCell(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                out_norm_cfg=norm_cfg)
+                out_norm_cfg=norm_cfg,
+            )
             # sum(p3_out, p4_2) -> p4_out
-            stage['sum_34_4'] = SumCell(
+            stage["sum_34_4"] = SumCell(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                out_norm_cfg=norm_cfg)
+                out_norm_cfg=norm_cfg,
+            )
             # sum(p5, gp(p4_out, p3_out)) -> p5_out
-            stage['gp_43_5'] = GlobalPoolingCell(with_out_conv=False)
-            stage['sum_55_5'] = SumCell(
+            stage["gp_43_5"] = GlobalPoolingCell(with_out_conv=False)
+            stage["sum_55_5"] = SumCell(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                out_norm_cfg=norm_cfg)
+                out_norm_cfg=norm_cfg,
+            )
             # sum(p7, gp(p5_out, p4_2)) -> p7_out
-            stage['gp_54_7'] = GlobalPoolingCell(with_out_conv=False)
-            stage['sum_77_7'] = SumCell(
+            stage["gp_54_7"] = GlobalPoolingCell(with_out_conv=False)
+            stage["sum_77_7"] = SumCell(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                out_norm_cfg=norm_cfg)
+                out_norm_cfg=norm_cfg,
+            )
             # gp(p7_out, p5_out) -> p6_out
-            stage['gp_75_6'] = GlobalPoolingCell(
+            stage["gp_75_6"] = GlobalPoolingCell(
                 in_channels=out_channels,
                 out_channels=out_channels,
-                out_norm_cfg=norm_cfg)
+                out_norm_cfg=norm_cfg,
+            )
             self.fpn_stages.append(stage)
 
     def init_weights(self):
@@ -141,20 +147,20 @@ class NASFPN(nn.Module):
 
         for stage in self.fpn_stages:
             # gp(p6, p4) -> p4_1
-            p4_1 = stage['gp_64_4'](p6, p4, out_size=p4.shape[-2:])
+            p4_1 = stage["gp_64_4"](p6, p4, out_size=p4.shape[-2:])
             # sum(p4_1, p4) -> p4_2
-            p4_2 = stage['sum_44_4'](p4_1, p4, out_size=p4.shape[-2:])
+            p4_2 = stage["sum_44_4"](p4_1, p4, out_size=p4.shape[-2:])
             # sum(p4_2, p3) -> p3_out
-            p3 = stage['sum_43_3'](p4_2, p3, out_size=p3.shape[-2:])
+            p3 = stage["sum_43_3"](p4_2, p3, out_size=p3.shape[-2:])
             # sum(p3_out, p4_2) -> p4_out
-            p4 = stage['sum_34_4'](p3, p4_2, out_size=p4.shape[-2:])
+            p4 = stage["sum_34_4"](p3, p4_2, out_size=p4.shape[-2:])
             # sum(p5, gp(p4_out, p3_out)) -> p5_out
-            p5_tmp = stage['gp_43_5'](p4, p3, out_size=p5.shape[-2:])
-            p5 = stage['sum_55_5'](p5, p5_tmp, out_size=p5.shape[-2:])
+            p5_tmp = stage["gp_43_5"](p4, p3, out_size=p5.shape[-2:])
+            p5 = stage["sum_55_5"](p5, p5_tmp, out_size=p5.shape[-2:])
             # sum(p7, gp(p5_out, p4_2)) -> p7_out
-            p7_tmp = stage['gp_54_7'](p5, p4_2, out_size=p7.shape[-2:])
-            p7 = stage['sum_77_7'](p7, p7_tmp, out_size=p7.shape[-2:])
+            p7_tmp = stage["gp_54_7"](p5, p4_2, out_size=p7.shape[-2:])
+            p7 = stage["sum_77_7"](p7, p7_tmp, out_size=p7.shape[-2:])
             # gp(p7_out, p5_out) -> p6_out
-            p6 = stage['gp_75_6'](p7, p5, out_size=p6.shape[-2:])
+            p6 = stage["gp_75_6"](p7, p5, out_size=p6.shape[-2:])
 
         return p3, p4, p5, p6, p7

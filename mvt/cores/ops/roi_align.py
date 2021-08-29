@@ -14,7 +14,7 @@ class RoIAlign(nn.Module):
         pool_mode (str, 'avg' or 'max'): pooling mode in each bin.
         aligned (bool): if False, use the legacy implementation in
             Detection. If True, align the results more perfectly.
-            
+
     Note:
         The implementation of RoIAlign when aligned=True is modified from
         https://github.com/facebookresearch/detectron2/
@@ -34,13 +34,15 @@ class RoIAlign(nn.Module):
         The difference does not make a difference to the model's
         performance if ROIAlign is used together with conv layers.
     """
-    
-    def __init__(self,
-                 output_size,
-                 spatial_scale=1.0,
-                 sampling_ratio=0,
-                 pool_mode='avg',
-                 aligned=True):
+
+    def __init__(
+        self,
+        output_size,
+        spatial_scale=1.0,
+        sampling_ratio=0,
+        pool_mode="avg",
+        aligned=True,
+    ):
         super(RoIAlign, self).__init__()
 
         self.output_size = _pair(output_size)
@@ -56,22 +58,27 @@ class RoIAlign(nn.Module):
             rois: Bx5 boxes. First column is the index into N.\
                 The other 4 columns are xyxy.
         """
-        if 'aligned' in roi_align.__code__.co_varnames:
-            return roi_align(input, rois, self.output_size,
-                             self.spatial_scale, self.sampling_ratio,
-                             self.aligned)
+        if "aligned" in roi_align.__code__.co_varnames:
+            return roi_align(
+                input,
+                rois,
+                self.output_size,
+                self.spatial_scale,
+                self.sampling_ratio,
+                self.aligned,
+            )
         else:
             if self.aligned:
-                rois -= rois.new_tensor([0.] +
-                                        [0.5 / self.spatial_scale] * 4)
-            return roi_align(input, rois, self.output_size,
-                             self.spatial_scale, self.sampling_ratio)
+                rois -= rois.new_tensor([0.0] + [0.5 / self.spatial_scale] * 4)
+            return roi_align(
+                input, rois, self.output_size, self.spatial_scale, self.sampling_ratio
+            )
 
     def __repr__(self):
         s = self.__class__.__name__
-        s += f'(output_size={self.output_size}, '
-        s += f'spatial_scale={self.spatial_scale}, '
-        s += f'sampling_ratio={self.sampling_ratio}, '
-        s += f'pool_mode={self.pool_mode}, '
-        s += f'aligned={self.aligned}, '
+        s += f"(output_size={self.output_size}, "
+        s += f"spatial_scale={self.spatial_scale}, "
+        s += f"sampling_ratio={self.sampling_ratio}, "
+        s += f"pool_mode={self.pool_mode}, "
+        s += f"aligned={self.aligned}, "
         return s

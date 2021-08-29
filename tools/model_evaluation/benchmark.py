@@ -12,16 +12,16 @@ from mvt.models.model_builder import build_model
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='MMDet benchmark a model')
-    parser.add_argument('config', help='test config file path')
-    parser.add_argument('checkpoint', help='checkpoint file')
+    parser = argparse.ArgumentParser(description="MMDet benchmark a model")
+    parser.add_argument("config", help="test config file path")
+    parser.add_argument("checkpoint", help="checkpoint file")
+    parser.add_argument("--log-interval", default=50, help="interval of logging")
     parser.add_argument(
-        '--log-interval', default=50, help='interval of logging')
-    parser.add_argument(
-        '--fuse-conv-bn',
-        action='store_true',
-        help='Whether to fuse conv and bn, this will slightly increase'
-        'the inference speed')
+        "--fuse-conv-bn",
+        action="store_true",
+        help="Whether to fuse conv and bn, this will slightly increase"
+        "the inference speed",
+    )
     args = parser.parse_args()
     return args
 
@@ -31,13 +31,13 @@ def main():
 
     cfg = get_task_cfg(args.config)
     # set cudnn_benchmark
-    if cfg.get('cudnn_benchmark', False):
+    if cfg.get("cudnn_benchmark", False):
         torch.backends.cudnn.benchmark = True
     cfg.model.pretrained = None
     cfg.data.test.test_mode = True
 
     # build the dataloader
-    samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 1)
+    samples_per_gpu = cfg.data.test.pop("samples_per_gpu", 1)
     if samples_per_gpu > 1:
         # Replace 'ImageToTensor' to 'DefaultFormatBundle'
         cfg.data.test.pipeline = replace_ImageToTensor(cfg.data.test.pipeline)
@@ -47,12 +47,13 @@ def main():
         samples_per_gpu=1,
         workers_per_gpu=cfg.data.workers_per_gpu,
         dist=False,
-        shuffle=False)
+        shuffle=False,
+    )
 
     # build the model and load checkpoint
     model = build_model(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
 
-    load_checkpoint(model, args.checkpoint, map_location='cpu')
+    load_checkpoint(model, args.checkpoint, map_location="cpu")
     if args.fuse_conv_bn:
         model = fuse_conv_bn(model)
 
@@ -80,14 +81,14 @@ def main():
             pure_inf_time += elapsed
             if (i + 1) % args.log_interval == 0:
                 fps = (i + 1 - num_warmup) / pure_inf_time
-                print(f'Done image [{i + 1:<3}/ 2000], fps: {fps:.1f} img / s')
+                print(f"Done image [{i + 1:<3}/ 2000], fps: {fps:.1f} img / s")
 
         if (i + 1) == 2000:
             pure_inf_time += elapsed
             fps = (i + 1 - num_warmup) / pure_inf_time
-            print(f'Overall fps: {fps:.1f} img / s')
+            print(f"Overall fps: {fps:.1f} img / s")
             break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

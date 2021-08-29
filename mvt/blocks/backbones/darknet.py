@@ -45,21 +45,25 @@ class Darknet(nn.Module):
 
     # Dict(depth: (layers, channels))
     arch_settings = {
-        53: ((1, 2, 8, 8, 4), ((32, 64), (64, 128), (128, 256), (256, 512),
-                               (512, 1024)))
+        53: (
+            (1, 2, 8, 8, 4),
+            ((32, 64), (64, 128), (128, 256), (256, 512), (512, 1024)),
+        )
     }
 
-    def __init__(self,
-                 depth=53,
-                 out_indices=(3, 4, 5),
-                 frozen_stages=-1,
-                 conv_cfg=None,
-                 norm_cfg=dict(type='BN', requires_grad=True),
-                 act_cfg=dict(type='LeakyReLU', negative_slope=0.1),
-                 norm_eval=True):
+    def __init__(
+        self,
+        depth=53,
+        out_indices=(3, 4, 5),
+        frozen_stages=-1,
+        conv_cfg=None,
+        norm_cfg=dict(type="BN", requires_grad=True),
+        act_cfg=dict(type="LeakyReLU", negative_slope=0.1),
+        norm_eval=True,
+    ):
         super(Darknet, self).__init__()
         if depth not in self.arch_settings:
-            raise KeyError(f'invalid depth {depth} for darknet')
+            raise KeyError(f"invalid depth {depth} for darknet")
         self.depth = depth
         self.out_indices = out_indices
         self.frozen_stages = frozen_stages
@@ -69,13 +73,13 @@ class Darknet(nn.Module):
 
         self.conv1 = ConvModule(3, 32, 3, padding=1, **cfg)
 
-        self.cr_blocks = ['conv1']
+        self.cr_blocks = ["conv1"]
         for i, n_layers in enumerate(self.layers):
-            layer_name = f'conv_res_block{i + 1}'
+            layer_name = f"conv_res_block{i + 1}"
             in_c, out_c = self.channels[i]
             self.add_module(
-                layer_name,
-                self.make_conv_res_block(in_c, out_c, n_layers, **cfg))
+                layer_name, self.make_conv_res_block(in_c, out_c, n_layers, **cfg)
+            )
             self.cr_blocks.append(layer_name)
 
         self.norm_eval = norm_eval
@@ -102,7 +106,7 @@ class Darknet(nn.Module):
                     constant_init(m, 1)
 
         else:
-            raise TypeError('pretrained must be a str or None')
+            raise TypeError("pretrained must be a str or None")
 
     def _freeze_stages(self):
         if self.frozen_stages >= 0:
@@ -121,13 +125,14 @@ class Darknet(nn.Module):
                     m.eval()
 
     @staticmethod
-    def make_conv_res_block(in_channels,
-                            out_channels,
-                            res_repeat,
-                            conv_cfg=None,
-                            norm_cfg=dict(type='BN', requires_grad=True),
-                            act_cfg=dict(type='LeakyReLU',
-                                         negative_slope=0.1)):
+    def make_conv_res_block(
+        in_channels,
+        out_channels,
+        res_repeat,
+        conv_cfg=None,
+        norm_cfg=dict(type="BN", requires_grad=True),
+        act_cfg=dict(type="LeakyReLU", negative_slope=0.1),
+    ):
         """In Darknet backbone, ConvLayer is usually followed by ResBlock. This
         function will make that. The Conv layers always have 3x3 filters with
         stride=2. The number of the filters in Conv layer is the same as the
@@ -148,12 +153,10 @@ class Darknet(nn.Module):
 
         model = nn.Sequential()
         model.add_module(
-            'conv',
-            ConvModule(
-                in_channels, out_channels, 3, stride=2, padding=1, **cfg))
+            "conv", ConvModule(in_channels, out_channels, 3, stride=2, padding=1, **cfg)
+        )
         for idx in range(res_repeat):
-            model.add_module('res{}'.format(idx),
-                             ResBlock(out_channels, **cfg))
+            model.add_module("res{}".format(idx), ResBlock(out_channels, **cfg))
         return model
 
 
@@ -167,25 +170,51 @@ class CSPDarknet53(nn.Module):
         self.conv1 = vn_layer.Conv2dBatchMish(3, self.inplanes, kernel_size=3, stride=1)
         self.feature_channels = [64, 128, 256, 512, 1024]
 
-        self.stages = nn.ModuleList([
-            vn_layer.Resblock_body(self.inplanes, self.feature_channels[0], layers[0], first=True),
-            vn_layer.Resblock_body(self.feature_channels[0], self.feature_channels[1], layers[1], first=False),
-            vn_layer.Resblock_body(self.feature_channels[1], self.feature_channels[2], layers[2], first=False),
-            vn_layer.Resblock_body(self.feature_channels[2], self.feature_channels[3], layers[3], first=False),
-            vn_layer.Resblock_body(self.feature_channels[3], self.feature_channels[4], layers[4], first=False)
-        ])
+        self.stages = nn.ModuleList(
+            [
+                vn_layer.Resblock_body(
+                    self.inplanes, self.feature_channels[0], layers[0], first=True
+                ),
+                vn_layer.Resblock_body(
+                    self.feature_channels[0],
+                    self.feature_channels[1],
+                    layers[1],
+                    first=False,
+                ),
+                vn_layer.Resblock_body(
+                    self.feature_channels[1],
+                    self.feature_channels[2],
+                    layers[2],
+                    first=False,
+                ),
+                vn_layer.Resblock_body(
+                    self.feature_channels[2],
+                    self.feature_channels[3],
+                    layers[3],
+                    first=False,
+                ),
+                vn_layer.Resblock_body(
+                    self.feature_channels[3],
+                    self.feature_channels[4],
+                    layers[4],
+                    first=False,
+                ),
+            ]
+        )
 
         self.init_weights(pretrained)
 
     def __modules_recurse(self, mod=None):
-        """ This function will recursively loop over all module children.
+        """This function will recursively loop over all module children.
         Args:
             mod (torch.nn.Module, optional): Module to loop over; Default **self**
         """
         if mod is None:
             mod = self
         for module in mod.children():
-            if isinstance(module, (nn.ModuleList, nn.Sequential, CSPDarknet53.custom_layers)):
+            if isinstance(
+                module, (nn.ModuleList, nn.Sequential, CSPDarknet53.custom_layers)
+            ):
                 yield from self.__modules_recurse(module)
             else:
                 yield module
@@ -196,12 +225,14 @@ class CSPDarknet53(nn.Module):
             for module in self.__modules_recurse():
                 try:
                     weights.load_layer(module)
-                    print(f'Layer loaded: {module}')
+                    print(f"Layer loaded: {module}")
                     if weights.start >= weights.size:
-                        print(f'Finished loading weights [{weights.start}/{weights.size} weights]')
+                        print(
+                            f"Finished loading weights [{weights.start}/{weights.size} weights]"
+                        )
                         break
                 except NotImplementedError:
-                    print(f'Layer skipped: {module.__class__.__name__}')
+                    print(f"Layer skipped: {module.__class__.__name__}")
         else:
             for m in self.modules():
                 if isinstance(m, nn.Conv2d):

@@ -15,9 +15,19 @@ from .arcmargin_head import ArcMarginHead
 
 
 __all__ = [
-    'AnchorFreeHead', 'AnchorHead', 
-    'RPNHead', 'RetinaHead', 'SSDHead', 'FCOSHead', 
-    'ATSSHead', 'YOLOV3Head', 'TinyYOLOV4Head', 
-    'RetinaSepConvHead', 'YOLOCSPHead', 'LinearEmbHead',
-    'MlpEmbHead', 'MlpLocEmbHead', 'ArcMarginHead'
+    "AnchorFreeHead",
+    "AnchorHead",
+    "RPNHead",
+    "RetinaHead",
+    "SSDHead",
+    "FCOSHead",
+    "ATSSHead",
+    "YOLOV3Head",
+    "TinyYOLOV4Head",
+    "RetinaSepConvHead",
+    "YOLOCSPHead",
+    "LinearEmbHead",
+    "MlpEmbHead",
+    "MlpLocEmbHead",
+    "ArcMarginHead",
 ]

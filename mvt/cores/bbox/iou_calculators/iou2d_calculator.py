@@ -3,7 +3,7 @@ import torch
 from ...core_bbox import IOU_CALCULATORS
 
 
-def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
+def bbox_overlaps(bboxes1, bboxes2, mode="iou", is_aligned=False, eps=1e-6):
     """Calculate overlap between two set of bboxes.
 
     If ``is_aligned `` is ``False``, then calculate the overlaps between each
@@ -55,10 +55,10 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
         >>> assert tuple(bbox_overlaps(empty, empty).shape) == (0, 0)
     """
 
-    assert mode in ['iou', 'iof', 'giou'], f'Unsupported mode {mode}'
+    assert mode in ["iou", "iof", "giou"], f"Unsupported mode {mode}"
     # Either the boxes are empty or the length of boxes's last dimenstion is 4
-    assert (bboxes1.size(-1) == 4 or bboxes1.size(0) == 0)
-    assert (bboxes2.size(-1) == 4 or bboxes2.size(0) == 0)
+    assert bboxes1.size(-1) == 4 or bboxes1.size(0) == 0
+    assert bboxes2.size(-1) == 4 or bboxes2.size(0) == 0
 
     # Batch dim must be the same
     # Batch dim: (B1, B2, ... Bn)
@@ -72,14 +72,12 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
 
     if rows * cols == 0:
         if is_aligned:
-            return bboxes1.new(batch_shape + (rows, ))
+            return bboxes1.new(batch_shape + (rows,))
         else:
             return bboxes1.new(batch_shape + (rows, cols))
 
-    area1 = (bboxes1[..., 2] - bboxes1[..., 0]) * (
-        bboxes1[..., 3] - bboxes1[..., 1])
-    area2 = (bboxes2[..., 2] - bboxes2[..., 0]) * (
-        bboxes2[..., 3] - bboxes2[..., 1])
+    area1 = (bboxes1[..., 2] - bboxes1[..., 0]) * (bboxes1[..., 3] - bboxes1[..., 1])
+    area2 = (bboxes2[..., 2] - bboxes2[..., 0]) * (bboxes2[..., 3] - bboxes2[..., 1])
 
     if is_aligned:
         lt = torch.max(bboxes1[..., :2], bboxes2[..., :2])  # [B, rows, 2]
@@ -88,43 +86,47 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
         wh = (rb - lt).clamp(min=0)  # [B, rows, 2]
         overlap = wh[..., 0] * wh[..., 1]
 
-        if mode in ['iou', 'giou']:
+        if mode in ["iou", "giou"]:
             union = area1 + area2 - overlap
         else:
             union = area1
-        if mode == 'giou':
+        if mode == "giou":
             enclosed_lt = torch.min(bboxes1[..., :2], bboxes2[..., :2])
             enclosed_rb = torch.max(bboxes1[..., 2:], bboxes2[..., 2:])
     else:
-        lt = torch.max(bboxes1[..., :, None, :2],
-                       bboxes2[..., None, :, :2])  # [B, rows, cols, 2]
-        rb = torch.min(bboxes1[..., :, None, 2:],
-                       bboxes2[..., None, :, 2:])  # [B, rows, cols, 2]
+        lt = torch.max(
+            bboxes1[..., :, None, :2], bboxes2[..., None, :, :2]
+        )  # [B, rows, cols, 2]
+        rb = torch.min(
+            bboxes1[..., :, None, 2:], bboxes2[..., None, :, 2:]
+        )  # [B, rows, cols, 2]
 
         wh = (rb - lt).clamp(min=0)  # [B, rows, cols, 2]
         overlap = wh[..., 0] * wh[..., 1]
 
-        if mode in ['iou', 'giou']:
+        if mode in ["iou", "giou"]:
             union = area1[..., None] + area2[..., None, :] - overlap
         else:
             union = area1[..., None]
-        if mode == 'giou':
-            enclosed_lt = torch.min(bboxes1[..., :, None, :2],
-                                    bboxes2[..., None, :, :2])
-            enclosed_rb = torch.max(bboxes1[..., :, None, 2:],
-                                    bboxes2[..., None, :, 2:])
+        if mode == "giou":
+            enclosed_lt = torch.min(
+                bboxes1[..., :, None, :2], bboxes2[..., None, :, :2]
+            )
+            enclosed_rb = torch.max(
+                bboxes1[..., :, None, 2:], bboxes2[..., None, :, 2:]
+            )
 
     eps = union.new_tensor([eps])
     union = torch.max(union, eps)
     ious = overlap / union
-    if mode in ['iou', 'iof']:
+    if mode in ["iou", "iof"]:
         return ious
     # calculate gious
     enclose_wh = (enclosed_rb - enclosed_lt).clamp(min=0)
     enclose_area = enclose_wh[..., 0] * enclose_wh[..., 1]
     enclose_area = torch.max(enclose_area, eps)
     gious = ious - (enclose_area - union) / enclose_area
-    
+
     return gious
 
 
@@ -132,7 +134,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
 class BboxOverlaps2D(object):
     """2D Overlaps (e.g. IoUs, GIoUs) Calculator."""
 
-    def __call__(self, bboxes1, bboxes2, mode='iou', is_aligned=False):
+    def __call__(self, bboxes1, bboxes2, mode="iou", is_aligned=False):
         """Calculate IoU between 2D bboxes.
 
         Args:
@@ -161,5 +163,5 @@ class BboxOverlaps2D(object):
 
     def __repr__(self):
         """str: a string describing the module"""
-        repr_str = self.__class__.__name__ + '()'
+        repr_str = self.__class__.__name__ + "()"
         return repr_str

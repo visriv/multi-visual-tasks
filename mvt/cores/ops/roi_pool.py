@@ -4,7 +4,6 @@ from torchvision.ops import roi_pool
 
 
 class RoIPool(nn.Module):
-
     def __init__(self, output_size, spatial_scale=1.0):
         super(RoIPool, self).__init__()
 
@@ -16,6 +15,6 @@ class RoIPool(nn.Module):
 
     def __repr__(self):
         s = self.__class__.__name__
-        s += f'(output_size={self.output_size}, '
-        s += f'spatial_scale={self.spatial_scale})'
+        s += f"(output_size={self.output_size}, "
+        s += f"spatial_scale={self.spatial_scale})"
         return s

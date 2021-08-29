@@ -6,22 +6,25 @@ from mvt.utils.io_util import file_load
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Evaluate metric of the '
-                                     'results saved in pkl format')
-    parser.add_argument('config', help='Config of the model')
-    parser.add_argument('pkl_results', help='Results in pickle format')
+    parser = argparse.ArgumentParser(
+        description="Evaluate metric of the " "results saved in pkl format"
+    )
+    parser.add_argument("config", help="Config of the model")
+    parser.add_argument("pkl_results", help="Results in pickle format")
     parser.add_argument(
-        '--format-only',
-        action='store_true',
-        help='Format the output results without perform evaluation. It is'
-        'useful when you want to format the result to a specific format and '
-        'submit it to the test server')
+        "--format-only",
+        action="store_true",
+        help="Format the output results without perform evaluation. It is"
+        "useful when you want to format the result to a specific format and "
+        "submit it to the test server",
+    )
     parser.add_argument(
-        '--eval',
+        "--eval",
         type=str,
-        nargs='+',
+        nargs="+",
         help='Evaluation metrics, which depends on the dataset, e.g., "bbox",'
-        ' "segm", "proposal" for COCO, and "mAP", "recall" for PASCAL VOC')    
+        ' "segm", "proposal" for COCO, and "mAP", "recall" for PASCAL VOC',
+    )
     args = parser.parse_args()
     return args
 
@@ -31,10 +34,11 @@ def main():
 
     cfg = get_task_cfg(args.config)
     assert args.eval or args.format_only, (
-        'Please specify at least one operation (eval/format the results) with '
-        'the argument "--eval", "--format-only"')
+        "Please specify at least one operation (eval/format the results) with "
+        'the argument "--eval", "--format-only"'
+    )
     if args.eval and args.format_only:
-        raise ValueError('--eval and --format_only cannot be both specified')
+        raise ValueError("--eval and --format_only cannot be both specified")
 
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
@@ -47,13 +51,13 @@ def main():
     if args.format_only:
         dataset.format_results(outputs, **kwargs)
     if args.eval:
-        eval_kwargs = cfg.get('evaluation', {}).copy()
+        eval_kwargs = cfg.get("evaluation", {}).copy()
         # hard-code way to remove EvalHook args
-        for key in ['interval', 'tmpdir', 'start', 'gpu_collect']:
+        for key in ["interval", "tmpdir", "start", "gpu_collect"]:
             eval_kwargs.pop(key, None)
         eval_kwargs.update(dict(metric=args.eval, **kwargs))
         print(dataset.evaluate(outputs, **eval_kwargs))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

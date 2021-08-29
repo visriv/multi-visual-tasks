@@ -38,7 +38,7 @@ def test_main():
             "age": 12,
             "height": 160,
             "score": 100,
-            "variance": 12
+            "variance": 12,
         }
     }
 
@@ -49,5 +49,5 @@ def test_main():
     print("---------------------------split----------------------------------")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_main()

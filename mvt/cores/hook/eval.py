@@ -25,14 +25,18 @@ class EvalHook(Hook):
 
     def __init__(self, dataloader, eval_type, start=None, interval=1, **eval_kwargs):
         if not isinstance(dataloader, DataLoader):
-            raise TypeError('dataloader must be a pytorch DataLoader, but got'
-                            f' {type(dataloader)}')
+            raise TypeError(
+                "dataloader must be a pytorch DataLoader, but got"
+                f" {type(dataloader)}"
+            )
         if not interval > 0:
-            raise ValueError(f'interval must be positive, but got {interval}')
+            raise ValueError(f"interval must be positive, but got {interval}")
         if start is not None and start < 0:
             warnings.warn(
-                f'The evaluation start epoch {start} is smaller than 0, '
-                f'use 0 instead', UserWarning)
+                f"The evaluation start epoch {start} is smaller than 0, "
+                f"use 0 instead",
+                UserWarning,
+            )
             start = 0
         self.eval_type = eval_type
         self.dataloader = dataloader
@@ -74,12 +78,14 @@ class EvalHook(Hook):
         from mvt.engines.evaluator import single_device_test
 
         results = single_device_test(
-            runner.model, self.dataloader, model_type=self.eval_type, show=False)
+            runner.model, self.dataloader, model_type=self.eval_type, show=False
+        )
         self.evaluate(runner, results)
 
     def evaluate(self, runner, results):
         eval_res = self.dataloader.dataset.evaluate(
-            results, logger=runner.logger, **self.eval_kwargs)
+            results, logger=runner.logger, **self.eval_kwargs
+        )
         for name, val in eval_res.items():
             runner.log_buffer.output[name] = val
         runner.log_buffer.ready = True
@@ -106,16 +112,19 @@ class DistEvalHook(EvalHook):
             the dataset.
     """
 
-    def __init__(self,
-                 dataloader,
-                 eval_type,
-                 start=None,
-                 interval=1,
-                 tmpdir=None,
-                 gpu_collect=False,
-                 **eval_kwargs):
+    def __init__(
+        self,
+        dataloader,
+        eval_type,
+        start=None,
+        interval=1,
+        tmpdir=None,
+        gpu_collect=False,
+        **eval_kwargs,
+    ):
         super().__init__(
-            dataloader, eval_type, start=start, interval=interval, **eval_kwargs)
+            dataloader, eval_type, start=start, interval=interval, **eval_kwargs
+        )
         self.tmpdir = tmpdir
         self.gpu_collect = gpu_collect
 
@@ -123,15 +132,13 @@ class DistEvalHook(EvalHook):
         if not self.evaluation_flag(runner):
             return
         from mvt.engines.evaluator import multi_device_det_test
+
         tmpdir = self.tmpdir
         if tmpdir is None:
-            tmpdir = osp.join(runner.work_dir, '.eval_hook')
+            tmpdir = osp.join(runner.work_dir, ".eval_hook")
         results = multi_device_det_test(
-            runner.model,
-            self.dataloader,
-            tmpdir=tmpdir,
-            gpu_collect=self.gpu_collect)
+            runner.model, self.dataloader, tmpdir=tmpdir, gpu_collect=self.gpu_collect
+        )
         if runner.rank == 0:
-            print('\n')
+            print("\n")
             self.evaluate(runner, results)
-

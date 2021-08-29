@@ -23,7 +23,7 @@ class RPNTestMixin(object):
         return proposal_list
 
     def aug_test_rpn(self, feats, img_metas):
-        
+
         samples_per_gpu = len(img_metas[0])
         aug_proposals = [[] for _ in range(samples_per_gpu)]
         for x, img_meta in zip(feats, img_metas):

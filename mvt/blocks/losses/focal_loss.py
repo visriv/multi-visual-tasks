@@ -8,13 +8,9 @@ from mvt.utils.loss_util import weight_reduce_loss
 
 
 # This method is for debugging
-def sigmoid_focal_loss(pred,
-                       target,
-                       weight=None,
-                       gamma=2.0,
-                       alpha=0.25,
-                       reduction='mean',
-                       avg_factor=None):
+def sigmoid_focal_loss(
+    pred, target, weight=None, gamma=2.0, alpha=0.25, reduction="mean", avg_factor=None
+):
     """PyTorch version of `Focal Loss <https://arxiv.org/abs/1708.02002>`_.
 
     Args:
@@ -34,23 +30,20 @@ def sigmoid_focal_loss(pred,
     pred_sigmoid = pred.sigmoid()
     target = target.type_as(pred)
     pt = (1 - pred_sigmoid) * target + pred_sigmoid * (1 - target)
-    focal_weight = (alpha * target + (1 - alpha) *
-                    (1 - target)) * pt.pow(gamma)
-    loss = F.binary_cross_entropy_with_logits(
-        pred, target, reduction='none') * focal_weight
+    focal_weight = (alpha * target + (1 - alpha) * (1 - target)) * pt.pow(gamma)
+    loss = (
+        F.binary_cross_entropy_with_logits(pred, target, reduction="none")
+        * focal_weight
+    )
     loss = weight_reduce_loss(loss, weight, reduction, avg_factor)
     return loss
 
 
 @LOSSES.register_module()
 class FocalLoss(nn.Module):
-
-    def __init__(self,
-                 use_sigmoid=True,
-                 gamma=2.0,
-                 alpha=0.25,
-                 reduction='mean',
-                 loss_weight=1.0):
+    def __init__(
+        self, use_sigmoid=True, gamma=2.0, alpha=0.25, reduction="mean", loss_weight=1.0
+    ):
         """`Focal Loss <https://arxiv.org/abs/1708.02002>`_
 
         Args:
@@ -67,19 +60,16 @@ class FocalLoss(nn.Module):
         """
 
         super(FocalLoss, self).__init__()
-        assert use_sigmoid is True, 'Only sigmoid focal loss supported now.'
+        assert use_sigmoid is True, "Only sigmoid focal loss supported now."
         self.use_sigmoid = use_sigmoid
         self.gamma = gamma
         self.alpha = alpha
         self.reduction = reduction
         self.loss_weight = loss_weight
 
-    def forward(self,
-                pred,
-                target,
-                weight=None,
-                avg_factor=None,
-                reduction_override=None):
+    def forward(
+        self, pred, target, weight=None, avg_factor=None, reduction_override=None
+    ):
         """Forward function.
 
         Args:
@@ -97,10 +87,9 @@ class FocalLoss(nn.Module):
             torch.Tensor: The calculated loss
         """
 
-        assert reduction_override in (None, 'none', 'mean', 'sum')
-        reduction = (
-            reduction_override if reduction_override else self.reduction)
-        
+        assert reduction_override in (None, "none", "mean", "sum")
+        reduction = reduction_override if reduction_override else self.reduction
+
         if self.use_sigmoid:
             loss_cls = self.loss_weight * sigmoid_focal_loss(
                 pred,
@@ -109,7 +98,8 @@ class FocalLoss(nn.Module):
                 gamma=self.gamma,
                 alpha=self.alpha,
                 reduction=reduction,
-                avg_factor=avg_factor)
+                avg_factor=avg_factor,
+            )
         else:
             raise NotImplementedError
 
@@ -118,12 +108,7 @@ class FocalLoss(nn.Module):
 
 @LOSSES.register_module()
 class SoftFocalLoss(nn.Module):
-
-    def __init__(self,
-                 gamma=2.0,
-                 alpha=0.25,
-                 reduction='mean',
-                 loss_weight=1.0):
+    def __init__(self, gamma=2.0, alpha=0.25, reduction="mean", loss_weight=1.0):
         """`Focal Loss <https://arxiv.org/abs/1708.02002>`_
 
         Args:
@@ -145,12 +130,9 @@ class SoftFocalLoss(nn.Module):
         self.reduction = reduction
         self.loss_weight = loss_weight
 
-    def forward(self,
-                pred,
-                target,
-                weight=None,
-                avg_factor=None,
-                reduction_override=None):
+    def forward(
+        self, pred, target, weight=None, avg_factor=None, reduction_override=None
+    ):
         """Forward function.
 
         Args:
@@ -167,11 +149,10 @@ class SoftFocalLoss(nn.Module):
         Returns:
             torch.Tensor: The calculated loss
         """
-        
-        assert reduction_override in (None, 'none', 'mean', 'sum')
-        reduction = (
-            reduction_override if reduction_override else self.reduction)
-        
+
+        assert reduction_override in (None, "none", "mean", "sum")
+        reduction = reduction_override if reduction_override else self.reduction
+
         N = pred.size(0)
         C = pred.size(1)
         soft_pred = F.softmax(pred, dim=1)
@@ -179,13 +160,13 @@ class SoftFocalLoss(nn.Module):
         class_mask = pred.data.new(N, C).fill_(0)
         class_mask = Variable(class_mask)
         ids = target.view(-1, 1)
-        class_mask.scatter_(1, ids.data, 1.)
+        class_mask.scatter_(1, ids.data, 1.0)
 
-        probs = (soft_pred*class_mask).sum(1).view(-1,1)
+        probs = (soft_pred * class_mask).sum(1).view(-1, 1)
 
         log_p = probs.log()
 
-        loss_cls = -self.alpha * (torch.pow((1-probs), self.gamma)) * log_p
+        loss_cls = -self.alpha * (torch.pow((1 - probs), self.gamma)) * log_p
 
         if weight is not None:
             if weight.shape != loss_cls.shape:
@@ -197,7 +178,7 @@ class SoftFocalLoss(nn.Module):
             assert weight.ndim == loss_cls.ndim
             loss_cls = loss_cls * weight
 
-        if reduction == 'mean' and avg_factor is not None:
+        if reduction == "mean" and avg_factor is not None:
             loss_cls = loss_cls.sum() / avg_factor
         else:
             loss_cls = loss_cls.sum()

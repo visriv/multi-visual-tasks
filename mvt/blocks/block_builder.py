@@ -14,13 +14,13 @@ from mvt.utils.config_util import convert_to_dict
 # --------------------------------------------------------------------------- #
 # Registries for blocks
 # --------------------------------------------------------------------------- #
-BACKBONES = Registry('backbone')
-NECKS = Registry('neck')
-ROI_EXTRACTORS = Registry('roi_extractor')
-SHARED_HEADS = Registry('shared_head')
-HEADS = Registry('head')
-LOSSES = Registry('loss')
-PIXEL_SAMPLERS = Registry('pixel sampler')
+BACKBONES = Registry("backbone")
+NECKS = Registry("neck")
+ROI_EXTRACTORS = Registry("roi_extractor")
+SHARED_HEADS = Registry("shared_head")
+HEADS = Registry("head")
+LOSSES = Registry("loss")
+PIXEL_SAMPLERS = Registry("pixel sampler")
 
 
 def build_block(cfg, registry, default_args=None):
@@ -33,14 +33,12 @@ def build_block(cfg, registry, default_args=None):
         nn.Module: A built nn module.
     """
     if isinstance(cfg, list):
-        modules = [
-            build_module_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
-        ]
+        modules = [build_module_from_cfg(cfg_, registry, default_args) for cfg_ in cfg]
         return nn.Sequential(*modules)
-    elif isinstance(cfg, CfgNode): # CfgNode is inheritted from dict
+    elif isinstance(cfg, CfgNode):  # CfgNode is inheritted from dict
         return build_module_from_cfg(cfg, registry, default_args)
     else:
-        return build_module_from_dict(cfg, registry, default_args) 
+        return build_module_from_dict(cfg, registry, default_args)
 
 
 def build_backbone(cfg):

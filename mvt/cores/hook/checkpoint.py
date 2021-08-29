@@ -26,14 +26,16 @@ class CheckpointHook(Hook):
             gpus. Default: False.
     """
 
-    def __init__(self,
-                 interval=-1,
-                 by_epoch=True,
-                 save_optimizer=True,
-                 out_dir=None,
-                 max_keep_ckpts=-1,
-                 sync_buffer=False,
-                 **kwargs):
+    def __init__(
+        self,
+        interval=-1,
+        by_epoch=True,
+        save_optimizer=True,
+        out_dir=None,
+        max_keep_ckpts=-1,
+        sync_buffer=False,
+        **kwargs,
+    ):
         self.interval = interval
         self.by_epoch = by_epoch
         self.save_optimizer = save_optimizer
@@ -45,9 +47,9 @@ class CheckpointHook(Hook):
     def after_train_epoch(self, runner):
         if not self.by_epoch or not self.every_n_epochs(runner, self.interval):
             return
-        
+
         if runner.rank == 0:
-            runner.logger.info(f'Saving checkpoint at {runner.epoch + 1} epochs')
+            runner.logger.info(f"Saving checkpoint at {runner.epoch + 1} epochs")
         if self.sync_buffer:
             allreduce_params(runner.model.buffers())
         self._save_checkpoint(runner)
@@ -58,38 +60,43 @@ class CheckpointHook(Hook):
         if not self.out_dir:
             self.out_dir = runner.work_dir
         if self.by_epoch:
-            filename_tmpl = 'epoch_{}.pth'
+            filename_tmpl = "epoch_{}.pth"
         else:
-            filename_tmpl = 'epoch_{}_iter_{}.pth'.format('{}', runner.iter + 1)
+            filename_tmpl = "epoch_{}_iter_{}.pth".format("{}", runner.iter + 1)
 
         runner.save_checkpoint(
-            self.out_dir, filename_tmpl=filename_tmpl, 
-            save_optimizer=self.save_optimizer, **self.args)
+            self.out_dir,
+            filename_tmpl=filename_tmpl,
+            save_optimizer=self.save_optimizer,
+            **self.args,
+        )
         if runner.meta is not None:
             if self.by_epoch:
                 cur_ckpt_filename = self.args.get(
-                    'filename_tmpl', 'epoch_{}.pth').format(runner.epoch + 1)
+                    "filename_tmpl", "epoch_{}.pth"
+                ).format(runner.epoch + 1)
             else:
                 cur_ckpt_filename = self.args.get(
-                    'filename_tmpl', 'iter_{}.pth').format(runner.iter + 1)
-            runner.meta.setdefault('hook_msgs', dict())
-            runner.meta['hook_msgs']['last_ckpt'] = os.path.join(
-                self.out_dir, cur_ckpt_filename)
+                    "filename_tmpl", "iter_{}.pth"
+                ).format(runner.iter + 1)
+            runner.meta.setdefault("hook_msgs", dict())
+            runner.meta["hook_msgs"]["last_ckpt"] = os.path.join(
+                self.out_dir, cur_ckpt_filename
+            )
         # remove other checkpoints
         if self.max_keep_ckpts > 0:
             if self.by_epoch:
-                name = 'epoch_{}.pth'
+                name = "epoch_{}.pth"
                 current_ckpt = runner.epoch + 1
             else:
-                name = 'iter_{}.pth'
+                name = "iter_{}.pth"
                 current_ckpt = runner.iter + 1
             redundant_ckpts = range(
-                current_ckpt - self.max_keep_ckpts * self.interval, 0,
-                -self.interval)
-            filename_tmpl = self.args.get('filename_tmpl', name)
+                current_ckpt - self.max_keep_ckpts * self.interval, 0, -self.interval
+            )
+            filename_tmpl = self.args.get("filename_tmpl", name)
             for _step in redundant_ckpts:
-                ckpt_path = os.path.join(self.out_dir,
-                                         filename_tmpl.format(_step))
+                ckpt_path = os.path.join(self.out_dir, filename_tmpl.format(_step))
                 if os.path.exists(ckpt_path):
                     os.remove(ckpt_path)
                 else:
@@ -99,8 +106,7 @@ class CheckpointHook(Hook):
         if self.by_epoch or not self.every_n_iters(runner, self.interval):
             return
         if runner.rank == 0:
-            runner.logger.info(
-                f'Saving checkpoint at {runner.iter + 1} iterations')
+            runner.logger.info(f"Saving checkpoint at {runner.iter + 1} iterations")
         if self.sync_buffer:
             allreduce_params(runner.model.buffers())
         self._save_checkpoint(runner)

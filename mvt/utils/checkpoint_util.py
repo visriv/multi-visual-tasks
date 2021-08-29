@@ -35,47 +35,51 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
     all_missing_keys = []
     err_msg = []
 
-    metadata = getattr(state_dict, '_metadata', None)
+    metadata = getattr(state_dict, "_metadata", None)
     state_dict = state_dict.copy()
     if metadata is not None:
         state_dict._metadata = metadata
 
     # use _load_from_state_dict to enable checkpoint version control
-    def recursive_load(module, prefix=''):
+    def recursive_load(module, prefix=""):
         # recursively check parallel module in case that the model has a
         # complicated structure, e.g., nn.Module(nn.Module(DDP))
 
         if is_module_wrapper(module):
             module = module.module
-        local_metadata = {} if metadata is None else metadata.get(
-            prefix[:-1], {})
-        module._load_from_state_dict(state_dict, prefix, local_metadata, True,
-                                     all_missing_keys, unexpected_keys,
-                                     err_msg)
+        local_metadata = {} if metadata is None else metadata.get(prefix[:-1], {})
+        module._load_from_state_dict(
+            state_dict,
+            prefix,
+            local_metadata,
+            True,
+            all_missing_keys,
+            unexpected_keys,
+            err_msg,
+        )
         for name, child in module._modules.items():
             if child is not None:
-                recursive_load(child, prefix + name + '.')
+                recursive_load(child, prefix + name + ".")
 
     recursive_load(module)
     # load = None  # break load->load reference cycle
 
     # ignore "num_batches_tracked" of BN layers
-    missing_keys = [
-        key for key in all_missing_keys if 'num_batches_tracked' not in key
-    ]
+    missing_keys = [key for key in all_missing_keys if "num_batches_tracked" not in key]
 
     if unexpected_keys:
-        err_msg.append('unexpected key in source '
-                       f'state_dict: {", ".join(unexpected_keys)}\n')
+        err_msg.append(
+            "unexpected key in source " f'state_dict: {", ".join(unexpected_keys)}\n'
+        )
     if missing_keys:
         err_msg.append(
-            f'missing keys in source state_dict: {", ".join(missing_keys)}\n')
+            f'missing keys in source state_dict: {", ".join(missing_keys)}\n'
+        )
 
     rank, _ = get_dist_info()
     if len(err_msg) > 0 and rank == 0:
-        err_msg.insert(
-            0, 'The model and loaded state dict do not match exactly\n')
-        err_msg = '\n'.join(err_msg)
+        err_msg.insert(0, "The model and loaded state dict do not match exactly\n")
+        err_msg = "\n".join(err_msg)
         if strict:
             raise RuntimeError(err_msg)
         elif logger is not None:
@@ -89,7 +93,7 @@ def load_url_dist(url, model_dir=None):
     rank 0."""
 
     rank, world_size = get_dist_info()
-    rank = int(os.environ.get('LOCAL_RANK', rank))
+    rank = int(os.environ.get("LOCAL_RANK", rank))
     if rank == 0:
         checkpoint = model_zoo.load_url(url, model_dir=model_dir)
     if world_size > 1:
@@ -105,11 +109,12 @@ def get_torchvision_models():
     for _, name, ispkg in pkgutil.walk_packages(torchvision.models.__path__):
         if ispkg:
             continue
-        _zoo = import_module(f'torchvision.models.{name}')
-        if hasattr(_zoo, 'model_urls'):
-            _urls = getattr(_zoo, 'model_urls')
+        _zoo = import_module(f"torchvision.models.{name}")
+        if hasattr(_zoo, "model_urls"):
+            _urls = getattr(_zoo, "model_urls")
             model_urls.update(_urls)
     return model_urls
+
 
 def get_external_models(default_json_path, external_json_path):
 
@@ -122,22 +127,24 @@ def get_external_models(default_json_path, external_json_path):
 
     return default_urls
 
+
 def _process_cls_checkpoint(checkpoint):
 
-    state_dict = checkpoint['state_dict']
+    state_dict = checkpoint["state_dict"]
     new_state_dict = OrderedDict()
     for k, v in state_dict.items():
-        if k.startswith('backbone.'):
+        if k.startswith("backbone."):
             new_state_dict[k[9:]] = v
     new_checkpoint = dict(state_dict=new_state_dict)
 
     return new_checkpoint
 
+
 def _load_checkpoint(filename, map_location=None):
     """Load checkpoint from somewhere (modelzoo, file, url).
 
     Args:
-        filename (str): Accept local filepath, URL, ``torchvision://xxx``. 
+        filename (str): Accept local filepath, URL, ``torchvision://xxx``.
             Please refer to ``docs/model_zoo.md`` for details.
         map_location (str | None): Same as :func:`torch.load`. Default: None.
 
@@ -146,29 +153,26 @@ def _load_checkpoint(filename, map_location=None):
             OrderedDict storing model weights or a dict containing other
             information, which depends on the checkpoint.
     """
-    
-    if filename.startswith('torchvision://'):
+
+    if filename.startswith("torchvision://"):
         model_urls = get_torchvision_models()
         model_name = filename[14:]
-        checkpoint = load_url_dist(model_urls[model_name])    
-    elif filename.startswith(('http://', 'https://')):
+        checkpoint = load_url_dist(model_urls[model_name])
+    elif filename.startswith(("http://", "https://")):
         checkpoint = load_url_dist(filename)
     else:
         if not osp.isfile(filename):
-            raise IOError(f'{filename} is not a checkpoint file')
+            raise IOError(f"{filename} is not a checkpoint file")
         checkpoint = torch.load(filename, map_location=map_location)
     return checkpoint
 
-def load_checkpoint(model,
-                    filename,
-                    map_location=None,
-                    strict=False,
-                    logger=None):
+
+def load_checkpoint(model, filename, map_location=None, strict=False, logger=None):
     """Load checkpoint from a file or URI.
 
     Args:
         model (Module): Module to load checkpoint.
-        filename (str): Accept local filepath, URL, ``torchvision://xxx``. 
+        filename (str): Accept local filepath, URL, ``torchvision://xxx``.
             Please refer to ``docs/model_zoo.md`` for details.
         map_location (str): Same as :func:`torch.load`.
         strict (bool): Whether to allow different params for the model and
@@ -182,11 +186,10 @@ def load_checkpoint(model,
     checkpoint = _load_checkpoint(filename, map_location)
     # OrderedDict is a subclass of dict
     if not isinstance(checkpoint, dict):
-        raise RuntimeError(
-            f'No state_dict found in checkpoint file {filename}')
+        raise RuntimeError(f"No state_dict found in checkpoint file {filename}")
     # get state_dict from checkpoint
-    if 'state_dict' in checkpoint:
-        state_dict = checkpoint['state_dict']
+    if "state_dict" in checkpoint:
+        state_dict = checkpoint["state_dict"]
     else:
         state_dict = checkpoint
     # strip prefix of state_dict
@@ -198,12 +201,13 @@ def load_checkpoint(model,
     #         state_dict[k[len("module.encoder_q."):]] = state_dict[k]
     #     # delete renamed or unused k
     #     del state_dict[k]
-    
-    if list(state_dict.keys())[0].startswith('module.'):
-        state_dict = {k[7:]: v for k, v in checkpoint['state_dict'].items()}
+
+    if list(state_dict.keys())[0].startswith("module."):
+        state_dict = {k[7:]: v for k, v in checkpoint["state_dict"].items()}
     # load state_dict
     load_state_dict(model, state_dict, strict, logger)
     return checkpoint
+
 
 def weights_to_cpu(state_dict):
     """Copy a model state_dict to cpu.
@@ -218,6 +222,7 @@ def weights_to_cpu(state_dict):
     for key, val in state_dict.items():
         state_dict_cpu[key] = val.cpu()
     return state_dict_cpu
+
 
 def _save_to_state_dict(module, destination, prefix, keep_vars):
     """Saves module state to `destination` dictionary.
@@ -237,7 +242,8 @@ def _save_to_state_dict(module, destination, prefix, keep_vars):
         if buf is not None:
             destination[prefix + name] = buf if keep_vars else buf.detach()
 
-def get_state_dict(module, destination=None, prefix='', keep_vars=False):
+
+def get_state_dict(module, destination=None, prefix="", keep_vars=False):
     """Returns a dictionary containing a whole state of the module.
     Both parameters and persistent buffers (e.g. running averages) are
     included. Keys are corresponding parameter and buffer names.
@@ -265,24 +271,23 @@ def get_state_dict(module, destination=None, prefix='', keep_vars=False):
     if destination is None:
         destination = OrderedDict()
         destination._metadata = OrderedDict()
-    destination._metadata[prefix[:-1]] = local_metadata = dict(
-        version=module._version)
+    destination._metadata[prefix[:-1]] = local_metadata = dict(version=module._version)
     _save_to_state_dict(module, destination, prefix, keep_vars)
     for name, child in module._modules.items():
         if child is not None:
-            get_state_dict(
-                child, destination, prefix + name + '.', keep_vars=keep_vars)
+            get_state_dict(child, destination, prefix + name + ".", keep_vars=keep_vars)
     for hook in module._state_dict_hooks.values():
         hook_result = hook(module, destination, prefix, local_metadata)
         if hook_result is not None:
             destination = hook_result
     return destination
 
+
 def save_checkpoint(model, filename, optimizer=None, meta=None):
     """Save checkpoint to file.
     The checkpoint will have 3 fields: ``meta``, ``state_dict`` and
     ``optimizer``. By default ``meta`` will contain version and time info.
-    
+
     Args:
         model (Module): Module whose params are to be saved.
         filename (str): Checkpoint filename.
@@ -292,25 +297,22 @@ def save_checkpoint(model, filename, optimizer=None, meta=None):
     if meta is None:
         meta = {}
     elif not isinstance(meta, dict):
-        raise TypeError(f'meta must be a dict or None, but got {type(meta)}')
+        raise TypeError(f"meta must be a dict or None, but got {type(meta)}")
     meta.update(time=time.asctime())
 
     mkdir_or_exist(osp.dirname(filename))
     if is_module_wrapper(model):
         model = model.module
 
-    checkpoint = {
-        'meta': meta,
-        'state_dict': weights_to_cpu(get_state_dict(model))
-    }
+    checkpoint = {"meta": meta, "state_dict": weights_to_cpu(get_state_dict(model))}
     # save optimizer state dict in the checkpoint
     if isinstance(optimizer, Optimizer):
-        checkpoint['optimizer'] = optimizer.state_dict()
+        checkpoint["optimizer"] = optimizer.state_dict()
     elif isinstance(optimizer, dict):
-        checkpoint['optimizer'] = {}
+        checkpoint["optimizer"] = {}
         for name, optim in optimizer.items():
-            checkpoint['optimizer'][name] = optim.state_dict()
+            checkpoint["optimizer"][name] = optim.state_dict()
     # immediately flush buffer
-    with open(filename, 'wb') as f:
+    with open(filename, "wb") as f:
         torch.save(checkpoint, f)
         f.flush()

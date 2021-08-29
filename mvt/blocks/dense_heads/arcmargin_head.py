@@ -23,9 +23,15 @@ class ArcMarginHead(BaseClsHead):
         loss (dict): Config of classification loss.
     """
 
-    def __init__(self, in_channels=128, out_channels=10575,
-                 scale=80.0, margin=0.50, easy_margin=False,
-                 loss=dict(type='CrossEntropyLoss')):
+    def __init__(
+        self,
+        in_channels=128,
+        out_channels=10575,
+        scale=80.0,
+        margin=0.50,
+        easy_margin=False,
+        loss=dict(type="CrossEntropyLoss"),
+    ):
         super(ArcMarginHead, self).__init__()
 
         self.in_channels = in_channels
@@ -52,7 +58,7 @@ class ArcMarginHead(BaseClsHead):
 
         if isinstance(labels, list):
             cat_labels = torch.cat(labels)
-        
+
         # cos(theta + m)
         sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
         phi = cosine * self.cos_m - sine * self.sin_m

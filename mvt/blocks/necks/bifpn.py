@@ -8,10 +8,19 @@ from mvt.cores.layer_ops.efficient_ops import SeparableConv2d, MemoryEfficientSw
 
 
 class WeightedMerge(nn.Module):
-
-    def __init__(self, in_channels, out_channels, target_size, norm_cfg, apply_bn=False, eps=0.0001):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        target_size,
+        norm_cfg,
+        apply_bn=False,
+        eps=0.0001,
+    ):
         super(WeightedMerge, self).__init__()
-        self.conv = SeparableConv2d(out_channels, out_channels, 3, padding=1, norm_cfg=norm_cfg, bias=True)
+        self.conv = SeparableConv2d(
+            out_channels, out_channels, 3, padding=1, norm_cfg=norm_cfg, bias=True
+        )
         self.eps = eps
         self.num_ins = len(in_channels)
         self.weight = nn.Parameter(torch.Tensor(self.num_ins).fill_(1))
@@ -19,13 +28,15 @@ class WeightedMerge(nn.Module):
         self.swish = MemoryEfficientSwish()
         self.resample_ops = nn.ModuleList()
         for in_c in in_channels:
-            self.resample_ops.append(Resample(in_c, out_channels, target_size, norm_cfg, apply_bn))
+            self.resample_ops.append(
+                Resample(in_c, out_channels, target_size, norm_cfg, apply_bn)
+            )
 
     def forward(self, inputs):
         assert isinstance(inputs, list)
         assert len(inputs) == self.num_ins
         w = self.relu(self.weight)
-        w /= (w.sum() + self.eps)
+        w /= w.sum() + self.eps
         x = 0
         for i in range(self.num_ins):
             x += w[i] * self.resample_ops[i](inputs[i])
@@ -34,29 +45,34 @@ class WeightedMerge(nn.Module):
 
 
 class Resample(nn.Module):
-
-    def __init__(self, in_channels, out_channels, target_size, norm_cfg, apply_bn=False):
+    def __init__(
+        self, in_channels, out_channels, target_size, norm_cfg, apply_bn=False
+    ):
         super(Resample, self).__init__()
         self.target_size = torch.Size([target_size, target_size])
         self.is_conv = in_channels != out_channels
         if self.is_conv:
-            self.conv = ConvModule(in_channels,
-                    out_channels,
-                    1,
-                    norm_cfg=norm_cfg if apply_bn else None,
-                    bias=True,
-                    act_cfg=None,
-                    inplace=False)
+            self.conv = ConvModule(
+                in_channels,
+                out_channels,
+                1,
+                norm_cfg=norm_cfg if apply_bn else None,
+                bias=True,
+                act_cfg=None,
+                inplace=False,
+            )
 
     def _resize(self, x, size):
         if x.shape[-2:] == size:
             return x
         elif x.shape[-2:] < size:
-            return F.interpolate(x, size=size, mode='nearest')
+            return F.interpolate(x, size=size, mode="nearest")
         else:
             assert x.shape[-2] % size[-2] == 0 and x.shape[-1] % size[-1] == 0
             kernel_size = x.shape[-1] // size[-1]
-            x = F.max_pool2d(x, kernel_size=kernel_size+1, stride=kernel_size, padding=1)
+            x = F.max_pool2d(
+                x, kernel_size=kernel_size + 1, stride=kernel_size, padding=1
+            )
             return x
 
     def forward(self, inputs):
@@ -66,15 +82,16 @@ class Resample(nn.Module):
 
 
 class BiFPNLayer(nn.Module):
-
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 target_size_list,
-                 num_outs=5,
-                 conv_cfg=None,
-                 norm_cfg=None,
-                 activation=None):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        target_size_list,
+        num_outs=5,
+        conv_cfg=None,
+        norm_cfg=None,
+        activation=None,
+    ):
         super(BiFPNLayer, self).__init__()
         assert num_outs >= 2
         self.out_channels = out_channels
@@ -85,14 +102,34 @@ class BiFPNLayer(nn.Module):
 
         self.top_down_merge = nn.ModuleList()
         for i in range(self.num_outs - 1, 0, -1):
-            in_channels_list = [out_channels, in_channels[i-1]] if i < self.num_outs - 1 else [in_channels[i], in_channels[i-1]]
-            merge_op = WeightedMerge(in_channels_list, out_channels, target_size_list[i-1], norm_cfg, apply_bn=True)
+            in_channels_list = (
+                [out_channels, in_channels[i - 1]]
+                if i < self.num_outs - 1
+                else [in_channels[i], in_channels[i - 1]]
+            )
+            merge_op = WeightedMerge(
+                in_channels_list,
+                out_channels,
+                target_size_list[i - 1],
+                norm_cfg,
+                apply_bn=True,
+            )
             self.top_down_merge.append(merge_op)
 
         self.bottom_up_merge = nn.ModuleList()
         for i in range(0, self.num_outs - 1):
-            in_channels_list = [out_channels, in_channels[i+1], out_channels] if i < self.num_outs - 2 else [in_channels[-1], out_channels]
-            merge_op = WeightedMerge(in_channels_list, out_channels, target_size_list[i+1], norm_cfg, apply_bn=True)
+            in_channels_list = (
+                [out_channels, in_channels[i + 1], out_channels]
+                if i < self.num_outs - 2
+                else [in_channels[-1], out_channels]
+            )
+            merge_op = WeightedMerge(
+                in_channels_list,
+                out_channels,
+                target_size_list[i + 1],
+                norm_cfg,
+                apply_bn=True,
+            )
             self.bottom_up_merge.append(merge_op)
 
     def forward(self, inputs):
@@ -101,30 +138,38 @@ class BiFPNLayer(nn.Module):
         # top down merge
         md_x = []
         for i in range(self.num_outs - 1, 0, -1):
-            inputs_list = [md_x[-1], inputs[i-1]] if i < self.num_outs - 1 else [inputs[i], inputs[i-1]]
-            x = self.top_down_merge[self.num_outs-i-1](inputs_list)
+            inputs_list = (
+                [md_x[-1], inputs[i - 1]]
+                if i < self.num_outs - 1
+                else [inputs[i], inputs[i - 1]]
+            )
+            x = self.top_down_merge[self.num_outs - i - 1](inputs_list)
             md_x.append(x)
 
         # bottom up merge
         outputs = md_x[::-1]
         for i in range(1, self.num_outs - 1):
-            outputs[i] = self.bottom_up_merge[i-1]([outputs[i], inputs[i], outputs[i-1]])
+            outputs[i] = self.bottom_up_merge[i - 1](
+                [outputs[i], inputs[i], outputs[i - 1]]
+            )
         outputs.append(self.bottom_up_merge[-1]([inputs[-1], outputs[-1]]))
         return outputs
 
 
 @NECKS.register_module()
 class BiFPN(nn.Module):
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 target_size_list,
-                 num_outs,
-                 start_level=0,
-                 end_level=-1,
-                 stack=1,
-                 conv_cfg=None,
-                 norm_cfg=dict(type='BN', momentum=0.003, eps=1e-4, requires_grad=True)):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        target_size_list,
+        num_outs,
+        start_level=0,
+        end_level=-1,
+        stack=1,
+        conv_cfg=None,
+        norm_cfg=dict(type="BN", momentum=0.003, eps=1e-4, requires_grad=True),
+    ):
         super(BiFPN, self).__init__()
         assert len(in_channels) >= 3
         self.in_channels = in_channels
@@ -149,19 +194,24 @@ class BiFPN(nn.Module):
         for i in range(self.backbone_end_level, self.num_outs):
             in_c = in_channels[-1]
             self.extra_ops.append(
-                Resample(in_c, out_channels, target_size_list[i] , norm_cfg, apply_bn=True)
+                Resample(
+                    in_c, out_channels, target_size_list[i], norm_cfg, apply_bn=True
+                )
             )
             in_channels.append(out_channels)
 
         self.stack_bifpns = nn.ModuleList()
         for _ in range(stack):
             self.stack_bifpns.append(
-                BiFPNLayer(in_channels,
-                           out_channels,
-                           target_size_list,
-                           num_outs=self.num_outs,
-                           conv_cfg=conv_cfg,
-                           norm_cfg=norm_cfg))
+                BiFPNLayer(
+                    in_channels,
+                    out_channels,
+                    target_size_list,
+                    num_outs=self.num_outs,
+                    conv_cfg=conv_cfg,
+                    norm_cfg=norm_cfg,
+                )
+            )
             in_channels = [out_channels] * self.num_outs
 
     def init_weights(self):
@@ -177,4 +227,4 @@ class BiFPN(nn.Module):
         for _, stack_bifpn in enumerate(self.stack_bifpns):
             outs = stack_bifpn(outs)
 
-        return tuple(outs[:self.num_outs])
+        return tuple(outs[: self.num_outs])

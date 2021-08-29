@@ -24,17 +24,17 @@ class LoadImageToDetector(object):
         Returns:
             dict: ``results`` will be returned containing loaded image.
         """
-        if isinstance(results['img'], str):
-            results['filename'] = results['img']
-            results['ori_filename'] = results['img']
+        if isinstance(results["img"], str):
+            results["filename"] = results["img"]
+            results["ori_filename"] = results["img"]
         else:
-            results['filename'] = None
-            results['ori_filename'] = None
-        img = imread(results['img'])
-        results['img'] = img
-        results['img_fields'] = ['img']
-        results['img_shape'] = img.shape
-        results['ori_shape'] = img.shape
+            results["filename"] = None
+            results["ori_filename"] = None
+        img = imread(results["img"])
+        results["img"] = img
+        results["img_fields"] = ["img"]
+        results["img_shape"] = img.shape
+        results["ori_shape"] = img.shape
         return results
 
 
@@ -43,7 +43,7 @@ def get_pipeline_list(pipeline_cfg, is_byte=False):
 
     Note:
         self.pipeline is a CfgNode
-    
+
     Returns:
         list[dict]: list of dicts with types and parameters for constructing pipelines.
     """
@@ -54,9 +54,9 @@ def get_pipeline_list(pipeline_cfg, is_byte=False):
         if len(v_t) > 0:
             if not isinstance(v_t, CfgNode):
                 raise TypeError("pipeline items must be a CfgNode")
-        if is_byte and k_t == 'LoadImageFromFile':
+        if is_byte and k_t == "LoadImageFromFile":
             # remove the load image process
-            k_t = 'LoadImageFromWebcam'
+            k_t = "LoadImageFromWebcam"
         pipeline_item["type"] = k_t
 
         for k_a, v_a in v_t.items():
@@ -80,7 +80,7 @@ def get_pipeline_list(pipeline_cfg, is_byte=False):
     return pipeline_list
 
 
-def get_detector(config, checkpoint=None, device='cuda:0'):
+def get_detector(config, checkpoint=None, device="cuda:0"):
     """Initialize a detector from config file.
 
     Args:
@@ -96,10 +96,10 @@ def get_detector(config, checkpoint=None, device='cuda:0'):
     config.MODEL.PRETRAINED_MODEL_PATH = ""
     model = build_model(config.MODEL)
     if checkpoint is not None:
-        map_loc = 'cpu' if device == 'cpu' else None
+        map_loc = "cpu" if device == "cpu" else None
         checkpoint = load_checkpoint(model, checkpoint, map_location=map_loc)
-        if 'CLASSES' in checkpoint['meta']:
-            model.CLASSES = checkpoint['meta']['CLASSES']
+        if "CLASSES" in checkpoint["meta"]:
+            model.CLASSES = checkpoint["meta"]["CLASSES"]
         else:
             model.CLASSES = get_classes(config.DATA.NAME)
 
@@ -129,8 +129,7 @@ def inference_detector(config, model, img):
         # directly add img
         data = dict(img=img)
         # set loading pipeline type
-        pipeline_list = get_pipeline_list(
-            config.DATA.TEST_TRANSFORMS, is_byte=True)
+        pipeline_list = get_pipeline_list(config.DATA.TEST_TRANSFORMS, is_byte=True)
     else:
         # add information into dict
         data = dict(img_info=dict(filename=img), img_prefix=None)
@@ -146,7 +145,7 @@ def inference_detector(config, model, img):
         data = scatter(data, [device])[0]
     else:
         # just get the actual data from DataContainer
-        data['img_metas'] = data['img_metas'][0].data
+        data["img_metas"] = data["img_metas"][0].data
 
     # forward the model
     with torch.no_grad():
@@ -154,8 +153,9 @@ def inference_detector(config, model, img):
     return result
 
 
-def show_detector_result(model, img, result, score_thr=0.3, 
-                         with_show=True, save_path=None):
+def show_detector_result(
+    model, img, result, score_thr=0.3, with_show=True, save_path=None
+):
     """Visualize the detection results on the image.
 
     Args:
@@ -166,7 +166,8 @@ def show_detector_result(model, img, result, score_thr=0.3,
         score_thr (float): The threshold to visualize the bboxes and masks.
         fig_size (tuple): Figure size of the pyplot figure.
     """
-    if hasattr(model, 'module'):
+    if hasattr(model, "module"):
         model = model.module
     img = model.show_result(
-        img, result, score_thr=score_thr, show=with_show, out_file=save_path)
+        img, result, score_thr=score_thr, show=with_show, out_file=save_path
+    )

@@ -17,10 +17,7 @@ class MlpEmbHead(BaseEmbHead):
         loss (dict): Config of classification loss.
     """
 
-    def __init__(self,
-                 out_channels,
-                 in_channels,
-                 loss=dict(type='TripletMarginLoss')):
+    def __init__(self, out_channels, in_channels, loss=dict(type="TripletMarginLoss")):
         super(MlpEmbHead, self).__init__()
         self.in_channels = in_channels
         self.mid_channels = in_channels // 2
@@ -38,7 +35,7 @@ class MlpEmbHead(BaseEmbHead):
     def init_weights(self):
         normal_init(self.fc1, mean=0, std=0.01, bias=0)
         normal_init(self.fc2, mean=0, std=0.01, bias=0)
-    
+
     def forward(self, x):
         x = x[0].view(x[0].size(0), -1)
         x = self.fc2(self.act(self.fc1(x)))

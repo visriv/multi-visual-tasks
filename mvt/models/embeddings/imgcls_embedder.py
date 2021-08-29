@@ -7,7 +7,6 @@ from mvt.blocks.block_builder import build_backbone, build_head, build_neck
 
 @EMBEDDERS.register_module()
 class ImgClsEmbedder(BaseEmbedder):
-
     def __init__(self, cfg):
 
         super(ImgClsEmbedder, self).__init__()
@@ -45,9 +44,8 @@ class ImgClsEmbedder(BaseEmbedder):
             self.cls_head.init_weights()
 
     def extract_feat(self, img):
-        """Directly extract features from the backbone + neck
-        """
-        
+        """Directly extract features from the backbone + neck"""
+
         x = self.backbone(img)
         if self.with_neck:
             x = self.neck(x)
@@ -93,7 +91,7 @@ class ImgClsEmbedder(BaseEmbedder):
             losses.update(loss_cls)
 
         return losses
-    
+
     def forward_test(self, x, **kwargs):
         """
         Args:
@@ -105,4 +103,4 @@ class ImgClsEmbedder(BaseEmbedder):
     def simple_test(self, x, **kwargs):
         """Test without augmentation."""
         x = self.extract_feat(x)
-        return self.head.simple_test(x) 
+        return self.head.simple_test(x)

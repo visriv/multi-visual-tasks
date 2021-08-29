@@ -28,8 +28,8 @@ def ae_loss_per_image(tl_preds, br_preds, match):
 
     tl_list, br_list, me_list = [], [], []
     if len(match) == 0:  # no object in image
-        pull_loss = tl_preds.sum() * 0.
-        push_loss = tl_preds.sum() * 0.
+        pull_loss = tl_preds.sum() * 0.0
+        push_loss = tl_preds.sum() * 0.0
     else:
         for m in match:
             [tl_y, tl_x], [br_y, br_x] = m
@@ -61,7 +61,7 @@ def ae_loss_per_image(tl_preds, br_preds, match):
         if N > 1:  # more than one object in current image
             push_loss = F.relu(conf_mat).sum() / (N * (N - 1))
         else:
-            push_loss = tl_preds.sum() * 0.
+            push_loss = tl_preds.sum() * 0.0
 
     return pull_loss, push_loss
 
@@ -71,8 +71,8 @@ class AssociativeEmbeddingLoss(nn.Module):
     """Associative Embedding Loss.
     More details can be found in
     `Associative Embedding <https://arxiv.org/abs/1611.05424>`_ and
-    `CornerNet <https://arxiv.org/abs/1808.01244>`_ . 
-       
+    `CornerNet <https://arxiv.org/abs/1808.01244>`_ .
+
     Args:
         pull_weight (float): Loss weight for corners from same object.
         push_weight (float): Loss weight for corners from different object.

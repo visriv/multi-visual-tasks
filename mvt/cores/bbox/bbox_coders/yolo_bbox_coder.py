@@ -49,11 +49,14 @@ class YOLOBBoxCoder(BaseBBoxCoder):
         w_target = torch.log((w_gt / w).clamp(min=self.eps))
         h_target = torch.log((h_gt / h).clamp(min=self.eps))
         x_center_target = ((x_center_gt - x_center) / stride + 0.5).clamp(
-            self.eps, 1 - self.eps)
+            self.eps, 1 - self.eps
+        )
         y_center_target = ((y_center_gt - y_center) / stride + 0.5).clamp(
-            self.eps, 1 - self.eps)
+            self.eps, 1 - self.eps
+        )
         encoded_bboxes = torch.stack(
-            [x_center_target, y_center_target, w_target, h_target], dim=-1)
+            [x_center_target, y_center_target, w_target, h_target], dim=-1
+        )
         return encoded_bboxes
 
     def decode(self, bboxes, pred_bboxes, stride):
@@ -76,15 +79,24 @@ class YOLOBBoxCoder(BaseBBoxCoder):
         # Get outputs x, y
         # x_center_pred = (pred_bboxes[..., 0] - 0.5) * stride + x_center
         # y_center_pred = (pred_bboxes[..., 1] - 0.5) * stride + y_center
-        x_center_pred = (pred_bboxes[..., 0] * self.scale_x_y - 0.5 * (self.scale_x_y - 1) - 0.5) * stride + x_center
-        y_center_pred = (pred_bboxes[..., 1] * self.scale_x_y - 0.5 * (self.scale_x_y - 1) - 0.5) * stride + y_center
+        x_center_pred = (
+            pred_bboxes[..., 0] * self.scale_x_y - 0.5 * (self.scale_x_y - 1) - 0.5
+        ) * stride + x_center
+        y_center_pred = (
+            pred_bboxes[..., 1] * self.scale_x_y - 0.5 * (self.scale_x_y - 1) - 0.5
+        ) * stride + y_center
         w_pred = torch.exp(pred_bboxes[..., 2]) * w
         h_pred = torch.exp(pred_bboxes[..., 3]) * h
 
         decoded_bboxes = torch.stack(
-            (x_center_pred - w_pred / 2, y_center_pred - h_pred / 2,
-             x_center_pred + w_pred / 2, y_center_pred + h_pred / 2),
-            dim=-1)
+            (
+                x_center_pred - w_pred / 2,
+                y_center_pred - h_pred / 2,
+                x_center_pred + w_pred / 2,
+                y_center_pred + h_pred / 2,
+            ),
+            dim=-1,
+        )
 
         return decoded_bboxes
 
@@ -145,8 +157,13 @@ class YOLOV4BBoxCoder(BaseBBoxCoder):
         h_pred = pred_bboxes[..., 3] * h
 
         decoded_bboxes = torch.stack(
-            (x_center_pred - w_pred / 2, y_center_pred - h_pred / 2,
-             x_center_pred + w_pred / 2, y_center_pred + h_pred / 2),
-            dim=-1)
+            (
+                x_center_pred - w_pred / 2,
+                y_center_pred - h_pred / 2,
+                x_center_pred + w_pred / 2,
+                y_center_pred + h_pred / 2,
+            ),
+            dim=-1,
+        )
 
         return decoded_bboxes

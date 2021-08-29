@@ -34,8 +34,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         self.data_root = root_path
         self.data_cfg = data_cfg
 
-        if ("DATA_INFO" in data_cfg and
-                isinstance(data_cfg.DATA_INFO, list)):
+        if "DATA_INFO" in data_cfg and isinstance(data_cfg.DATA_INFO, list):
             self.ann_file = data_cfg.DATA_INFO[sel_index]
         else:
             raise ValueError("DATA_INFO should be set properly")
@@ -55,8 +54,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         self.pipeline = Compose(self.get_pipeline_list())
         self.sel_index = sel_index
 
-        if ("DATA_PREFIX" in data_cfg and
-                isinstance(data_cfg.DATA_PREFIX, list)):
+        if "DATA_PREFIX" in data_cfg and isinstance(data_cfg.DATA_PREFIX, list):
             self.data_prefix = data_cfg.DATA_PREFIX[sel_index]
         else:
             self.data_prefix = None
@@ -72,7 +70,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
 
         # set group flag for the sampler
         self._set_group_flag()
-        
+
     def get_pipeline_list(self):
         """get the list of pipelines"""
 
@@ -129,7 +127,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
 
         gt_labels = []
         for i in range(len(self)):
-            gt_labels.append(self.getitem_info(i)['label'])
+            gt_labels.append(self.getitem_info(i)["label"])
 
         gt_labels = np.array(gt_labels)
         return gt_labels
@@ -143,7 +141,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         Returns:
             int: Image category of specified index.
         """
-        cat_ids = self.getitem_info(idx)['label']
+        cat_ids = self.getitem_info(idx)["label"]
         if isinstance(cat_ids, list):
             return np.array(cat_ids).astype(np.int)
         elif isinstance(cat_ids, np.ndarray):
@@ -160,7 +158,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
 
         return len(self.data_infos)
 
-    def getitem_info(self, index):        
+    def getitem_info(self, index):
         return self.data_infos[index]
 
     def __getitem__(self, idx):
@@ -190,10 +188,10 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         elif isinstance(classes, (tuple, list)):
             class_names = classes
         else:
-            raise ValueError(f'Unsupported type {type(classes)} of classes.')
+            raise ValueError(f"Unsupported type {type(classes)} of classes.")
 
         return class_names
-    
+
     def _set_group_flag(self):
         """Set flag according to image aspect ratio.
 
@@ -204,10 +202,10 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         self.flag = np.zeros(len(self), dtype=np.uint8)
         for i in range(len(self)):
             img_info = self.getitem_info(i)
-            if img_info['width'] / img_info['height'] > 1:
+            if img_info["width"] / img_info["height"] > 1:
                 self.flag[i] = 1
 
-    def evaluate(self, results, metric='accuracy'):
+    def evaluate(self, results, metric="accuracy"):
         """Evaluate the dataset.
 
         Args:
@@ -220,25 +218,25 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         """
         print(type(results))
         print(len(results))
-        eval_results = {f'accuracy': 10.0}
+        eval_results = {f"accuracy": 10.0}
         return eval_results
 
         if isinstance(metric, str):
             metrics = [metric]
         else:
             metrics = metric
-        allowed_metrics = ['accuracy']
+        allowed_metrics = ["accuracy"]
         eval_results = {}
         for metric in metrics:
             if metric not in allowed_metrics:
-                raise KeyError(f'metric {metric} is not supported.')
+                raise KeyError(f"metric {metric} is not supported.")
             results = np.vstack(results)
             labels = self.get_gt_labels()
             assert len(labels) == len(results)
-            if metric == 'accuracy':
+            if metric == "accuracy":
                 acc = np.sum(results == labels) / len(labels)
-                eval_result = {f'accuracy': acc}
-            
+                eval_result = {f"accuracy": acc}
+
             eval_results.update(eval_result)
 
         return eval_results

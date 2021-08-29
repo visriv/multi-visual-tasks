@@ -40,9 +40,8 @@ def generate_grid(num_grid, size, device):
             contains coordinates for the regular grids.
     """
 
-    affine_trans = torch.tensor([[[1., 0., 0.], [0., 1., 0.]]], device=device)
-    grid = F.affine_grid(
-        affine_trans, torch.Size((1, 1, *size)), align_corners=False)
+    affine_trans = torch.tensor([[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]], device=device)
+    grid = F.affine_grid(affine_trans, torch.Size((1, 1, *size)), align_corners=False)
     grid = normalize(grid)
     return grid.view(1, -1, 2).expand(num_grid, -1, -1)
 
@@ -69,17 +68,17 @@ def rel_roi_point_to_abs_img_point(rois, rel_roi_points):
             rois = rois[:, 1:]
         abs_img_points = rel_roi_points.clone()
         abs_img_points[:, :, 0] = abs_img_points[:, :, 0] * (
-            rois[:, None, 2] - rois[:, None, 0])
+            rois[:, None, 2] - rois[:, None, 0]
+        )
         abs_img_points[:, :, 1] = abs_img_points[:, :, 1] * (
-            rois[:, None, 3] - rois[:, None, 1])
+            rois[:, None, 3] - rois[:, None, 1]
+        )
         abs_img_points[:, :, 0] += rois[:, None, 0]
         abs_img_points[:, :, 1] += rois[:, None, 1]
     return abs_img_points
 
 
-def abs_img_point_to_rel_img_point(abs_img_points,
-                                   img_shape,
-                                   spatial_scale=1.):
+def abs_img_point_to_rel_img_point(abs_img_points, img_shape, spatial_scale=1.0):
     """Convert image based absolute point coordinates to image based relative
     coordinates for sampling.
 
@@ -96,19 +95,14 @@ def abs_img_point_to_rel_img_point(abs_img_points,
 
     assert isinstance(img_shape, tuple) and len(img_shape) == 2
     h, w = img_shape
-    scale = torch.tensor([w, h],
-                         dtype=torch.float,
-                         device=abs_img_points.device)
+    scale = torch.tensor([w, h], dtype=torch.float, device=abs_img_points.device)
     scale = scale.view(1, 1, 2)
     rel_img_points = abs_img_points / scale * spatial_scale
 
     return rel_img_points
 
 
-def rel_roi_point_to_rel_img_point(rois,
-                                   rel_roi_points,
-                                   img_shape,
-                                   spatial_scale=1.):
+def rel_roi_point_to_rel_img_point(rois, rel_roi_points, img_shape, spatial_scale=1.0):
     """Convert roi based relative point coordinates to image based absolute
     point coordinates.
 
@@ -125,8 +119,9 @@ def rel_roi_point_to_rel_img_point(rois,
     """
 
     abs_img_point = rel_roi_point_to_abs_img_point(rois, rel_roi_points)
-    rel_img_point = abs_img_point_to_rel_img_point(abs_img_point, img_shape,
-                                                   spatial_scale)
+    rel_img_point = abs_img_point_to_rel_img_point(
+        abs_img_point, img_shape, spatial_scale
+    )
 
     return rel_img_point
 
@@ -152,14 +147,14 @@ def point_sample(input, points, align_corners=False, **kwargs):
         add_dim = True
         points = points.unsqueeze(2)
     output = F.grid_sample(
-        input, denormalize(points), align_corners=align_corners, **kwargs)
+        input, denormalize(points), align_corners=align_corners, **kwargs
+    )
     if add_dim:
         output = output.squeeze(3)
     return output
 
 
 class SimpleRoIAlign(nn.Module):
-
     def __init__(self, output_size, spatial_scale, aligned=True):
         """Simple RoI align in PointRend, faster than standard RoIAlign.
 
@@ -182,20 +177,20 @@ class SimpleRoIAlign(nn.Module):
 
         num_imgs = features.size(0)
         num_rois = rois.size(0)
-        rel_roi_points = generate_grid(
-            num_rois, self.output_size, device=rois.device)
+        rel_roi_points = generate_grid(num_rois, self.output_size, device=rois.device)
 
         point_feats = []
         for batch_ind in range(num_imgs):
             # unravel batch dim
             feat = features[batch_ind].unsqueeze(0)
-            inds = (rois[:, 0].long() == batch_ind)
+            inds = rois[:, 0].long() == batch_ind
             if inds.any():
                 rel_img_points = rel_roi_point_to_rel_img_point(
-                    rois[inds], rel_roi_points[inds], feat.shape[2:],
-                    self.spatial_scale).unsqueeze(0)
+                    rois[inds], rel_roi_points[inds], feat.shape[2:], self.spatial_scale
+                ).unsqueeze(0)
                 point_feat = point_sample(
-                    feat, rel_img_points, align_corners=not self.aligned)
+                    feat, rel_img_points, align_corners=not self.aligned
+                )
                 point_feat = point_feat.squeeze(0).transpose(0, 1)
                 point_feats.append(point_feat)
 
@@ -207,6 +202,7 @@ class SimpleRoIAlign(nn.Module):
 
     def __repr__(self):
         format_str = self.__class__.__name__
-        format_str += '(output_size={}, spatial_scale={}'.format(
-            self.output_size, self.spatial_scale)
+        format_str += "(output_size={}, spatial_scale={}".format(
+            self.output_size, self.spatial_scale
+        )
         return format_str

@@ -9,29 +9,63 @@ from ..builder import HEADS
 
 @HEADS.register_module()
 class TinyYolov4Head(BaseYOLOHead):
-
     def _init_layers(self):
         head = [
-            OrderedDict([
-                ('10_max', nn.MaxPool2d(2, 2)),
-                ('11_conv', vn_layer.Conv2dBatchLeaky(self.in_channels[0], self.in_channels[0], 3, 1)),
-                ('12_conv', vn_layer.Conv2dBatchLeaky(self.in_channels[0], self.out_channels[0], 1, 1)),
-            ]),
-
-            OrderedDict([
-                ('13_conv', vn_layer.Conv2dBatchLeaky(self.in_channels[1], self.in_channels[0], 3, 1)),
-                ('14_conv', nn.Conv2d(self.in_channels[0], self.num_anchors * self.num_attrib, 1)),
-            ]),
-
-            OrderedDict([
-                ('15_convbatch', vn_layer.Conv2dBatchLeaky(self.in_channels[1], self.out_channels[1], 1, 1)),
-                ('16_upsample', nn.Upsample(scale_factor=2)),
-            ]),
-
-            OrderedDict([
-                ('17_convbatch', vn_layer.Conv2dBatchLeaky(self.out_channels[0]+self.out_channels[1], 256, 3, 1)),
-                ('18_conv', nn.Conv2d(256, self.num_anchors * self.num_attrib, 1)),
-            ]),
+            OrderedDict(
+                [
+                    ("10_max", nn.MaxPool2d(2, 2)),
+                    (
+                        "11_conv",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[0], self.in_channels[0], 3, 1
+                        ),
+                    ),
+                    (
+                        "12_conv",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[0], self.out_channels[0], 1, 1
+                        ),
+                    ),
+                ]
+            ),
+            OrderedDict(
+                [
+                    (
+                        "13_conv",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[1], self.in_channels[0], 3, 1
+                        ),
+                    ),
+                    (
+                        "14_conv",
+                        nn.Conv2d(
+                            self.in_channels[0], self.num_anchors * self.num_attrib, 1
+                        ),
+                    ),
+                ]
+            ),
+            OrderedDict(
+                [
+                    (
+                        "15_convbatch",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[1], self.out_channels[1], 1, 1
+                        ),
+                    ),
+                    ("16_upsample", nn.Upsample(scale_factor=2)),
+                ]
+            ),
+            OrderedDict(
+                [
+                    (
+                        "17_convbatch",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.out_channels[0] + self.out_channels[1], 256, 3, 1
+                        ),
+                    ),
+                    ("18_conv", nn.Conv2d(256, self.num_anchors * self.num_attrib, 1)),
+                ]
+            ),
         ]
         self.layers = nn.ModuleList([nn.Sequential(layer_dict) for layer_dict in head])
 
@@ -43,4 +77,4 @@ class TinyYolov4Head(BaseYOLOHead):
         stage2 = torch.cat((stage1, extra_x), dim=1)
         head1 = self.layers[3](stage2)
         head = [head0, head1]  # small feature map ahead
-        return tuple(head),
+        return (tuple(head),)

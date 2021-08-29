@@ -24,9 +24,9 @@ class DetBaseDataset(Dataset):
         Args:
             data_cfg (cfgNode): dataset info.
             pipeline_cfg (cfgNode): Processing pipeline info.
-            root_path (str, optional): Data root for ``ann_file``, ``data_prefix``, 
+            root_path (str, optional): Data root for ``ann_file``, ``data_prefix``,
                 ``seg_prefix``, ``proposal_file`` if specified.
-            sel_index (int): select the annotation file with the index from 
+            sel_index (int): select the annotation file with the index from
                 annotation list.
         """
 
@@ -42,7 +42,7 @@ class DetBaseDataset(Dataset):
         self.data_root = root_path
         self.data_cfg = data_cfg
         self.ann_file = data_cfg.DATA_INFO[sel_index]
-        
+
         if "TEST_MODE" in data_cfg:
             self.test_mode = data_cfg.TEST_MODE
         else:
@@ -52,38 +52,34 @@ class DetBaseDataset(Dataset):
             self.filter_empty_gt = data_cfg.FILTER_EMPTY_GT
         else:
             self.filter_empty_gt = True
-        
+
         if "CLASSES" in data_cfg:
             self.CLASSES = self.get_classes(data_cfg.CLASSES)
         else:
             self.CLASSES = self.get_classes()
-        
+
         self.sel_index = sel_index
         # processing pipeline
         self.pipeline_cfg = pipeline_cfg
         self.pipeline = Compose(self.get_pipeline_list())
-        
+
         # load annotations (and proposals)
-        if ("DATA_PREFIX" in data_cfg and 
-                isinstance(data_cfg.DATA_PREFIX, list)):
+        if "DATA_PREFIX" in data_cfg and isinstance(data_cfg.DATA_PREFIX, list):
             self.data_prefix = data_cfg.DATA_PREFIX[sel_index]
         else:
             self.data_prefix = None
 
-        if ("ANNO_PREFIX" in data_cfg and 
-                isinstance(data_cfg.ANNO_PREFIX, list)):
+        if "ANNO_PREFIX" in data_cfg and isinstance(data_cfg.ANNO_PREFIX, list):
             self.anno_prefix = data_cfg.ANNO_PREFIX[sel_index]
         else:
             self.anno_prefix = None
 
-        if ("SEG_PREFIX" in data_cfg and 
-                isinstance(data_cfg.SEG_PREFIX, list)):
+        if "SEG_PREFIX" in data_cfg and isinstance(data_cfg.SEG_PREFIX, list):
             self.seg_prefix = data_cfg.SEG_PREFIX[sel_index]
         else:
             self.seg_prefix = None
-        
-        if ("PROPOSAL_FILE" in data_cfg and 
-                isinstance(data_cfg.PROPOSAL_FILE, list)):
+
+        if "PROPOSAL_FILE" in data_cfg and isinstance(data_cfg.PROPOSAL_FILE, list):
             self.proposal_file = data_cfg.PROPOSAL_FILE[sel_index]
         else:
             self.proposal_file = None
@@ -101,18 +97,18 @@ class DetBaseDataset(Dataset):
             self.proposals = self.load_proposals(self.proposal_file)
         else:
             self.proposals = None
-        
+
         if not osp.isabs(self.ann_file):
             self.ann_file = osp.join(self.data_root, self.ann_file)
         self.data_infos = self.load_annotations(self.ann_file)
-        
+
         # filter images too small and containing no annotations
         if not self.test_mode:
             valid_inds = self._filter_imgs()
             self.data_infos = [self.data_infos[i] for i in valid_inds]
             if self.proposals is not None:
                 self.proposals = [self.proposals[i] for i in valid_inds]
-        
+
         # set group flag for the sampler
         self._set_group_flag()
 
@@ -128,7 +124,7 @@ class DetBaseDataset(Dataset):
             self.pipeline is a CfgNode
 
         Returns:
-            list[dict]: list of dicts with types and parameters for 
+            list[dict]: list of dicts with types and parameters for
                 constructing pipelines.
         """
 
@@ -138,12 +134,12 @@ class DetBaseDataset(Dataset):
             if len(v_t) > 0:
                 if not isinstance(v_t, CfgNode):
                     raise TypeError("pipeline items must be a CfgNode")
-            
+
             pipeline_item["type"] = k_t
 
             for k_a, v_a in v_t.items():
                 if isinstance(v_a, CfgNode):
-                    if 'type' in v_a:
+                    if "type" in v_a:
                         pipeline_item[k_a] = {}
                         for sub_kt, sub_vt in v_a.items():
                             pipeline_item[k_a][sub_kt] = sub_vt
@@ -154,7 +150,7 @@ class DetBaseDataset(Dataset):
                             if len(sub_vt) > 0:
                                 if not isinstance(sub_vt, CfgNode):
                                     raise TypeError("transform items must be a CfgNode")
-                            
+
                             sub_item["type"] = sub_kt
                             for sub_ka, sub_va in sub_vt.items():
                                 if isinstance(sub_va, CfgNode):
@@ -176,7 +172,7 @@ class DetBaseDataset(Dataset):
         """Load proposal from proposal file."""
 
         return file_load(proposal_file)
-    
+
     def getitem_info(self, index):
 
         return self.data_infos[index]
@@ -191,8 +187,8 @@ class DetBaseDataset(Dataset):
             dict: Annotation info of specified index.
         """
 
-        return self.getitem_info(idx)['ann']
-        
+        return self.getitem_info(idx)["ann"]
+
     def get_cat_ids(self, idx):
         """Get category ids by index.
 
@@ -202,26 +198,26 @@ class DetBaseDataset(Dataset):
         Returns:
             list[int]: All categories in the image of specified index.
         """
-        
-        return self.get_ann_info(idx)['labels'].astype(np.int).tolist()
+
+        return self.get_ann_info(idx)["labels"].astype(np.int).tolist()
 
     def pre_pipeline(self, results):
         """Prepare results dict for pipeline."""
 
-        results['img_prefix'] = self.data_prefix
-        results['seg_prefix'] = self.seg_prefix
-        results['proposal_file'] = self.proposal_file
-        results['bbox_fields'] = []
-        results['mask_fields'] = []
-        results['seg_fields'] = []
-        results['dataset'] = self
+        results["img_prefix"] = self.data_prefix
+        results["seg_prefix"] = self.seg_prefix
+        results["proposal_file"] = self.proposal_file
+        results["bbox_fields"] = []
+        results["mask_fields"] = []
+        results["seg_fields"] = []
+        results["dataset"] = self
 
     def _filter_imgs(self, min_size=32):
         """Filter images too small."""
 
         valid_inds = []
         for i, img_info in enumerate(self.data_infos):
-            if min(img_info['width'], img_info['height']) >= min_size:
+            if min(img_info["width"], img_info["height"]) >= min_size:
                 valid_inds.append(i)
         return valid_inds
 
@@ -231,13 +227,13 @@ class DetBaseDataset(Dataset):
         Images with aspect ratio greater than 1 will be set as group 1,
         otherwise group 0.
         """
-        
+
         self.flag = np.zeros(len(self), dtype=np.uint8)
 
         self.flag = np.zeros(len(self), dtype=np.uint8)
         for i in range(len(self)):
             img_info = self.getitem_info(i)
-            if img_info['width'] / img_info['height'] > 1:
+            if img_info["width"] / img_info["height"] > 1:
                 self.flag[i] = 1
 
     def _rand_another(self, idx):
@@ -249,7 +245,7 @@ class DetBaseDataset(Dataset):
     def batch_rand_others(self, idx, batch):
         """Get a batch of random index from the same group as the given
         index."""
-        mask = (self.flag == self.flag[idx])
+        mask = self.flag == self.flag[idx]
         mask[idx] = False
         pool = np.where(mask)[0]
         if len(pool) == 0:
@@ -288,12 +284,12 @@ class DetBaseDataset(Dataset):
             dict: Training data and annotation after pipeline with new keys \
                 introduced by pipeline.
         """
-        
+
         img_info = self.getitem_info(idx)
         ann_info = self.get_ann_info(idx)
         results = dict(img_info=img_info, ann_info=ann_info, _idx=idx)
         if self.proposals is not None:
-            results['proposals'] = self.proposals[idx]
+            results["proposals"] = self.proposals[idx]
         self.pre_pipeline(results)
         return self.pipeline(results)
 
@@ -307,11 +303,11 @@ class DetBaseDataset(Dataset):
             dict: Testing data after pipeline with new keys intorduced by \
                 piepline.
         """
-        
+
         img_info = self.getitem_info(idx)
         results = dict(img_info=img_info)
         if self.proposals is not None:
-            results['proposals'] = self.proposals[idx]
+            results["proposals"] = self.proposals[idx]
         self.pre_pipeline(results)
         return self.pipeline(results)
 
@@ -339,22 +335,24 @@ class DetBaseDataset(Dataset):
         elif isinstance(classes, (tuple, list)):
             class_names = classes
         else:
-            raise ValueError(f'Unsupported type {type(classes)} of classes.')
+            raise ValueError(f"Unsupported type {type(classes)} of classes.")
 
         return class_names
 
     def format_results(self, results, **kwargs):
         """Place holder to format result to dataset specific output."""
-        
+
         pass
 
-    def evaluate(self,
-                 results,
-                 metric='mAP',
-                 logger=None,
-                 proposal_nums=(100, 300, 1000),
-                 iou_thr=0.5,
-                 scale_ranges=None):
+    def evaluate(
+        self,
+        results,
+        metric="mAP",
+        logger=None,
+        proposal_nums=(100, 300, 1000),
+        iou_thr=0.5,
+        scale_ranges=None,
+    ):
         """Evaluate the dataset.
 
         Args:
@@ -375,12 +373,12 @@ class DetBaseDataset(Dataset):
         if not isinstance(metric, str):
             assert len(metric) == 1
             metric = metric[0]
-        allowed_metrics = ['mAP', 'recall']
+        allowed_metrics = ["mAP", "recall"]
         if metric not in allowed_metrics:
-            raise KeyError(f'metric {metric} is not supported')
+            raise KeyError(f"metric {metric} is not supported")
         annotations = [self.get_ann_info(i) for i in range(len(self))]
         eval_results = {}
-        if metric == 'mAP':
+        if metric == "mAP":
             assert isinstance(iou_thr, float)
             mean_ap, _ = eval_map(
                 results,
@@ -388,20 +386,22 @@ class DetBaseDataset(Dataset):
                 scale_ranges=scale_ranges,
                 iou_thr=iou_thr,
                 dataset=self.CLASSES,
-                logger=logger)
-            eval_results['mAP'] = mean_ap
-        elif metric == 'recall':
-            gt_bboxes = [ann['bboxes'] for ann in annotations]
+                logger=logger,
+            )
+            eval_results["mAP"] = mean_ap
+        elif metric == "recall":
+            gt_bboxes = [ann["bboxes"] for ann in annotations]
             if isinstance(iou_thr, float):
                 iou_thr = [iou_thr]
             recalls = eval_recalls(
-                gt_bboxes, results, proposal_nums, iou_thr, logger=logger)
+                gt_bboxes, results, proposal_nums, iou_thr, logger=logger
+            )
             for i, num in enumerate(proposal_nums):
                 for j, iou in enumerate(iou_thr):
-                    eval_results[f'recall@{num}@{iou}'] = recalls[i, j]
+                    eval_results[f"recall@{num}@{iou}"] = recalls[i, j]
             if recalls.shape[1] > 1:
                 ar = recalls.mean(axis=1)
                 for i, num in enumerate(proposal_nums):
-                    eval_results[f'AR@{num}'] = ar[i]
-                    
+                    eval_results[f"AR@{num}"] = ar[i]
+
         return eval_results

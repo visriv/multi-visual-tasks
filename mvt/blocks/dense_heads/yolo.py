@@ -47,41 +47,37 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         test_cfg (dict): Testing config of YOLOV3 head. Default: None.
     """
 
-    def __init__(self,
-                 num_classes,
-                 in_channels,
-                 out_channels=(1024, 512, 256),
-                 anchor_generator=dict(
-                     type='YOLOAnchorGenerator',
-                     base_sizes=[[(116, 90), (156, 198), (373, 326)],
-                                 [(30, 61), (62, 45), (59, 119)],
-                                 [(10, 13), (16, 30), (33, 23)]],
-                     strides=[32, 16, 8]),
-                 bbox_coder=dict(type='YOLOBBoxCoder'),
-                 featmap_strides=[32, 16, 8],
-                 one_hot_smoother=0.,
-                 conv_cfg=None,
-                 norm_cfg=dict(type='BN', requires_grad=True),
-                 act_cfg=dict(type='LeakyReLU', negative_slope=0.1),
-                 loss_cls=dict(
-                     type='CrossEntropyLoss',
-                     use_sigmoid=True,
-                     loss_weight=1.0),
-                 loss_conf=dict(
-                     type='CrossEntropyLoss',
-                     use_sigmoid=True,
-                     loss_weight=1.0),
-                 loss_xy=dict(
-                     type='CrossEntropyLoss',
-                     use_sigmoid=True,
-                     loss_weight=1.0),
-                 loss_wh=dict(type='MSELoss', loss_weight=1.0),
-                 train_cfg=None,
-                 test_cfg=None):
+    def __init__(
+        self,
+        num_classes,
+        in_channels,
+        out_channels=(1024, 512, 256),
+        anchor_generator=dict(
+            type="YOLOAnchorGenerator",
+            base_sizes=[
+                [(116, 90), (156, 198), (373, 326)],
+                [(30, 61), (62, 45), (59, 119)],
+                [(10, 13), (16, 30), (33, 23)],
+            ],
+            strides=[32, 16, 8],
+        ),
+        bbox_coder=dict(type="YOLOBBoxCoder"),
+        featmap_strides=[32, 16, 8],
+        one_hot_smoother=0.0,
+        conv_cfg=None,
+        norm_cfg=dict(type="BN", requires_grad=True),
+        act_cfg=dict(type="LeakyReLU", negative_slope=0.1),
+        loss_cls=dict(type="CrossEntropyLoss", use_sigmoid=True, loss_weight=1.0),
+        loss_conf=dict(type="CrossEntropyLoss", use_sigmoid=True, loss_weight=1.0),
+        loss_xy=dict(type="CrossEntropyLoss", use_sigmoid=True, loss_weight=1.0),
+        loss_wh=dict(type="MSELoss", loss_weight=1.0),
+        train_cfg=None,
+        test_cfg=None,
+    ):
         super(YOLOV3Head, self).__init__()
 
         # Check params
-        assert (len(in_channels) == len(out_channels) == len(featmap_strides))
+        assert len(in_channels) == len(out_channels) == len(featmap_strides)
 
         self.num_classes = num_classes
         self.in_channels = in_channels
@@ -92,17 +88,17 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         if self.train_cfg:
             if isinstance(self.train_cfg, CfgNode):
                 self.assigner = build_assigner(self.train_cfg.assigner)
-                if hasattr(self.train_cfg, 'sampler'):
+                if hasattr(self.train_cfg, "sampler"):
                     sampler_cfg = self.train_cfg.sampler
                 else:
-                    sampler_cfg = dict(type='PseudoSampler')
+                    sampler_cfg = dict(type="PseudoSampler")
             else:
-                self.assigner = build_assigner(self.train_cfg['assigner'])
-                if 'sample' in self.train_cfg:
-                    sampler_cfg = self.train_cfg['sampler']
+                self.assigner = build_assigner(self.train_cfg["assigner"])
+                if "sample" in self.train_cfg:
+                    sampler_cfg = self.train_cfg["sampler"]
                 else:
-                    sampler_cfg = dict(type='PseudoSampler')               
-            
+                    sampler_cfg = dict(type="PseudoSampler")
+
             self.sampler = build_sampler(sampler_cfg, context=self)
 
         self.one_hot_smoother = one_hot_smoother
@@ -121,8 +117,7 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         # usually the numbers of anchors for each level are the same
         # except SSD detectors
         self.num_anchors = self.anchor_generator.num_base_anchors[0]
-        assert len(
-            self.anchor_generator.num_base_anchors) == len(featmap_strides)
+        assert len(self.anchor_generator.num_base_anchors) == len(featmap_strides)
         self._init_layers()
 
     @property
@@ -148,9 +143,11 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
                 padding=1,
                 conv_cfg=self.conv_cfg,
                 norm_cfg=self.norm_cfg,
-                act_cfg=self.act_cfg)
-            conv_pred = nn.Conv2d(self.out_channels[i],
-                                  self.num_anchors * self.num_attrib, 1)
+                act_cfg=self.act_cfg,
+            )
+            conv_pred = nn.Conv2d(
+                self.out_channels[i], self.num_anchors * self.num_attrib, 1
+            )
 
             self.convs_bridge.append(conv_bridge)
             self.convs_pred.append(conv_pred)
@@ -181,14 +178,9 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
             pred_map = self.convs_pred[i](x)
             pred_maps.append(pred_map)
 
-        return tuple(pred_maps),
+        return (tuple(pred_maps),)
 
-    def get_bboxes(self,
-                   pred_maps,
-                   img_metas,
-                   cfg=None,
-                   rescale=False,
-                   with_nms=True):
+    def get_bboxes(self, pred_maps, img_metas, cfg=None, rescale=False, with_nms=True):
         """Transform network output for a batch into bbox predictions.
 
         Args:
@@ -214,21 +206,17 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         result_list = []
         num_levels = len(pred_maps)
         for img_id in range(len(img_metas)):
-            pred_maps_list = [
-                pred_maps[i][img_id].detach() for i in range(num_levels)
-            ]
-            scale_factor = img_metas[img_id]['scale_factor']
-            proposals = self._get_bboxes_single(pred_maps_list, scale_factor,
-                                                cfg, rescale, with_nms)
+            pred_maps_list = [pred_maps[i][img_id].detach() for i in range(num_levels)]
+            scale_factor = img_metas[img_id]["scale_factor"]
+            proposals = self._get_bboxes_single(
+                pred_maps_list, scale_factor, cfg, rescale, with_nms
+            )
             result_list.append(proposals)
         return result_list
 
-    def _get_bboxes_single(self,
-                           pred_maps_list,
-                           scale_factor,
-                           cfg,
-                           rescale=False,
-                           with_nms=True):
+    def _get_bboxes_single(
+        self, pred_maps_list, scale_factor, cfg, rescale=False, with_nms=True
+    ):
         """Transform outputs for a single batch item into bbox predictions.
 
         Args:
@@ -257,11 +245,10 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         multi_lvl_cls_scores = []
         multi_lvl_conf_scores = []
         num_levels = len(pred_maps_list)
-        featmap_sizes = [
-            pred_maps_list[i].shape[-2:] for i in range(num_levels)
-        ]
+        featmap_sizes = [pred_maps_list[i].shape[-2:] for i in range(num_levels)]
         multi_lvl_anchors = self.anchor_generator.grid_anchors(
-            featmap_sizes, pred_maps_list[0][0].device)
+            featmap_sizes, pred_maps_list[0][0].device
+        )
         for i in range(self.num_levels):
             # get some key info for current scale
             pred_map = pred_maps_list[i]
@@ -271,23 +258,25 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
             pred_map = pred_map.permute(1, 2, 0).reshape(-1, self.num_attrib)
 
             pred_map[..., :2] = torch.sigmoid(pred_map[..., :2])
-            bbox_pred = self.bbox_coder.decode(multi_lvl_anchors[i],
-                                               pred_map[..., :4], stride)
+            bbox_pred = self.bbox_coder.decode(
+                multi_lvl_anchors[i], pred_map[..., :4], stride
+            )
             # conf and cls
             conf_pred = torch.sigmoid(pred_map[..., 4]).view(-1)
             cls_pred = torch.sigmoid(pred_map[..., 5:]).view(
-                -1, self.num_classes)  # Cls pred one-hot.
-            
+                -1, self.num_classes
+            )  # Cls pred one-hot.
+
             # Filtering out all predictions with conf < conf_thr
             # Get top-k prediction
             if not torch.onnx.is_in_onnx_export():
-                conf_thr = cfg.get('conf_thr', -1)
+                conf_thr = cfg.get("conf_thr", -1)
                 conf_inds = conf_pred.ge(conf_thr).nonzero(as_tuple=False).flatten()
                 bbox_pred = bbox_pred[conf_inds, :]
                 cls_pred = cls_pred[conf_inds, :]
                 conf_pred = conf_pred[conf_inds]
-                
-            nms_pre = cfg.get('nms_pre', -1)
+
+            nms_pre = cfg.get("nms_pre", -1)
             if 0 < nms_pre < conf_pred.size(0):
                 _, topk_inds = torch.topk(conf_pred, nms_pre)
                 bbox_pred = bbox_pred[topk_inds, :]
@@ -298,14 +287,14 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
             multi_lvl_bboxes.append(bbox_pred)
             multi_lvl_cls_scores.append(cls_pred)
             multi_lvl_conf_scores.append(conf_pred)
-        
+
         # Merge the results of different scales together
         multi_lvl_bboxes = torch.cat(multi_lvl_bboxes)
         multi_lvl_cls_scores = torch.cat(multi_lvl_cls_scores)
         multi_lvl_conf_scores = torch.cat(multi_lvl_conf_scores)
 
         if with_nms and (multi_lvl_conf_scores.size(0) == 0):
-            return torch.zeros((0, 5)), torch.zeros((0, ))
+            return torch.zeros((0, 5)), torch.zeros((0,))
 
         if rescale:
             multi_lvl_bboxes /= multi_lvl_bboxes.new_tensor(scale_factor)
@@ -318,20 +307,16 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
             det_bboxes, det_labels = multiclass_nms(
                 multi_lvl_bboxes,
                 multi_lvl_cls_scores,
-                cfg['score_thr'],
-                cfg['nms'],
-                cfg['max_per_img'],
-                score_factors=multi_lvl_conf_scores)
+                cfg["score_thr"],
+                cfg["nms"],
+                cfg["max_per_img"],
+                score_factors=multi_lvl_conf_scores,
+            )
             return det_bboxes, det_labels
         else:
             return (multi_lvl_bboxes, multi_lvl_cls_scores, multi_lvl_conf_scores)
 
-    def loss(self,
-             pred_maps,
-             gt_bboxes,
-             gt_labels,
-             img_metas,
-             gt_bboxes_ignore=None):
+    def loss(self, pred_maps, gt_bboxes, gt_labels, img_metas, gt_bboxes_ignore=None):
         """Compute loss of the head.
 
         Args:
@@ -352,30 +337,32 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         num_imgs = len(img_metas)
         device = pred_maps[0][0].device
 
-        featmap_sizes = [
-            pred_maps[i].shape[-2:] for i in range(self.num_levels)
-        ]
-        multi_level_anchors = self.anchor_generator.grid_anchors(
-            featmap_sizes, device)
+        featmap_sizes = [pred_maps[i].shape[-2:] for i in range(self.num_levels)]
+        multi_level_anchors = self.anchor_generator.grid_anchors(featmap_sizes, device)
         anchor_list = [multi_level_anchors for _ in range(num_imgs)]
 
         responsible_flag_list = []
         for img_id in range(len(img_metas)):
             responsible_flag_list.append(
                 self.anchor_generator.responsible_flags(
-                    featmap_sizes, gt_bboxes[img_id], device))
+                    featmap_sizes, gt_bboxes[img_id], device
+                )
+            )
 
         target_maps_list, neg_maps_list = self.get_targets(
-            anchor_list, responsible_flag_list, gt_bboxes, gt_labels)
+            anchor_list, responsible_flag_list, gt_bboxes, gt_labels
+        )
 
         losses_cls, losses_conf, losses_xy, losses_wh = multi_apply(
-            self.loss_single, pred_maps, target_maps_list, neg_maps_list)
+            self.loss_single, pred_maps, target_maps_list, neg_maps_list
+        )
 
         return dict(
             loss_cls=losses_cls,
             loss_conf=losses_conf,
             loss_xy=losses_xy,
-            loss_wh=losses_wh)
+            loss_wh=losses_wh,
+        )
 
     def loss_single(self, pred_map, target_map, neg_map):
         """Compute loss of a single image from a batch.
@@ -394,15 +381,14 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         """
 
         num_imgs = len(pred_map)
-        pred_map = pred_map.permute(0, 2, 3,
-                                    1).reshape(num_imgs, -1, self.num_attrib)
+        pred_map = pred_map.permute(0, 2, 3, 1).reshape(num_imgs, -1, self.num_attrib)
         neg_mask = neg_map.float()
         pos_mask = target_map[..., 4]
         pos_and_neg_mask = neg_mask + pos_mask
         pos_mask = pos_mask.unsqueeze(dim=-1)
-        if torch.max(pos_and_neg_mask) > 1.:
-            warnings.warn('There is overlap between pos and neg sample.')
-            pos_and_neg_mask = pos_and_neg_mask.clamp(min=0., max=1.)
+        if torch.max(pos_and_neg_mask) > 1.0:
+            warnings.warn("There is overlap between pos and neg sample.")
+            pos_and_neg_mask = pos_and_neg_mask.clamp(min=0.0, max=1.0)
 
         pred_xy = pred_map[..., :2]
         pred_wh = pred_map[..., 2:4]
@@ -415,15 +401,15 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         target_label = target_map[..., 5:]
 
         loss_cls = self.loss_cls(pred_label, target_label, weight=pos_mask)
-        loss_conf = self.loss_conf(
-            pred_conf, target_conf, weight=pos_and_neg_mask)
+        loss_conf = self.loss_conf(pred_conf, target_conf, weight=pos_and_neg_mask)
         loss_xy = self.loss_xy(pred_xy, target_xy, weight=pos_mask)
         loss_wh = self.loss_wh(pred_wh, target_wh, weight=pos_mask)
 
         return loss_cls, loss_conf, loss_xy, loss_wh
 
-    def get_targets(self, anchor_list, responsible_flag_list, gt_bboxes_list,
-                    gt_labels_list):
+    def get_targets(
+        self, anchor_list, responsible_flag_list, gt_bboxes_list, gt_labels_list
+    ):
         """Compute target maps for anchors in multiple images.
 
         Args:
@@ -448,9 +434,13 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         # anchor number of multi levels
         num_level_anchors = [anchors.size(0) for anchors in anchor_list[0]]
 
-        results = multi_apply(self._get_targets_single, anchor_list,
-                              responsible_flag_list, gt_bboxes_list,
-                              gt_labels_list)
+        results = multi_apply(
+            self._get_targets_single,
+            anchor_list,
+            responsible_flag_list,
+            gt_bboxes_list,
+            gt_labels_list,
+        )
 
         all_target_maps, all_neg_maps = results
         assert num_imgs == len(all_target_maps) == len(all_neg_maps)
@@ -459,8 +449,7 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
 
         return target_maps_list, neg_maps_list
 
-    def _get_targets_single(self, anchors, responsible_flags, gt_bboxes,
-                            gt_labels):
+    def _get_targets_single(self, anchors, responsible_flags, gt_bboxes, gt_labels):
         """Generate matching bounding box prior and converted GT.
         Args:
             anchors (list[Tensor]): Multi-level anchors of the image.
@@ -481,40 +470,43 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
         anchor_strides = []
         for i in range(len(anchors)):
             anchor_strides.append(
-                torch.tensor(self.featmap_strides[i],
-                             device=gt_bboxes.device).repeat(len(anchors[i])))
+                torch.tensor(self.featmap_strides[i], device=gt_bboxes.device).repeat(
+                    len(anchors[i])
+                )
+            )
         concat_anchors = torch.cat(anchors)
         concat_responsible_flags = torch.cat(responsible_flags)
 
         anchor_strides = torch.cat(anchor_strides)
-        assert len(anchor_strides) == len(concat_anchors) == \
-               len(concat_responsible_flags)
-        assign_result = self.assigner.assign(concat_anchors,
-                                             concat_responsible_flags,
-                                             gt_bboxes)
-        sampling_result = self.sampler.sample(assign_result, concat_anchors,
-                                              gt_bboxes)
+        assert (
+            len(anchor_strides) == len(concat_anchors) == len(concat_responsible_flags)
+        )
+        assign_result = self.assigner.assign(
+            concat_anchors, concat_responsible_flags, gt_bboxes
+        )
+        sampling_result = self.sampler.sample(assign_result, concat_anchors, gt_bboxes)
 
-        target_map = concat_anchors.new_zeros(
-            concat_anchors.size(0), self.num_attrib)
+        target_map = concat_anchors.new_zeros(concat_anchors.size(0), self.num_attrib)
 
         target_map[sampling_result.pos_inds, :4] = self.bbox_coder.encode(
-            sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes,
-            anchor_strides[sampling_result.pos_inds]).to(torch.float32)
+            sampling_result.pos_bboxes,
+            sampling_result.pos_gt_bboxes,
+            anchor_strides[sampling_result.pos_inds],
+        ).to(torch.float32)
 
         target_map[sampling_result.pos_inds, 4] = 1
 
-        gt_labels_one_hot = F.one_hot(
-            gt_labels, num_classes=self.num_classes).float()
+        gt_labels_one_hot = F.one_hot(gt_labels, num_classes=self.num_classes).float()
         if self.one_hot_smoother != 0:  # label smooth
-            gt_labels_one_hot = gt_labels_one_hot * (
-                1 - self.one_hot_smoother
-            ) + self.one_hot_smoother / self.num_classes
+            gt_labels_one_hot = (
+                gt_labels_one_hot * (1 - self.one_hot_smoother)
+                + self.one_hot_smoother / self.num_classes
+            )
         target_map[sampling_result.pos_inds, 5:] = gt_labels_one_hot[
-            sampling_result.pos_assigned_gt_inds]
+            sampling_result.pos_assigned_gt_inds
+        ]
 
-        neg_map = concat_anchors.new_zeros(
-            concat_anchors.size(0), dtype=torch.uint8)
+        neg_map = concat_anchors.new_zeros(concat_anchors.size(0), dtype=torch.uint8)
         neg_map[sampling_result.neg_inds] = 1
 
         return target_map, neg_map
@@ -541,32 +533,66 @@ class YOLOV3Head(BaseDetHead, BBoxTestMixin):
 
 @HEADS.register_module()
 class TinyYOLOV4Head(YOLOV3Head):
-
     def _init_layers(self):
         head = [
-            OrderedDict([
-                ('10_max', nn.MaxPool2d(2, 2)),
-                ('11_conv', vn_layer.Conv2dBatchLeaky(self.in_channels[0], self.in_channels[0], 3, 1)),
-                ('12_conv', vn_layer.Conv2dBatchLeaky(self.in_channels[0], self.out_channels[0], 1, 1)),
-            ]),
-
-            OrderedDict([
-                ('13_conv', vn_layer.Conv2dBatchLeaky(self.in_channels[1], self.in_channels[0], 3, 1)),
-                ('14_conv', nn.Conv2d(self.in_channels[0], self.num_anchors * self.num_attrib, 1)),
-            ]),
-
-            OrderedDict([
-                ('15_convbatch', vn_layer.Conv2dBatchLeaky(self.in_channels[1], self.out_channels[1], 1, 1)),
-                ('16_upsample', nn.Upsample(scale_factor=2)),
-            ]),
-
-            OrderedDict([
-                ('17_convbatch', vn_layer.Conv2dBatchLeaky(self.out_channels[0]+self.out_channels[1], 256, 3, 1)),
-                ('18_conv', nn.Conv2d(256, self.num_anchors * self.num_attrib, 1)),
-            ]),
+            OrderedDict(
+                [
+                    ("10_max", nn.MaxPool2d(2, 2)),
+                    (
+                        "11_conv",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[0], self.in_channels[0], 3, 1
+                        ),
+                    ),
+                    (
+                        "12_conv",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[0], self.out_channels[0], 1, 1
+                        ),
+                    ),
+                ]
+            ),
+            OrderedDict(
+                [
+                    (
+                        "13_conv",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[1], self.in_channels[0], 3, 1
+                        ),
+                    ),
+                    (
+                        "14_conv",
+                        nn.Conv2d(
+                            self.in_channels[0], self.num_anchors * self.num_attrib, 1
+                        ),
+                    ),
+                ]
+            ),
+            OrderedDict(
+                [
+                    (
+                        "15_convbatch",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.in_channels[1], self.out_channels[1], 1, 1
+                        ),
+                    ),
+                    ("16_upsample", nn.Upsample(scale_factor=2)),
+                ]
+            ),
+            OrderedDict(
+                [
+                    (
+                        "17_convbatch",
+                        vn_layer.Conv2dBatchLeaky(
+                            self.out_channels[0] + self.out_channels[1], 256, 3, 1
+                        ),
+                    ),
+                    ("18_conv", nn.Conv2d(256, self.num_anchors * self.num_attrib, 1)),
+                ]
+            ),
         ]
         self.layers = nn.ModuleList([nn.Sequential(layer_dict) for layer_dict in head])
-    
+
     def init_weights(self):
         """Initialize weights of the head."""
         pass
@@ -579,7 +605,7 @@ class TinyYOLOV4Head(YOLOV3Head):
         stage2 = torch.cat((stage1, extra_x), dim=1)
         head1 = self.layers[3](stage2)
         head = [head0, head1]
-        return tuple(head),
+        return (tuple(head),)
 
 
 def _make_divisible(x, divisor, width_multiple):
@@ -591,7 +617,9 @@ def _make_round(x, depth_multiple=1.0):
 
 
 def make_divisible(divisor, width_multiple=1.0):
-    return functools.partial(_make_divisible, divisor=divisor, width_multiple=width_multiple)
+    return functools.partial(
+        _make_divisible, divisor=divisor, width_multiple=width_multiple
+    )
 
 
 def make_round(depth_multiple=1.0):

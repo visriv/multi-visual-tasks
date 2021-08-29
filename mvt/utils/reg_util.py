@@ -25,9 +25,10 @@ class Registry:
         return self.get(key) is not None
 
     def __repr__(self):
-        format_str = self.__class__.__name__ + \
-                     f'(name={self._name}, ' \
-                     f'items={self._module_dict})'
+        format_str = (
+            self.__class__.__name__ + f"(name={self._name}, "
+            f"items={self._module_dict})"
+        )
         return format_str
 
     @property
@@ -49,16 +50,14 @@ class Registry:
 
     def _register_module(self, module_class, module_name=None, force=False):
         if not inspect.isclass(module_class):
-            raise TypeError("module must be a class, "
-                            f"but got {type(module_class)}")
+            raise TypeError("module must be a class, " f"but got {type(module_class)}")
 
         if module_name is None:
             module_name = module_class.__name__
         if not force and module_name in self._module_dict:
-            raise KeyError(f"{module_name} is already registered "
-                           f"in {self.name}")
+            raise KeyError(f"{module_name} is already registered " f"in {self.name}")
 
-        self._module_dict[module_name] = module_class  
+        self._module_dict[module_name] = module_class
 
     def register_module(self, name=None, force=False, module=None):
         """Register a module.
@@ -86,12 +85,11 @@ class Registry:
             module (type): Module class to be registered.
         """
         if not isinstance(force, bool):
-            raise TypeError(f'force must be a boolean, but got {type(force)}')
-        
+            raise TypeError(f"force must be a boolean, but got {type(force)}")
+
         # use it as a normal method: x.register_module(module=SomeClass)
         if module is not None:
-            self._register_module(
-                module_class=module, module_name=name, force=force)
+            self._register_module(module_class=module, module_name=name, force=force)
             return module
 
         # raise the error ahead of time
@@ -100,18 +98,13 @@ class Registry:
 
         # use it as a decorator: @x.register_module()
         def _register(cls):
-            self._register_module(
-                module_class=cls, module_name=name, force=force)
+            self._register_module(module_class=cls, module_name=name, force=force)
             return cls
 
         return _register
 
 
-def build_data_from_cfg(data_cfg, 
-                        pipeline_cfg, 
-                        default_args, 
-                        registry, 
-                        sel_index=0):
+def build_data_from_cfg(data_cfg, pipeline_cfg, default_args, registry, sel_index=0):
     """Build a dataset from config dict.
     Args:
         data_cfg (cfgNode): Config dict. It should at least contain the key "type".
@@ -120,26 +113,25 @@ def build_data_from_cfg(data_cfg,
         object: The constructed object.
     """
     if not isinstance(registry, Registry):
-        raise TypeError('registry must be an Registry object, '
-                        f'but got {type(registry)}')
-    if 'type' not in default_args:
-        raise KeyError('cfg must have a name to define dataset class')
-        
-    data_cls_name = default_args['type']
+        raise TypeError(
+            "registry must be an Registry object, " f"but got {type(registry)}"
+        )
+    if "type" not in default_args:
+        raise KeyError("cfg must have a name to define dataset class")
+
+    data_cls_name = default_args["type"]
 
     if isinstance(data_cls_name, str):
         data_cls = registry.get(data_cls_name)
         if data_cls is None:
-            raise KeyError(
-                f"{data_cls_name} is not in the {registry.name} registry")
+            raise KeyError(f"{data_cls_name} is not in the {registry.name} registry")
     else:
-        raise TypeError(
-            f"type must be a str type, but got {type(data_cls_name)}")
+        raise TypeError(f"type must be a str type, but got {type(data_cls_name)}")
 
-    if 'root_path' not in default_args:
-        raise KeyError('args must have a root path to find the dataset')
+    if "root_path" not in default_args:
+        raise KeyError("args must have a root path to find the dataset")
 
-    return data_cls(data_cfg, pipeline_cfg, default_args['root_path'], sel_index)
+    return data_cls(data_cfg, pipeline_cfg, default_args["root_path"], sel_index)
 
 
 def build_model_from_cfg(cfg, registry):
@@ -151,21 +143,20 @@ def build_model_from_cfg(cfg, registry):
         object: The constructed object.
     """
     if not isinstance(registry, Registry):
-        raise TypeError('registry must be an Registry object, '
-                        f'but got {type(registry)}')
-    if 'NAME' not in cfg:
-        raise KeyError('cfg must have a name to define class')
-        
+        raise TypeError(
+            "registry must be an Registry object, " f"but got {type(registry)}"
+        )
+    if "NAME" not in cfg:
+        raise KeyError("cfg must have a name to define class")
+
     model_cls_name = cfg.NAME
 
     if isinstance(model_cls_name, str):
         model_cls = registry.get(model_cls_name)
         if model_cls is None:
-            raise KeyError(
-                f'{model_cls_name} is not in the {registry.name} registry')
+            raise KeyError(f"{model_cls_name} is not in the {registry.name} registry")
     else:
-        raise TypeError(
-            f'NAME must be a str type, but got {type(model_cls_name)}')
+        raise TypeError(f"NAME must be a str type, but got {type(model_cls_name)}")
 
     return model_cls(cfg)
 
@@ -179,26 +170,25 @@ def build_module_from_cfg(cfg, registry, default_args=None):
         object: The constructed object.
     """
     if not isinstance(registry, Registry):
-        raise TypeError('registry must be an Registry object, '
-                        f'but got {type(registry)}')
-    if 'type' not in cfg:
-        raise KeyError('cfg must have a type to define class')
-        
+        raise TypeError(
+            "registry must be an Registry object, " f"but got {type(registry)}"
+        )
+    if "type" not in cfg:
+        raise KeyError("cfg must have a type to define class")
+
     obj_type = cfg.type
 
     if isinstance(obj_type, str):
         obj_cls = registry.get(obj_type)
         if obj_cls is None:
-            raise KeyError(
-                f'{obj_type} is not in the {registry.name} registry')
+            raise KeyError(f"{obj_type} is not in the {registry.name} registry")
     elif inspect.isclass(obj_type):
         obj_cls = obj_type
     else:
-        raise TypeError(
-            f'type must be a str or valid type, but got {type(obj_type)}')
+        raise TypeError(f"type must be a str or valid type, but got {type(obj_type)}")
 
     cfg_dict = convert_to_dict(cfg)
-    cfg_dict.pop('type')
+    cfg_dict.pop("type")
 
     if default_args is not None and len(default_args) > 0:
         return obj_cls(**cfg_dict, **default_args)
@@ -215,27 +205,27 @@ def build_module_from_dict(cfg_dict, registry, default_args=None):
         object: The constructed object.
     """
     if not isinstance(registry, Registry):
-        raise TypeError('registry must be an Registry object, '
-                        f'but got {type(registry)}')
-    if 'type' not in cfg_dict:
-        raise KeyError('cfg_dict must have a name to define module')
-        
+        raise TypeError(
+            "registry must be an Registry object, " f"but got {type(registry)}"
+        )
+    if "type" not in cfg_dict:
+        raise KeyError("cfg_dict must have a name to define module")
+
     module_cls_name = cfg_dict["type"]
 
     if isinstance(module_cls_name, str):
         module_cls = registry.get(module_cls_name)
         if module_cls is None:
-            raise KeyError(
-                f'{module_cls_name} is not in the {registry.name} registry')
+            raise KeyError(f"{module_cls_name} is not in the {registry.name} registry")
     else:
-        raise TypeError(
-            f'type must be a str type, but got {type(module_cls_name)}')
-    
+        raise TypeError(f"type must be a str type, but got {type(module_cls_name)}")
+
     if not (isinstance(default_args, dict) or default_args is None):
-        raise TypeError('default_args must be a dict or None, '
-                        f'but got {type(default_args)}')
-                        
-    cfg_dict.pop('type')
+        raise TypeError(
+            "default_args must be a dict or None, " f"but got {type(default_args)}"
+        )
+
+    cfg_dict.pop("type")
     if default_args is not None and len(default_args) > 0:
         return module_cls(**cfg_dict, **default_args)
     else:

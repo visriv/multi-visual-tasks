@@ -12,14 +12,14 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
 
     def __init__(self):
         super(BaseEmbedder, self).__init__()
-    
+
     @property
     def with_neck(self):
-        return hasattr(self, 'neck') and self.neck is not None
+        return hasattr(self, "neck") and self.neck is not None
 
     @property
     def with_cls_head(self):
-        return hasattr(self, 'cls_head') and self.cls_head is not None
+        return hasattr(self, "cls_head") and self.cls_head is not None
 
     @abstractmethod
     def extract_feat(self, datas):
@@ -45,7 +45,7 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
 
     def init_weights(self, pretrained=None):
         if pretrained is not None:
-            print_log(f'load model from: {pretrained}', logger='root')
+            print_log(f"load model from: {pretrained}", logger="root")
 
     def forward_test(self, datas, **kwargs):
         """
@@ -58,7 +58,7 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
         if len(datas) == 1:
             return self.simple_test(datas[0], **kwargs)
         else:
-            raise NotImplementedError('Test has not been implemented')
+            raise NotImplementedError("Test has not been implemented")
 
     def forward(self, datas, return_loss=True, **kwargs):
         """
@@ -85,13 +85,11 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
                 for name, value in loss_value.items():
                     log_vars[name] = value
             else:
-                raise TypeError(
-                    f'{loss_name} is not a tensor or list of tensors')
+                raise TypeError(f"{loss_name} is not a tensor or list of tensors")
 
-        loss = sum(_value for _key, _value in log_vars.items()
-                   if 'loss' in _key)
+        loss = sum(_value for _key, _value in log_vars.items() if "loss" in _key)
 
-        log_vars['loss'] = loss
+        log_vars["loss"] = loss
         for loss_name, loss_value in log_vars.items():
             # reduce loss when distributed training
             if dist.is_available() and dist.is_initialized():
@@ -131,8 +129,7 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
         losses = self(**datas)
         loss, log_vars = self._parse_losses(losses)
 
-        outputs = dict(
-            loss=loss, log_vars=log_vars, num_samples=len(datas['img'].data))
+        outputs = dict(loss=loss, log_vars=log_vars, num_samples=len(datas["img"].data))
 
         return outputs
 
@@ -147,7 +144,6 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
             losses = self(**datas)
         loss, log_vars = self._parse_losses(losses)
 
-        outputs = dict(
-            loss=loss, log_vars=log_vars, num_samples=len(datas['img'].data))
+        outputs = dict(loss=loss, log_vars=log_vars, num_samples=len(datas["img"].data))
 
         return outputs

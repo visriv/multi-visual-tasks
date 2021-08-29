@@ -1,6 +1,6 @@
 from mvt.utils.reg_util import Registry, build_module_from_dict
 
-RUNNERS = Registry('runner')
+RUNNERS = Registry("runner")
 
 
 def build_runner(cfg_dict, default_args=None):

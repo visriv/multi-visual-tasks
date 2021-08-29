@@ -5,27 +5,30 @@ from pathlib import Path
 import shutil
 import errno
 from collections import OrderedDict
-from typing import (Callable, Optional, Any, Dict, List, IO, 
-                    Union, MutableMapping)
+from typing import Callable, Optional, Any, Dict, List, IO, Union, MutableMapping
 
 
 def is_filepath(x):
     return isinstance(x, str) or isinstance(x, Path)
+
 
 def symlink(src, dst, overwrite=True, **kwargs):
     if os.path.lexists(dst) and overwrite:
         os.remove(dst)
     os.symlink(src, dst, **kwargs)
 
+
 def check_file_exist(filename, msg_tmpl='file "{}" does not exist'):
     if not osp.isfile(filename):
         raise FileNotFoundError(msg_tmpl.format(filename))
 
+
 def mkdir_or_exist(dir_name, mode=0o777):
-    if dir_name == '':
+    if dir_name == "":
         return
     dir_name = osp.expanduser(dir_name)
     os.makedirs(dir_name, mode=mode, exist_ok=True)
+
 
 def scandir(dir_path, suffix=None, recursive=False):
     """Scan a directory to find the interested files.
@@ -50,7 +53,7 @@ def scandir(dir_path, suffix=None, recursive=False):
 
     def _scandir(dir_path, suffix, recursive):
         for entry in os.scandir(dir_path):
-            if not entry.name.startswith('.') and entry.is_file():
+            if not entry.name.startswith(".") and entry.is_file():
                 rel_path = osp.relpath(entry.path, root)
                 if suffix is None:
                     yield rel_path
@@ -58,14 +61,14 @@ def scandir(dir_path, suffix=None, recursive=False):
                     yield rel_path
             else:
                 if recursive:
-                    yield from _scandir(
-                        entry.path, suffix=suffix, recursive=recursive)
+                    yield from _scandir(entry.path, suffix=suffix, recursive=recursive)
                 else:
                     continue
 
     return _scandir(dir_path, suffix=suffix, recursive=recursive)
 
-def find_vcs_root(path, markers=('.git', )):
+
+def find_vcs_root(path, markers=(".git",)):
     """Finds the root directory (including itself) of specified markers.
     Args:
         path (str): Path of directory or file.
@@ -130,13 +133,13 @@ class LazyPath(os.PathLike):
 
 
 class PathHandler:
-    """PathHandler is a base class that defines common I/O functionality.
-    """
+    """PathHandler is a base class that defines common I/O functionality."""
+
     _strict_kwargs_check = True
 
     def _check_kwargs(self, kwargs: Dict[str, Any]) -> None:
-        """Checks if the given arguments are empty. Throws a ValueError if 
-        strict kwargs checking is enabled and args are non-empty. If strict 
+        """Checks if the given arguments are empty. Throws a ValueError if
+        strict kwargs checking is enabled and args are non-empty. If strict
         kwargs checking is disabled, only a warning is logged.
         Args:
             kwargs (Dict[str, Any])
@@ -157,7 +160,7 @@ class PathHandler:
         raise NotImplementedError()
 
     def _get_local_path(self, path: str, **kwargs: Any) -> str:
-        """Get a filepath which is compatible with native Python I/O such as 
+        """Get a filepath which is compatible with native Python I/O such as
         `open` and `os.path`.
         If URI points to a remote resource, this function may download and cache
         the resource to local disk. In this case, the cache stays on filesystem
@@ -278,7 +281,7 @@ class PathHandler:
 
 
 class NativePathHandler(PathHandler):
-    """Handles paths that can be accessed using Python native system calls. 
+    """Handles paths that can be accessed using Python native system calls.
     This handler uses `open()` and `os.*` calls on the given path.
     """
 
@@ -433,7 +436,7 @@ class NativePathHandler(PathHandler):
 
 # NOTE: this class should be renamed back to PathManager when it is moved to a new library
 class PathManagerBase:
-    """A class for users to open generic paths or translate generic paths to 
+    """A class for users to open generic paths or translate generic paths to
     file names. path_manager.method(path) will do the following:
     1. Find a handler by checking the prefixes in `self._path_handlers`.
     2. Call handler.method(path) on the handler that's found
@@ -447,7 +450,7 @@ class PathManagerBase:
         """ A NativePathHandler that works on posix paths."""
 
     def __get_path_handler(self, path: Union[str, os.PathLike]) -> PathHandler:
-        """Finds a PathHandler that supports the given path. Falls back to the 
+        """Finds a PathHandler that supports the given path. Falls back to the
         native PathHandler if no other handler is found.
         Args:
             path (str or os.PathLike): URI path to resource
@@ -501,7 +504,7 @@ class PathManagerBase:
         )
 
     def get_local_path(self, path: str, **kwargs: Any) -> str:
-        """Get a filepath which is compatible with native Python I/O such as 
+        """Get a filepath which is compatible with native Python I/O such as
         `open` and `os.path`.
         If URI points to a remote resource, this function may download and cache
         the resource to local disk.
@@ -601,7 +604,7 @@ class PathManagerBase:
     def register_handler(
         self, handler: PathHandler, allow_override: bool = False
     ) -> None:
-        """Register a path handler associated with 
+        """Register a path handler associated with
         `handler._get_supported_prefixes` URI prefixes.
         Args:
             handler (PathHandler)
@@ -614,7 +617,7 @@ class PathManagerBase:
                 continue
 
             old_handler_type = type(self._path_handlers[prefix])
-            if allow_override:                
+            if allow_override:
                 self._path_handlers[prefix] = handler
             else:
                 raise KeyError(
@@ -624,21 +627,20 @@ class PathManagerBase:
 
         # Sort path handlers in reverse order so longer prefixes take priority
         self._path_handlers = OrderedDict(
-            sorted(
-                self._path_handlers.items(), key=lambda t: t[0], reverse=True)
+            sorted(self._path_handlers.items(), key=lambda t: t[0], reverse=True)
         )
 
     def set_strict_kwargs_checking(self, enable: bool) -> None:
-        """Toggles strict kwargs checking. If enabled, a ValueError is thrown 
-        if any unused parameters are passed to a PathHandler function. If 
+        """Toggles strict kwargs checking. If enabled, a ValueError is thrown
+        if any unused parameters are passed to a PathHandler function. If
         disabled, only a warning is given.
         With a centralized file API, there's a tradeoff of convenience and
-        correctness delegating arguments to the proper I/O layers. An 
-        underlying `PathHandler` may support custom arguments which should not 
-        be statically exposed on the `PathManager` function. For example, a 
+        correctness delegating arguments to the proper I/O layers. An
+        underlying `PathHandler` may support custom arguments which should not
+        be statically exposed on the `PathManager` function. For example, a
         custom `HTTPURLHandler` may want to expose a `cache_timeout` argument
-        for `open()` which specifies how old a locally cached resource can be 
-        before it's refetched from the remote server. This argument would not 
+        for `open()` which specifies how old a locally cached resource can be
+        before it's refetched from the remote server. This argument would not
         make sense for a `NativePathHandler`.
         If strict kwargs checking is disabled, `cache_timeout` can be passed to
         `PathManager.open` which will forward the arguments to the underlying

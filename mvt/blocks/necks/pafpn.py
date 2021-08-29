@@ -11,7 +11,7 @@ class PAFPN(FPN):
     """Path Aggregation Network for Instance Segmentation.
     This is an implementation of the `PAFPN in Path Aggregation Network
     <https://arxiv.org/abs/1803.01534>`_.
-    
+
     Args:
         in_channels (List[int]): Number of input channels per scale.
         out_channels (int): Number of output channels (used at each scale)
@@ -34,24 +34,35 @@ class PAFPN(FPN):
             Default: None.
     """
 
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 num_outs,
-                 start_level=0,
-                 end_level=-1,
-                 add_extra_convs=False,
-                 extra_convs_on_inputs=True,
-                 relu_before_extra_convs=False,
-                 no_norm_on_lateral=False,
-                 conv_cfg=None,
-                 norm_cfg=None,
-                 act_cfg=None):
-        super(PAFPN,
-              self).__init__(in_channels, out_channels, num_outs, start_level,
-                             end_level, add_extra_convs, extra_convs_on_inputs,
-                             relu_before_extra_convs, no_norm_on_lateral,
-                             conv_cfg, norm_cfg, act_cfg)
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        num_outs,
+        start_level=0,
+        end_level=-1,
+        add_extra_convs=False,
+        extra_convs_on_inputs=True,
+        relu_before_extra_convs=False,
+        no_norm_on_lateral=False,
+        conv_cfg=None,
+        norm_cfg=None,
+        act_cfg=None,
+    ):
+        super(PAFPN, self).__init__(
+            in_channels,
+            out_channels,
+            num_outs,
+            start_level,
+            end_level,
+            add_extra_convs,
+            extra_convs_on_inputs,
+            relu_before_extra_convs,
+            no_norm_on_lateral,
+            conv_cfg,
+            norm_cfg,
+            act_cfg,
+        )
         # add extra bottom up pathway
         self.downsample_convs = nn.ModuleList()
         self.pafpn_convs = nn.ModuleList()
@@ -65,7 +76,8 @@ class PAFPN(FPN):
                 conv_cfg=conv_cfg,
                 norm_cfg=norm_cfg,
                 act_cfg=act_cfg,
-                inplace=False)
+                inplace=False,
+            )
             pafpn_conv = ConvModule(
                 out_channels,
                 out_channels,
@@ -74,7 +86,8 @@ class PAFPN(FPN):
                 conv_cfg=conv_cfg,
                 norm_cfg=norm_cfg,
                 act_cfg=act_cfg,
-                inplace=False)
+                inplace=False,
+            )
             self.downsample_convs.append(d_conv)
             self.pafpn_convs.append(pafpn_conv)
 
@@ -93,7 +106,8 @@ class PAFPN(FPN):
         for i in range(used_backbone_levels - 1, 0, -1):
             prev_shape = laterals[i - 1].shape[2:]
             laterals[i - 1] += F.interpolate(
-                laterals[i], size=prev_shape, mode='nearest')
+                laterals[i], size=prev_shape, mode="nearest"
+            )
 
         # build outputs
         # part 1: from original levels
@@ -107,10 +121,12 @@ class PAFPN(FPN):
 
         outs = []
         outs.append(inter_outs[0])
-        outs.extend([
-            self.pafpn_convs[i - 1](inter_outs[i])
-            for i in range(1, used_backbone_levels)
-        ])
+        outs.extend(
+            [
+                self.pafpn_convs[i - 1](inter_outs[i])
+                for i in range(1, used_backbone_levels)
+            ]
+        )
 
         # part 3: add extra levels
         if self.num_outs > len(outs):
@@ -121,13 +137,12 @@ class PAFPN(FPN):
                     outs.append(F.max_pool2d(outs[-1], 1, stride=2))
             # add conv layers on top of original feature maps (RetinaNet)
             else:
-                if self.add_extra_convs == 'on_input':
+                if self.add_extra_convs == "on_input":
                     orig = inputs[self.backbone_end_level - 1]
                     outs.append(self.fpn_convs[used_backbone_levels](orig))
-                elif self.add_extra_convs == 'on_lateral':
-                    outs.append(self.fpn_convs[used_backbone_levels](
-                        laterals[-1]))
-                elif self.add_extra_convs == 'on_output':
+                elif self.add_extra_convs == "on_lateral":
+                    outs.append(self.fpn_convs[used_backbone_levels](laterals[-1]))
+                elif self.add_extra_convs == "on_output":
                     outs.append(self.fpn_convs[used_backbone_levels](outs[-1]))
                 else:
                     raise NotImplementedError

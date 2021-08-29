@@ -41,54 +41,54 @@ def collect_env():
             - OpenCV: OpenCV version.
     """
     env_info = {}
-    env_info['sys.platform'] = sys.platform
-    env_info['Python'] = sys.version.replace('\n', '')
+    env_info["sys.platform"] = sys.platform
+    env_info["Python"] = sys.version.replace("\n", "")
 
     cuda_available = torch.cuda.is_available()
-    env_info['CUDA available'] = cuda_available
+    env_info["CUDA available"] = cuda_available
 
     if cuda_available:
         devices = defaultdict(list)
         for k in range(torch.cuda.device_count()):
             devices[torch.cuda.get_device_name(k)].append(str(k))
         for name, device_ids in devices.items():
-            env_info['GPU ' + ','.join(device_ids)] = name
+            env_info["GPU " + ",".join(device_ids)] = name
 
-        env_info['CUDA_HOME'] = CUDA_HOME
+        env_info["CUDA_HOME"] = CUDA_HOME
 
         if CUDA_HOME is not None and osp.isdir(CUDA_HOME):
             try:
-                nvcc = osp.join(CUDA_HOME, 'bin/nvcc')
-                nvcc = subprocess.check_output(
-                    f'"{nvcc}" -V | tail -n1', shell=True)
-                nvcc = nvcc.decode('utf-8').strip()
+                nvcc = osp.join(CUDA_HOME, "bin/nvcc")
+                nvcc = subprocess.check_output(f'"{nvcc}" -V | tail -n1', shell=True)
+                nvcc = nvcc.decode("utf-8").strip()
             except subprocess.SubprocessError:
-                nvcc = 'Not Available'
-            env_info['NVCC'] = nvcc
+                nvcc = "Not Available"
+            env_info["NVCC"] = nvcc
 
     try:
-        gcc = subprocess.check_output('gcc --version | head -n1', shell=True)
-        gcc = gcc.decode('utf-8').strip()
-        env_info['GCC'] = gcc
+        gcc = subprocess.check_output("gcc --version | head -n1", shell=True)
+        gcc = gcc.decode("utf-8").strip()
+        env_info["GCC"] = gcc
     except subprocess.CalledProcessError:  # gcc is unavailable
-        env_info['GCC'] = 'n/a'
+        env_info["GCC"] = "n/a"
 
-    env_info['PyTorch'] = torch.__version__
-    env_info['PyTorch compiling details'] = torch.__config__.show()
+    env_info["PyTorch"] = torch.__version__
+    env_info["PyTorch compiling details"] = torch.__config__.show()
 
     try:
         import torchvision
-        env_info['TorchVision'] = torchvision.__version__
+
+        env_info["TorchVision"] = torchvision.__version__
     except ModuleNotFoundError:
         pass
 
-    env_info['OpenCV'] = cv2.__version__
-    
+    env_info["OpenCV"] = cv2.__version__
+
     return env_info
 
 
 def get_host_info():
-    return f'{getuser()}@{gethostname()}'
+    return f"{getuser()}@{gethostname()}"
 
 
 def collate(batch, samples_per_device=1):
@@ -101,16 +101,18 @@ def collate(batch, samples_per_device=1):
     3. cpu_only = False, stack = False, e.g., gt bboxes
     """
     if not isinstance(batch, Sequence):
-        raise TypeError(f'{batch.dtype} is not supported.')
+        raise TypeError(f"{batch.dtype} is not supported.")
 
     if isinstance(batch[0], DataContainer):
         stacked = []
         if batch[0].cpu_only:
             for i in range(0, len(batch), samples_per_device):
                 stacked.append(
-                    [sample.data for sample in batch[i:i + samples_per_device]])
+                    [sample.data for sample in batch[i : i + samples_per_device]]
+                )
             return DataContainer(
-                stacked, batch[0].stack, batch[0].padding_value, cpu_only=True)
+                stacked, batch[0].stack, batch[0].padding_value, cpu_only=True
+            )
         elif batch[0].stack:
             for i in range(0, len(batch), samples_per_device):
                 assert isinstance(batch[i].data, torch.Tensor)
@@ -121,35 +123,38 @@ def collate(batch, samples_per_device=1):
                     max_shape = [0 for _ in range(batch[i].pad_dims)]
                     for dim in range(1, batch[i].pad_dims + 1):
                         max_shape[dim - 1] = batch[i].size(-dim)
-                    for sample in batch[i:i + samples_per_device]:
+                    for sample in batch[i : i + samples_per_device]:
                         for dim in range(0, ndim - batch[i].pad_dims):
                             assert batch[i].size(dim) == sample.size(dim)
                         for dim in range(1, batch[i].pad_dims + 1):
                             max_shape[dim - 1] = max(
-                                max_shape[dim - 1], sample.size(-dim))
+                                max_shape[dim - 1], sample.size(-dim)
+                            )
                     padded_samples = []
-                    for sample in batch[i:i + samples_per_device]:
+                    for sample in batch[i : i + samples_per_device]:
                         pad = [0 for _ in range(batch[i].pad_dims * 2)]
                         for dim in range(1, batch[i].pad_dims + 1):
-                            pad[2 * dim - 1] = \
-                                max_shape[dim - 1] - sample.size(-dim)
+                            pad[2 * dim - 1] = max_shape[dim - 1] - sample.size(-dim)
                         padded_samples.append(
-                            F.pad(
-                                sample.data, pad, value=sample.padding_value))
+                            F.pad(sample.data, pad, value=sample.padding_value)
+                        )
                     stacked.append(default_collate(padded_samples))
                 elif batch[i].pad_dims is None:
                     stacked.append(
-                        default_collate([
-                            sample.data
-                            for sample in batch[i:i + samples_per_device]
-                        ]))
+                        default_collate(
+                            [
+                                sample.data
+                                for sample in batch[i : i + samples_per_device]
+                            ]
+                        )
+                    )
                 else:
-                    raise ValueError(
-                        'pad_dims should be either None or integers (1-3)')
+                    raise ValueError("pad_dims should be either None or integers (1-3)")
         else:
             for i in range(0, len(batch), samples_per_device):
                 stacked.append(
-                    [sample.data for sample in batch[i:i + samples_per_device]])
+                    [sample.data for sample in batch[i : i + samples_per_device]]
+                )
         return DataContainer(stacked, batch[0].stack, batch[0].padding_value)
     elif isinstance(batch[0], Sequence):
         transposed = zip(*batch)
@@ -191,7 +196,7 @@ def worker_init_fn(worker_id, num_workers, rank, seed):
 
 
 def get_time_str():
-    return time.strftime('%Y%m%d_%H%M%S', time.localtime())
+    return time.strftime("%Y%m%d_%H%M%S", time.localtime())
 
 
 def ensure_rng(rng=None):

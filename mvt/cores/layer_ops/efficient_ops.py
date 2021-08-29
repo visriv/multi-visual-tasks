@@ -29,19 +29,38 @@ class Swish(nn.Module):
 
 
 class SeparableConv2d(nn.Module):
-    def __init__(self, in_channels,
-                 out_channels,
-                 kernel_size=1,
-                 stride=1,
-                 padding=0,
-                 dilation=1,
-                 norm_cfg=dict(type='BN', momentum=0.003, eps=1e-4, requires_grad=True),
-                 activation=None,
-                 bias=False):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        kernel_size=1,
+        stride=1,
+        padding=0,
+        dilation=1,
+        norm_cfg=dict(type="BN", momentum=0.003, eps=1e-4, requires_grad=True),
+        activation=None,
+        bias=False,
+    ):
         super(SeparableConv2d, self).__init__()
-        self.depthwise = nn.Conv2d(in_channels, in_channels, kernel_size,
-                               stride, padding, dilation, groups=in_channels, bias=False)
-        self.pointwise = ConvModule(in_channels, out_channels, 1, norm_cfg=norm_cfg, act_cfg=None, bias=bias, inplace=False)
+        self.depthwise = nn.Conv2d(
+            in_channels,
+            in_channels,
+            kernel_size,
+            stride,
+            padding,
+            dilation,
+            groups=in_channels,
+            bias=False,
+        )
+        self.pointwise = ConvModule(
+            in_channels,
+            out_channels,
+            1,
+            norm_cfg=norm_cfg,
+            act_cfg=None,
+            bias=bias,
+            inplace=False,
+        )
         if activation == "ReLU":
             self.act = nn.ReLU()
         elif activation == "Swish":
@@ -50,8 +69,8 @@ class SeparableConv2d(nn.Module):
             self.act = None
 
     def init_weights(self):
-        xavier_init(self.depthwise, distribution='uniform')
-        xavier_init(self.pointwise.conv, distribution='uniform')
+        xavier_init(self.depthwise, distribution="uniform")
+        xavier_init(self.pointwise.conv, distribution="uniform")
 
     def forward(self, x):
         x = self.depthwise(x)

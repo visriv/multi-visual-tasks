@@ -18,15 +18,13 @@ class RandomSampler(BaseSampler):
             boxes as proposals. Defaults to True.
     """
 
-    def __init__(self,
-                 num,
-                 pos_fraction,
-                 neg_pos_ub=-1,
-                 add_gt_as_proposals=True,
-                 **kwargs):
-        super(RandomSampler, self).__init__(num, pos_fraction, neg_pos_ub,
-                                            add_gt_as_proposals)
-        self.rng = ensure_rng(kwargs.get('rng', None))
+    def __init__(
+        self, num, pos_fraction, neg_pos_ub=-1, add_gt_as_proposals=True, **kwargs
+    ):
+        super(RandomSampler, self).__init__(
+            num, pos_fraction, neg_pos_ub, add_gt_as_proposals
+        )
+        self.rng = ensure_rng(kwargs.get("rng", None))
 
     def random_choice(self, gallery, num):
         """Random select some elements from the gallery.
@@ -49,7 +47,7 @@ class RandomSampler(BaseSampler):
             if torch.cuda.is_available():
                 device = torch.cuda.current_device()
             else:
-                device = 'cpu'
+                device = "cpu"
             gallery = torch.tensor(gallery, dtype=torch.long, device=device)
         perm = torch.randperm(gallery.numel(), device=gallery.device)[:num]
         rand_inds = gallery[perm]

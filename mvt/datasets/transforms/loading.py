@@ -9,7 +9,7 @@ from mvt.utils.mask_util import BitmapMasks, PolygonMasks
 
 
 @PIPELINES.register_module()
-class LoadImageFromFile():
+class LoadImageFromFile:
     """Load an image from file.
     Required keys are "img_prefix" and "img_info" (a dict that must contain the
     key "filename"). Added or updated keys are "filename", "img", "img_shape",
@@ -27,12 +27,14 @@ class LoadImageFromFile():
             Defaults to ``dict(backend='disk')``.
     """
 
-    def __init__(self,
-                 to_float32=False,
-                 color_type='color',
-                 backend='pillow',
-                 channel_order='bgr', 
-                 file_client_args=dict(backend='disk')):
+    def __init__(
+        self,
+        to_float32=False,
+        color_type="color",
+        backend="pillow",
+        channel_order="bgr",
+        file_client_args=dict(backend="disk"),
+    ):
 
         self.to_float32 = to_float32
         self.color_type = color_type
@@ -54,34 +56,37 @@ class LoadImageFromFile():
         if self.file_client is None:
             self.file_client = FileClient(**self.file_client_args)
 
-        if results['img_prefix'] is not None:
-            filename = osp.join(results['img_prefix'],
-                                results['img_info']['filename'])
+        if results["img_prefix"] is not None:
+            filename = osp.join(results["img_prefix"], results["img_info"]["filename"])
         else:
-            filename = results['img_info']['filename']
+            filename = results["img_info"]["filename"]
 
         img_bytes = self.file_client.get(filename)
-        img = imfrombytes(img_bytes,
-                          flag=self.color_type, 
-                          channel_order=self.channel_order, 
-                          backend=self.backend)
+        img = imfrombytes(
+            img_bytes,
+            flag=self.color_type,
+            channel_order=self.channel_order,
+            backend=self.backend,
+        )
         if self.to_float32:
             img = img.astype(np.float32)
 
-        results['filename'] = filename
-        results['ori_filename'] = results['img_info']['filename']
-        results['img'] = img
-        results['img_shape'] = img.shape
-        results['ori_shape'] = img.shape
-        results['img_fields'] = ['img']
+        results["filename"] = filename
+        results["ori_filename"] = results["img_info"]["filename"]
+        results["img"] = img
+        results["img_shape"] = img.shape
+        results["ori_shape"] = img.shape
+        results["img_fields"] = ["img"]
         return results
 
     def __repr__(self):
 
-        repr_str = (f'{self.__class__.__name__}('
-                    f'to_float32={self.to_float32}, '
-                    f"color_type='{self.color_type}', "
-                    f'file_client_args={self.file_client_args})')
+        repr_str = (
+            f"{self.__class__.__name__}("
+            f"to_float32={self.to_float32}, "
+            f"color_type='{self.color_type}', "
+            f"file_client_args={self.file_client_args})"
+        )
         return repr_str
 
 
@@ -103,21 +108,21 @@ class LoadImageFromWebcam(LoadImageFromFile):
             dict: The dict contains loaded image and meta information.
         """
 
-        img = results['img']
+        img = results["img"]
         if self.to_float32:
             img = img.astype(np.float32)
 
-        results['filename'] = None
-        results['ori_filename'] = None
-        results['img'] = img
-        results['img_shape'] = img.shape
-        results['ori_shape'] = img.shape
-        results['img_fields'] = ['img']
+        results["filename"] = None
+        results["ori_filename"] = None
+        results["img"] = img
+        results["img_shape"] = img.shape
+        results["ori_shape"] = img.shape
+        results["img_fields"] = ["img"]
         return results
 
 
 @PIPELINES.register_module()
-class LoadMultiChannelImageFromFiles():
+class LoadMultiChannelImageFromFiles:
     """Load multi-channel images from a list of separate channel files.
     Required keys are "img_prefix" and "img_info" (a dict that must contain the
     key "filename", which is expected to be a list of filenames).
@@ -136,10 +141,12 @@ class LoadMultiChannelImageFromFiles():
             Defaults to ``dict(backend='disk')``.
     """
 
-    def __init__(self,
-                 to_float32=False,
-                 color_type='unchanged',
-                 file_client_args=dict(backend='disk')):
+    def __init__(
+        self,
+        to_float32=False,
+        color_type="unchanged",
+        file_client_args=dict(backend="disk"),
+    ):
 
         self.to_float32 = to_float32
         self.color_type = color_type
@@ -160,13 +167,13 @@ class LoadMultiChannelImageFromFiles():
         if self.file_client is None:
             self.file_client = FileClient(**self.file_client_args)
 
-        if results['img_prefix'] is not None:
+        if results["img_prefix"] is not None:
             filename = [
-                osp.join(results['img_prefix'], fname)
-                for fname in results['img_info']['filename']
+                osp.join(results["img_prefix"], fname)
+                for fname in results["img_info"]["filename"]
             ]
         else:
-            filename = results['img_info']['filename']
+            filename = results["img_info"]["filename"]
 
         img = []
         for name in filename:
@@ -176,32 +183,35 @@ class LoadMultiChannelImageFromFiles():
         if self.to_float32:
             img = img.astype(np.float32)
 
-        results['filename'] = filename
-        results['ori_filename'] = results['img_info']['filename']
-        results['img'] = img
-        results['img_shape'] = img.shape
-        results['ori_shape'] = img.shape
+        results["filename"] = filename
+        results["ori_filename"] = results["img_info"]["filename"]
+        results["img"] = img
+        results["img_shape"] = img.shape
+        results["ori_shape"] = img.shape
         # Set initial values for default meta_keys
-        results['pad_shape'] = img.shape
-        results['scale_factor'] = 1.0
+        results["pad_shape"] = img.shape
+        results["scale_factor"] = 1.0
         num_channels = 1 if len(img.shape) < 3 else img.shape[2]
-        results['img_norm_cfg'] = dict(
+        results["img_norm_cfg"] = dict(
             mean=np.zeros(num_channels, dtype=np.float32),
             std=np.ones(num_channels, dtype=np.float32),
-            to_rgb=False)
+            to_rgb=False,
+        )
         return results
 
     def __repr__(self):
 
-        repr_str = (f'{self.__class__.__name__}('
-                    f'to_float32={self.to_float32}, '
-                    f"color_type='{self.color_type}', "
-                    f'file_client_args={self.file_client_args})')
+        repr_str = (
+            f"{self.__class__.__name__}("
+            f"to_float32={self.to_float32}, "
+            f"color_type='{self.color_type}', "
+            f"file_client_args={self.file_client_args})"
+        )
         return repr_str
 
 
 @PIPELINES.register_module()
-class LoadAnnotations():
+class LoadAnnotations:
     """Load mutiple types of annotations.
 
     Args:
@@ -220,15 +230,17 @@ class LoadAnnotations():
             Defaults to ``dict(backend='disk')``.
     """
 
-    def __init__(self,
-                 with_bbox=True,
-                 with_label=True,
-                 with_mask=False,
-                 with_seg=False,
-                 poly2mask=True,
-                 file_client_args=dict(backend='disk'),
-                 reduce_zero_label=False,
-                 imdecode_backend='pillow'):
+    def __init__(
+        self,
+        with_bbox=True,
+        with_label=True,
+        with_mask=False,
+        with_seg=False,
+        poly2mask=True,
+        file_client_args=dict(backend="disk"),
+        reduce_zero_label=False,
+        imdecode_backend="pillow",
+    ):
 
         self.with_bbox = with_bbox
         self.with_label = with_label
@@ -250,14 +262,14 @@ class LoadAnnotations():
             dict: The dict contains loaded bounding box annotations.
         """
 
-        ann_info = results['ann_info']
-        results['gt_bboxes'] = ann_info['bboxes'].copy()
+        ann_info = results["ann_info"]
+        results["gt_bboxes"] = ann_info["bboxes"].copy()
 
-        gt_bboxes_ignore = ann_info.get('bboxes_ignore', None)
+        gt_bboxes_ignore = ann_info.get("bboxes_ignore", None)
         if gt_bboxes_ignore is not None:
-            results['gt_bboxes_ignore'] = gt_bboxes_ignore.copy()
-            results['bbox_fields'].append('gt_bboxes_ignore')
-        results['bbox_fields'].append('gt_bboxes')
+            results["gt_bboxes_ignore"] = gt_bboxes_ignore.copy()
+            results["bbox_fields"].append("gt_bboxes_ignore")
+        results["bbox_fields"].append("gt_bboxes")
         return results
 
     def _load_labels(self, results):
@@ -270,7 +282,7 @@ class LoadAnnotations():
             dict: The dict contains loaded label annotations.
         """
 
-        results['gt_labels'] = results['ann_info']['labels'].copy()
+        results["gt_labels"] = results["ann_info"]["labels"].copy()
         return results
 
     def _poly2mask(self, mask_ann, img_h, img_w):
@@ -291,7 +303,7 @@ class LoadAnnotations():
             # we merge all parts into one mask rle code
             rles = maskUtils.frPyObjects(mask_ann, img_h, img_w)
             rle = maskUtils.merge(rles)
-        elif isinstance(mask_ann['counts'], list):
+        elif isinstance(mask_ann["counts"], list):
             # uncompressed RLE
             rle = maskUtils.frPyObjects(mask_ann, img_h, img_w)
         else:
@@ -329,17 +341,18 @@ class LoadAnnotations():
                 :obj:`PolygonMasks`. Otherwise, :obj:`BitmapMasks` is used.
         """
 
-        h, w = results['img_info']['height'], results['img_info']['width']
-        gt_masks = results['ann_info']['masks']
+        h, w = results["img_info"]["height"], results["img_info"]["width"]
+        gt_masks = results["ann_info"]["masks"]
         if self.poly2mask:
             gt_masks = BitmapMasks(
-                [self._poly2mask(mask, h, w) for mask in gt_masks], h, w)
+                [self._poly2mask(mask, h, w) for mask in gt_masks], h, w
+            )
         else:
             gt_masks = PolygonMasks(
-                [self.process_polygons(polygons) for polygons in gt_masks], h,
-                w)
-        results['gt_masks'] = gt_masks
-        results['mask_fields'].append('gt_masks')
+                [self.process_polygons(polygons) for polygons in gt_masks], h, w
+            )
+        results["gt_masks"] = gt_masks
+        results["mask_fields"].append("gt_masks")
         return results
 
     def _load_semantic_seg(self, results):
@@ -355,20 +368,21 @@ class LoadAnnotations():
         if self.file_client is None:
             self.file_client = FileClient(**self.file_client_args)
 
-        filename = osp.join(results['seg_prefix'],
-                            results['ann_info']['seg_map'])
+        filename = osp.join(results["seg_prefix"], results["ann_info"]["seg_map"])
         img_bytes = self.file_client.get(filename)
 
         # results['gt_semantic_seg'] = imfrombytes(
         #     img_bytes, flag='unchanged').squeeze()
         # results['seg_fields'].append('gt_semantic_seg')
-        gt_semantic_seg = imfrombytes(
-            img_bytes, flag='unchanged',
-            backend=self.imdecode_backend).squeeze().astype(np.uint8)
+        gt_semantic_seg = (
+            imfrombytes(img_bytes, flag="unchanged", backend=self.imdecode_backend)
+            .squeeze()
+            .astype(np.uint8)
+        )
 
         # modify if custom classes
-        if results.get('label_map', None) is not None:
-            for old_id, new_id in results['label_map'].items():
+        if results.get("label_map", None) is not None:
+            for old_id, new_id in results["label_map"].items():
                 gt_semantic_seg[gt_semantic_seg == old_id] = new_id
 
         # reduce zero_label
@@ -377,8 +391,8 @@ class LoadAnnotations():
             gt_semantic_seg[gt_semantic_seg == 0] = 255
             gt_semantic_seg = gt_semantic_seg - 1
         gt_semantic_seg[gt_semantic_seg == 254] = 255
-        results['gt_semantic_seg'] = gt_semantic_seg
-        results['seg_fields'].append('gt_semantic_seg')
+        results["gt_semantic_seg"] = gt_semantic_seg
+        results["seg_fields"].append("gt_semantic_seg")
         return results
 
     def __call__(self, results):
@@ -407,17 +421,17 @@ class LoadAnnotations():
     def __repr__(self):
 
         repr_str = self.__class__.__name__
-        repr_str += f'(with_bbox={self.with_bbox}, '
-        repr_str += f'with_label={self.with_label}, '
-        repr_str += f'with_mask={self.with_mask}, '
-        repr_str += f'with_seg={self.with_seg})'
-        repr_str += f'poly2mask={self.poly2mask})'
-        repr_str += f'poly2mask={self.file_client_args})'
+        repr_str += f"(with_bbox={self.with_bbox}, "
+        repr_str += f"with_label={self.with_label}, "
+        repr_str += f"with_mask={self.with_mask}, "
+        repr_str += f"with_seg={self.with_seg})"
+        repr_str += f"poly2mask={self.poly2mask})"
+        repr_str += f"poly2mask={self.file_client_args})"
         return repr_str
 
 
 @PIPELINES.register_module()
-class LoadProposals():
+class LoadProposals:
     """Load proposal pipeline.
     Required key is "proposals". Updated keys are "proposals", "bbox_fields".
 
@@ -440,30 +454,30 @@ class LoadProposals():
             dict: The dict contains loaded proposal annotations.
         """
 
-        proposals = results['proposals']
+        proposals = results["proposals"]
         if proposals.shape[1] not in (4, 5):
             raise AssertionError(
-                'proposals should have shapes (n, 4) or (n, 5), '
-                f'but found {proposals.shape}')
+                "proposals should have shapes (n, 4) or (n, 5), "
+                f"but found {proposals.shape}"
+            )
         proposals = proposals[:, :4]
 
         if self.num_max_proposals is not None:
-            proposals = proposals[:self.num_max_proposals]
+            proposals = proposals[: self.num_max_proposals]
 
         if len(proposals) == 0:
             proposals = np.array([[0, 0, 0, 0]], dtype=np.float32)
-        results['proposals'] = proposals
-        results['bbox_fields'].append('proposals')
+        results["proposals"] = proposals
+        results["bbox_fields"].append("proposals")
         return results
 
     def __repr__(self):
 
-        return self.__class__.__name__ + \
-            f'(num_max_proposals={self.num_max_proposals})'
+        return self.__class__.__name__ + f"(num_max_proposals={self.num_max_proposals})"
 
 
 @PIPELINES.register_module()
-class FilterAnnotations():
+class FilterAnnotations:
     """Filter invalid annotations.
 
     Args:
@@ -472,20 +486,20 @@ class FilterAnnotations():
     """
 
     def __init__(self, min_gt_bbox_wh):
-        
+
         self.min_gt_bbox_wh = min_gt_bbox_wh
 
     def __call__(self, results):
-        
-        assert 'gt_bboxes' in results
-        gt_bboxes = results['gt_bboxes']
+
+        assert "gt_bboxes" in results
+        gt_bboxes = results["gt_bboxes"]
         w = gt_bboxes[:, 2] - gt_bboxes[:, 0]
         h = gt_bboxes[:, 3] - gt_bboxes[:, 1]
         keep = (w > self.min_gt_bbox_wh[0]) & (h > self.min_gt_bbox_wh[1])
         if not keep.any():
             return None
         else:
-            keys = ('gt_bboxes', 'gt_labels', 'gt_masks', 'gt_semantic_seg')
+            keys = ("gt_bboxes", "gt_labels", "gt_masks", "gt_semantic_seg")
             for key in keys:
                 if key in results:
                     results[key] = results[key][keep]

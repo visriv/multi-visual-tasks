@@ -17,8 +17,8 @@ EMBEDDERS = Registry("embedder")
 def build_model(cfg):
     """Build model."""
     if "TYPE" not in cfg:
-        raise KeyError("cfg must have key \'TYPE\' to define model type")
-    
+        raise KeyError("cfg must have key 'TYPE' to define model type")
+
     model_type = cfg.TYPE
 
     if model_type == "cls":

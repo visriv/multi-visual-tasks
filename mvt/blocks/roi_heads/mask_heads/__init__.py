@@ -6,6 +6,10 @@ from .mask_point_head import MaskPointHead
 from .mask_iou_head import MaskIoUHead
 
 __all__ = [
-    'FCNMaskHead', 'FusedSemanticHead', 'GridHead',
-    'MaskIoUHead', 'CoarseMaskHead', 'MaskPointHead'
+    "FCNMaskHead",
+    "FusedSemanticHead",
+    "GridHead",
+    "MaskIoUHead",
+    "CoarseMaskHead",
+    "MaskPointHead",
 ]

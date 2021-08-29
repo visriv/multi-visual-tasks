@@ -10,10 +10,8 @@ def calculate_confusion_matrix(pred, target):
     if isinstance(pred, np.ndarray) and isinstance(target, np.ndarray):
         pred = torch.from_numpy(pred)
         target = torch.from_numpy(target)
-    elif not (isinstance(pred, torch.Tensor)
-              and isinstance(target, torch.Tensor)):
-        raise TypeError('pred and target should both be'
-                        'torch.Tensor or np.ndarray')
+    elif not (isinstance(pred, torch.Tensor) and isinstance(target, torch.Tensor)):
+        raise TypeError("pred and target should both be" "torch.Tensor or np.ndarray")
     _, pred_label = pred.topk(1, dim=1)
     num_classes = pred.size(1)
     pred_label = pred_label.view(-1)
@@ -37,8 +35,7 @@ def precision(pred, target):
     """
     confusion_matrix = calculate_confusion_matrix(pred, target)
     with torch.no_grad():
-        res = confusion_matrix.diag() / torch.clamp(
-            confusion_matrix.sum(0), min=1)
+        res = confusion_matrix.diag() / torch.clamp(confusion_matrix.sum(0), min=1)
         res = res.mean().item() * 100
     return res
 
@@ -55,8 +52,7 @@ def recall(pred, target):
     """
     confusion_matrix = calculate_confusion_matrix(pred, target)
     with torch.no_grad():
-        res = confusion_matrix.diag() / torch.clamp(
-            confusion_matrix.sum(1), min=1)
+        res = confusion_matrix.diag() / torch.clamp(confusion_matrix.sum(1), min=1)
         res = res.mean().item() * 100
     return res
 
@@ -74,11 +70,10 @@ def f1_score(pred, target):
     confusion_matrix = calculate_confusion_matrix(pred, target)
     with torch.no_grad():
         precision = confusion_matrix.diag() / torch.clamp(
-            confusion_matrix.sum(1), min=1)
-        recall = confusion_matrix.diag() / torch.clamp(
-            confusion_matrix.sum(0), min=1)
-        res = 2 * precision * recall / torch.clamp(
-            precision + recall, min=1e-20)
+            confusion_matrix.sum(1), min=1
+        )
+        recall = confusion_matrix.diag() / torch.clamp(confusion_matrix.sum(0), min=1)
+        res = 2 * precision * recall / torch.clamp(precision + recall, min=1e-20)
         res = torch.where(torch.isnan(res), torch.full_like(res, 0), res)
         res = res.mean().item() * 100
     return res
@@ -88,9 +83,9 @@ def accuracy(pred, target, topk=1, thresh=None):
     """Calculate accuracy according to the prediction and target.
 
     Args:
-        pred (torch.Tensor or np.array): The model prediction, 
+        pred (torch.Tensor or np.array): The model prediction,
             shape (N, num_class)
-        target (torch.Tensor or np.array): The target of each 
+        target (torch.Tensor or np.array): The target of each
             prediction, shape (N, )
         topk (int | tuple[int], optional): If the predictions in ``topk``
             matches the target, the predictions will be regarded as
@@ -122,14 +117,13 @@ def accuracy(pred, target, topk=1, thresh=None):
 
     maxk = max(topk)
     if pred.size(0) == 0:
-        accu = [pred.new_tensor(0.) for _ in range(len(topk))]
+        accu = [pred.new_tensor(0.0) for _ in range(len(topk))]
         return accu[0] if return_single else accu
     assert pred.ndim == target.ndim + 1
     assert pred.size(0) == target.size(0)
-    assert maxk <= pred.size(1), \
-        f'maxk {maxk} exceeds pred dimension {pred.size(1)}'
+    assert maxk <= pred.size(1), f"maxk {maxk} exceeds pred dimension {pred.size(1)}"
     pred_value, pred_label = pred.topk(maxk, dim=1)
-    pred_label = pred_label.transpose(0, 1) #.t()  # transpose to shape (maxk, N)
+    pred_label = pred_label.transpose(0, 1)  # .t()  # transpose to shape (maxk, N)
     correct = pred_label.eq(target.unsqueeze(0).expand_as(pred_label))
     # correct = pred_label.eq(target.view(1, -1).expand_as(pred_label))
     if thresh is not None:
@@ -179,11 +173,9 @@ def cal_recalls(all_ious, proposal_nums, thrs):
     return recalls
 
 
-def tpfp_default(det_bboxes,
-                 gt_bboxes,
-                 gt_bboxes_ignore=None,
-                 iou_thr=0.5,
-                 area_ranges=None):
+def tpfp_default(
+    det_bboxes, gt_bboxes, gt_bboxes_ignore=None, iou_thr=0.5, area_ranges=None
+):
     """Check if detected bboxes are true positive or false positive.
     Args:
         det_bbox (ndarray): Detected bboxes of this image, of shape (m, 5).
@@ -200,8 +192,11 @@ def tpfp_default(det_bboxes,
     """
     # an indicator of ignored gts
     gt_ignore_inds = np.concatenate(
-        (np.zeros(gt_bboxes.shape[0], dtype=np.bool),
-         np.ones(gt_bboxes_ignore.shape[0], dtype=np.bool)))
+        (
+            np.zeros(gt_bboxes.shape[0], dtype=np.bool),
+            np.ones(gt_bboxes_ignore.shape[0], dtype=np.bool),
+        )
+    )
     # stack gt_bboxes and gt_bboxes_ignore for convenience
     gt_bboxes = np.vstack((gt_bboxes, gt_bboxes_ignore))
 
@@ -222,7 +217,8 @@ def tpfp_default(det_bboxes,
             fp[...] = 1
         else:
             det_areas = (det_bboxes[:, 2] - det_bboxes[:, 0]) * (
-                det_bboxes[:, 3] - det_bboxes[:, 1])
+                det_bboxes[:, 3] - det_bboxes[:, 1]
+            )
             for i, (min_area, max_area) in enumerate(area_ranges):
                 fp[i, (det_areas >= min_area) & (det_areas < max_area)] = 1
         return tp, fp
@@ -241,13 +237,13 @@ def tpfp_default(det_bboxes,
             gt_area_ignore = np.zeros_like(gt_ignore_inds, dtype=bool)
         else:
             gt_areas = (gt_bboxes[:, 2] - gt_bboxes[:, 0]) * (
-                gt_bboxes[:, 3] - gt_bboxes[:, 1])
+                gt_bboxes[:, 3] - gt_bboxes[:, 1]
+            )
             gt_area_ignore = (gt_areas < min_area) | (gt_areas >= max_area)
         for i in sort_inds:
             if ious_max[i] >= iou_thr:
                 matched_gt = ious_argmax[i]
-                if not (gt_ignore_inds[matched_gt]
-                        or gt_area_ignore[matched_gt]):
+                if not (gt_ignore_inds[matched_gt] or gt_area_ignore[matched_gt]):
                     if not gt_covered[matched_gt]:
                         gt_covered[matched_gt] = True
                         tp[k, i] = 1
@@ -264,11 +260,9 @@ def tpfp_default(det_bboxes,
     return tp, fp
 
 
-def tpfp_imagenet(det_bboxes,
-                  gt_bboxes,
-                  gt_bboxes_ignore=None,
-                  default_iou_thr=0.5,
-                  area_ranges=None):
+def tpfp_imagenet(
+    det_bboxes, gt_bboxes, gt_bboxes_ignore=None, default_iou_thr=0.5, area_ranges=None
+):
     """Check if detected bboxes are true positive or false positive.
 
     Args:
@@ -288,8 +282,11 @@ def tpfp_imagenet(det_bboxes,
     """
     # an indicator of ignored gts
     gt_ignore_inds = np.concatenate(
-        (np.zeros(gt_bboxes.shape[0], dtype=np.bool),
-         np.ones(gt_bboxes_ignore.shape[0], dtype=np.bool)))
+        (
+            np.zeros(gt_bboxes.shape[0], dtype=np.bool),
+            np.ones(gt_bboxes_ignore.shape[0], dtype=np.bool),
+        )
+    )
     # stack gt_bboxes and gt_bboxes_ignore for convenience
     gt_bboxes = np.vstack((gt_bboxes, gt_bboxes_ignore))
 
@@ -307,15 +304,17 @@ def tpfp_imagenet(det_bboxes,
             fp[...] = 1
         else:
             det_areas = (det_bboxes[:, 2] - det_bboxes[:, 0]) * (
-                det_bboxes[:, 3] - det_bboxes[:, 1])
+                det_bboxes[:, 3] - det_bboxes[:, 1]
+            )
             for i, (min_area, max_area) in enumerate(area_ranges):
                 fp[i, (det_areas >= min_area) & (det_areas < max_area)] = 1
         return tp, fp
     ious = bbox_overlaps_np(det_bboxes, gt_bboxes - 1)
     gt_w = gt_bboxes[:, 2] - gt_bboxes[:, 0]
     gt_h = gt_bboxes[:, 3] - gt_bboxes[:, 1]
-    iou_thrs = np.minimum((gt_w * gt_h) / ((gt_w + 10.0) * (gt_h + 10.0)),
-                          default_iou_thr)
+    iou_thrs = np.minimum(
+        (gt_w * gt_h) / ((gt_w + 10.0) * (gt_h + 10.0)), default_iou_thr
+    )
     # sort all detections by scores in descending order
     sort_inds = np.argsort(-det_bboxes[:, -1])
     for k, (min_area, max_area) in enumerate(area_ranges):
@@ -345,8 +344,7 @@ def tpfp_imagenet(det_bboxes,
             # 4. it matches no gt but is beyond area range, tp = 0, fp = 0
             if matched_gt >= 0:
                 gt_covered[matched_gt] = 1
-                if not (gt_ignore_inds[matched_gt]
-                        or gt_area_ignore[matched_gt]):
+                if not (gt_ignore_inds[matched_gt] or gt_area_ignore[matched_gt]):
                     tp[k, i] = 1
             elif min_area is None:
                 fp[k, i] = 1
@@ -358,7 +356,7 @@ def tpfp_imagenet(det_bboxes,
     return tp, fp
 
 
-def average_precision(recalls, precisions, mode='area'):
+def average_precision(recalls, precisions, mode="area"):
     """Calculate average precision (for single or multiple scales).
 
     Args:
@@ -379,7 +377,7 @@ def average_precision(recalls, precisions, mode='area'):
     assert recalls.shape == precisions.shape and recalls.ndim == 2
     num_scales = recalls.shape[0]
     ap = np.zeros(num_scales, dtype=np.float32)
-    if mode == 'area':
+    if mode == "area":
         zeros = np.zeros((num_scales, 1), dtype=recalls.dtype)
         ones = np.ones((num_scales, 1), dtype=recalls.dtype)
         mrec = np.hstack((zeros, recalls, ones))
@@ -388,9 +386,8 @@ def average_precision(recalls, precisions, mode='area'):
             mpre[:, i - 1] = np.maximum(mpre[:, i - 1], mpre[:, i])
         for i in range(num_scales):
             ind = np.where(mrec[i, 1:] != mrec[i, :-1])[0]
-            ap[i] = np.sum(
-                (mrec[i, ind + 1] - mrec[i, ind]) * mpre[i, ind + 1])
-    elif mode == '11points':
+            ap[i] = np.sum((mrec[i, ind + 1] - mrec[i, ind]) * mpre[i, ind + 1])
+    elif mode == "11points":
         for i in range(num_scales):
             for thr in np.arange(0, 1 + 1e-3, 0.1):
                 precs = precisions[i, recalls[i, :] >= thr]
@@ -398,8 +395,7 @@ def average_precision(recalls, precisions, mode='area'):
                 ap[i] += prec
             ap /= 11
     else:
-        raise ValueError(
-            'Unrecognized mode, only "area" and "11points" are supported')
+        raise ValueError('Unrecognized mode, only "area" and "11points" are supported')
     if no_scale:
         ap = ap[0]
     return ap
@@ -408,7 +404,7 @@ def average_precision(recalls, precisions, mode='area'):
 class Accuracy(nn.Module):
     """Module to calculate the accuracy."""
 
-    def __init__(self, topk=(1, ), thresh=None):
+    def __init__(self, topk=(1,), thresh=None):
         """Initialization for computing accuracy.
 
         Args:
@@ -434,12 +430,14 @@ class Accuracy(nn.Module):
         return accuracy(pred, target, self.topk, self.thresh)
 
 
-def intersect_and_union(pred_label,
-                        label,
-                        num_classes,
-                        ignore_index,
-                        label_map=dict(),
-                        reduce_zero_label=False):
+def intersect_and_union(
+    pred_label,
+    label,
+    num_classes,
+    ignore_index,
+    label_map=dict(),
+    reduce_zero_label=False,
+):
     """Calculate intersection and Union.
 
     Args:
@@ -465,7 +463,7 @@ def intersect_and_union(pred_label,
         pred_label = np.load(pred_label)
 
     if isinstance(label, str):
-        label = imread(label, flag='unchanged', backend='pillow')
+        label = imread(label, flag="unchanged", backend="pillow")
     # modify if custom classes
     if label_map is not None:
         for old_id, new_id in label_map.items():
@@ -476,27 +474,27 @@ def intersect_and_union(pred_label,
         label = label - 1
         label[label == 254] = 255
 
-    mask = (label != ignore_index)
+    mask = label != ignore_index
     pred_label = pred_label[mask]
     label = label[mask]
 
     intersect = pred_label[pred_label == label]
-    area_intersect, _ = np.histogram(
-        intersect, bins=np.arange(num_classes + 1))
-    area_pred_label, _ = np.histogram(
-        pred_label, bins=np.arange(num_classes + 1))
+    area_intersect, _ = np.histogram(intersect, bins=np.arange(num_classes + 1))
+    area_pred_label, _ = np.histogram(pred_label, bins=np.arange(num_classes + 1))
     area_label, _ = np.histogram(label, bins=np.arange(num_classes + 1))
     area_union = area_pred_label + area_label - area_intersect
 
     return area_intersect, area_union, area_pred_label, area_label
 
 
-def total_intersect_and_union(results,
-                              gt_seg_maps,
-                              num_classes,
-                              ignore_index,
-                              label_map=dict(),
-                              reduce_zero_label=False):
+def total_intersect_and_union(
+    results,
+    gt_seg_maps,
+    num_classes,
+    ignore_index,
+    label_map=dict(),
+    reduce_zero_label=False,
+):
     """Calculate Total Intersection and Union.
 
     Args:
@@ -518,17 +516,26 @@ def total_intersect_and_union(results,
 
     num_imgs = len(results)
     assert len(gt_seg_maps) == num_imgs
-    total_area_intersect = np.zeros((num_classes, ), dtype=np.float)
-    total_area_union = np.zeros((num_classes, ), dtype=np.float)
-    total_area_pred_label = np.zeros((num_classes, ), dtype=np.float)
-    total_area_label = np.zeros((num_classes, ), dtype=np.float)
+    total_area_intersect = np.zeros((num_classes,), dtype=np.float)
+    total_area_union = np.zeros((num_classes,), dtype=np.float)
+    total_area_pred_label = np.zeros((num_classes,), dtype=np.float)
+    total_area_label = np.zeros((num_classes,), dtype=np.float)
     for i in range(num_imgs):
-        area_intersect, area_union, area_pred_label, area_label = \
-            intersect_and_union(results[i], gt_seg_maps[i], num_classes,
-                                ignore_index, label_map, reduce_zero_label)
+        area_intersect, area_union, area_pred_label, area_label = intersect_and_union(
+            results[i],
+            gt_seg_maps[i],
+            num_classes,
+            ignore_index,
+            label_map,
+            reduce_zero_label,
+        )
         total_area_intersect += area_intersect
         total_area_union += area_union
         total_area_pred_label += area_pred_label
         total_area_label += area_label
-    return total_area_intersect, total_area_union, \
-        total_area_pred_label, total_area_label
+    return (
+        total_area_intersect,
+        total_area_union,
+        total_area_pred_label,
+        total_area_label,
+    )

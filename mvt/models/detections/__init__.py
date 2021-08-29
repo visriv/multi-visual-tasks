@@ -12,7 +12,21 @@ from .ssd import SSD
 from .yolo import YOLOV3, YOLOV4, YOLOV5
 
 __all__ = [
-    'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'ATSS', 'SSD',
-    'CascadeRCNN', 'CornerNet', 'FastRCNN', 'FasterRCNN', 'FCOS', 'FOVEA', 
-    'MaskRCNN', 'RetinaNet', 'SSD', 'YOLOV3', 'YOLOV4', 'YOLOV5'
-    ]
+    "BaseDetector",
+    "SingleStageDetector",
+    "TwoStageDetector",
+    "ATSS",
+    "SSD",
+    "CascadeRCNN",
+    "CornerNet",
+    "FastRCNN",
+    "FasterRCNN",
+    "FCOS",
+    "FOVEA",
+    "MaskRCNN",
+    "RetinaNet",
+    "SSD",
+    "YOLOV3",
+    "YOLOV4",
+    "YOLOV5",
+]

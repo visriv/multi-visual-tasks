@@ -15,7 +15,7 @@ from collections.abc import Iterable
 
 from .log_util import get_root_logger
 
-DEBUG_COMPLETED_TIME = bool(os.environ.get('DEBUG_COMPLETED_TIME', False))
+DEBUG_COMPLETED_TIME = bool(os.environ.get("DEBUG_COMPLETED_TIME", False))
 logger = get_root_logger()
 
 
@@ -63,19 +63,16 @@ def import_modules_from_strings(imports, allow_failed_imports=False):
         single_import = True
         imports = [imports]
     if not isinstance(imports, list):
-        raise TypeError(
-            f'custom_imports must be a list but got type {type(imports)}')
+        raise TypeError(f"custom_imports must be a list but got type {type(imports)}")
     imported = []
     for imp in imports:
         if not isinstance(imp, str):
-            raise TypeError(
-                f'{imp} is of type {type(imp)} and cannot be imported.')
+            raise TypeError(f"{imp} is of type {type(imp)} and cannot be imported.")
         try:
             imported_tmp = import_module(imp)
         except ImportError:
             if allow_failed_imports:
-                warnings.warn(f'{imp} failed to import and is ignored.',
-                              UserWarning)
+                warnings.warn(f"{imp} failed to import and is ignored.", UserWarning)
                 imported_tmp = None
             else:
                 raise ImportError
@@ -96,7 +93,7 @@ def iter_cast(inputs, dst_type, return_type=None):
         iterator or specified type: The converted object.
     """
     if not isinstance(inputs, abc.Iterable):
-        raise TypeError('inputs must be an iterable object')
+        raise TypeError("inputs must be an iterable object")
     if not isinstance(dst_type, type):
         raise TypeError('"dst_type" must be a valid type')
 
@@ -172,12 +169,14 @@ def slice_list(in_list, lens):
     if not isinstance(lens, list):
         raise TypeError('"indices" must be an integer or a list of integers')
     elif sum(lens) != len(in_list):
-        raise ValueError('sum of lens and list length does not '
-                         f'match: {sum(lens)} != {len(in_list)}')
+        raise ValueError(
+            "sum of lens and list length does not "
+            f"match: {sum(lens)} != {len(in_list)}"
+        )
     out_list = []
     idx = 0
     for i in range(len(lens)):
-        out_list.append(in_list[idx:idx + lens[i]])
+        out_list.append(in_list[idx : idx + lens[i]])
         idx += lens[i]
     return out_list
 
@@ -193,10 +192,11 @@ def concat_list(in_list):
 
 
 def check_prerequisites(
-        prerequisites,
-        checker,
-        msg_tmpl='Prerequisites "{}" are required in method "{}" but not '
-        'found, please install them first.'):  # yapf: disable
+    prerequisites,
+    checker,
+    msg_tmpl='Prerequisites "{}" are required in method "{}" but not '
+    "found, please install them first.",
+):  # yapf: disable
     """A decorator factory to check if prerequisites are satisfied.
     Args:
         prerequisites (str of list[str]): Prerequisites to be checked.
@@ -208,18 +208,18 @@ def check_prerequisites(
     """
 
     def wrap(func):
-
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs):
-            requirements = [prerequisites] if isinstance(
-                prerequisites, str) else prerequisites
+            requirements = (
+                [prerequisites] if isinstance(prerequisites, str) else prerequisites
+            )
             missing = []
             for item in requirements:
                 if not checker(item):
                     missing.append(item)
             if missing:
-                print(msg_tmpl.format(', '.join(missing), func.__name__))
-                raise RuntimeError('Prerequisites not meet.')
+                print(msg_tmpl.format(", ".join(missing), func.__name__))
+                raise RuntimeError("Prerequisites not meet.")
             else:
                 return func(*args, **kwargs)
 
@@ -238,7 +238,7 @@ def _check_py_package(package):
 
 
 def _check_executable(cmd):
-    if subprocess.call(f'which {cmd}', shell=True) != 0:
+    if subprocess.call(f"which {cmd}", shell=True) != 0:
         return False
     else:
         return True
@@ -287,7 +287,7 @@ def multi_apply(func, *args, **kwargs):
         tuple(list): A tuple containing multiple list, each list contains \
             a kind of returned results by the function
     """
-    
+
     pfunc = partial(func, **kwargs) if kwargs else func
     map_results = map(pfunc, *args)
     return tuple(map(list, zip(*map_results)))
@@ -297,10 +297,10 @@ def unmap(data, count, inds, fill=0):
     """Unmap a subset of item (data) back to the original set of items (of size
     count)"""
     if data.dim() == 1:
-        ret = data.new_full((count, ), fill)
+        ret = data.new_full((count,), fill)
         ret[inds.type(torch.bool)] = data
     else:
-        new_size = (count, ) + data.size()[1:]
+        new_size = (count,) + data.size()[1:]
         ret = data.new_full(new_size, fill)
         ret[inds.type(torch.bool), :] = data
     return ret
@@ -339,21 +339,22 @@ class NiceRepr(object):
 
     def __nice__(self):
         """str: a "nice" summary string describing this module"""
-        if hasattr(self, '__len__'):
+        if hasattr(self, "__len__"):
             # It is a common pattern for objects to use __len__ in __nice__
             # As a convenience we define a default __nice__ for these objects
             return str(len(self))
         else:
             # In all other cases force the subclass to overload __nice__
             raise NotImplementedError(
-                f'Define the __nice__ method for {self.__class__!r}')
+                f"Define the __nice__ method for {self.__class__!r}"
+            )
 
     def __repr__(self):
         """str: the string of the module"""
         try:
             nice = self.__nice__()
             classname = self.__class__.__name__
-            return f'<{classname}({nice}) at {hex(id(self))}>'
+            return f"<{classname}({nice}) at {hex(id(self))}>"
         except NotImplementedError as ex:
             warnings.warn(str(ex), category=RuntimeWarning)
             return object.__repr__(self)
@@ -363,14 +364,13 @@ class NiceRepr(object):
         try:
             classname = self.__class__.__name__
             nice = self.__nice__()
-            return f'<{classname}({nice})>'
+            return f"<{classname}({nice})>"
         except NotImplementedError as ex:
             warnings.warn(str(ex), category=RuntimeWarning)
             return object.__repr__(self)
 
 
 class TimerError(Exception):
-
     def __init__(self, message):
         self.message = message
         super(TimerError, self).__init__(message)
@@ -381,7 +381,7 @@ class Timer:
 
     def __init__(self, start=True, print_tmpl=None):
         self._is_running = False
-        self.print_tmpl = print_tmpl if print_tmpl else '{:.3f}'
+        self.print_tmpl = print_tmpl if print_tmpl else "{:.3f}"
         if start:
             self.start()
 
@@ -410,7 +410,7 @@ class Timer:
         Returns (float): Time in seconds.
         """
         if not self._is_running:
-            raise TimerError('timer is not running')
+            raise TimerError("timer is not running")
         self._t_last = time.time()
         return self._t_last - self._t_start
 
@@ -421,7 +421,7 @@ class Timer:
         Returns (float): Time in seconds.
         """
         if not self._is_running:
-            raise TimerError('timer is not running')
+            raise TimerError("timer is not running")
         dur = time.time() - self._t_last
         self._t_last = time.time()
         return dur
@@ -445,10 +445,11 @@ class ProgressBar:
 
     def start(self):
         if self.task_num > 0:
-            self.file.write(f'[{" " * self.bar_width}] 0/{self.task_num}, '
-                            'elapsed: 0s, ETA:')
+            self.file.write(
+                f'[{" " * self.bar_width}] 0/{self.task_num}, ' "elapsed: 0s, ETA:"
+            )
         else:
-            self.file.write('completed: 0, elapsed: 0s')
+            self.file.write("completed: 0, elapsed: 0s")
         self.file.flush()
         self.timer = Timer()
 
@@ -459,25 +460,30 @@ class ProgressBar:
         if elapsed > 0:
             fps = self.completed / elapsed
         else:
-            fps = float('inf')
+            fps = float("inf")
         if self.task_num > 0:
             percentage = self.completed / float(self.task_num)
             eta = int(elapsed * (1 - percentage) / percentage + 0.5)
-            msg = f'\r[{{}}] {self.completed}/{self.task_num}, ' \
-                  f'{fps:.1f} task/s, elapsed: {int(elapsed + 0.5)}s, ' \
-                  f'ETA: {eta:5}s'
+            msg = (
+                f"\r[{{}}] {self.completed}/{self.task_num}, "
+                f"{fps:.1f} task/s, elapsed: {int(elapsed + 0.5)}s, "
+                f"ETA: {eta:5}s"
+            )
 
-            bar_width = min(self.bar_width,
-                            int(self.terminal_width - len(msg)) + 2,
-                            int(self.terminal_width * 0.6))
+            bar_width = min(
+                self.bar_width,
+                int(self.terminal_width - len(msg)) + 2,
+                int(self.terminal_width * 0.6),
+            )
             bar_width = max(2, bar_width)
             mark_width = int(bar_width * percentage)
-            bar_chars = '>' * mark_width + ' ' * (bar_width - mark_width)
+            bar_chars = ">" * mark_width + " " * (bar_width - mark_width)
             self.file.write(msg.format(bar_chars))
         else:
             self.file.write(
-                f'completed: {self.completed}, elapsed: {int(elapsed + 0.5)}s,'
-                f' {fps:.1f} tasks/s')
+                f"completed: {self.completed}, elapsed: {int(elapsed + 0.5)}s,"
+                f" {fps:.1f} tasks/s"
+            )
         self.file.flush()
 
 
@@ -501,14 +507,13 @@ def track_progress(func, tasks, bar_width=50, file=sys.stdout, **kwargs):
     elif isinstance(tasks, Iterable):
         task_num = len(tasks)
     else:
-        raise TypeError(
-            '"tasks" must be an iterable object or a (iterator, int) tuple')
+        raise TypeError('"tasks" must be an iterable object or a (iterator, int) tuple')
     prog_bar = ProgressBar(task_num, bar_width, file=file)
     results = []
     for task in tasks:
         results.append(func(task, **kwargs))
         prog_bar.update()
-    prog_bar.file.write('\n')
+    prog_bar.file.write("\n")
     return results
 
 
@@ -552,6 +557,6 @@ def add_prefix(inputs, prefix):
 
     outputs = dict()
     for name, value in inputs.items():
-        outputs[f'{prefix}.{name}'] = value
+        outputs[f"{prefix}.{name}"] = value
 
     return outputs

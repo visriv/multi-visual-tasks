@@ -4,7 +4,6 @@ import torch.nn.functional as F
 
 
 class BasicConv2d(nn.Module):
-
     def __init__(self, in_channels, out_channels, **kwargs):
         super(BasicConv2d, self).__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, bias=False, **kwargs)
@@ -17,7 +16,6 @@ class BasicConv2d(nn.Module):
 
 
 class Inception(nn.Module):
-
     def __init__(self, in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj):
         super(Inception, self).__init__()
 
@@ -25,17 +23,17 @@ class Inception(nn.Module):
 
         self.branch2 = nn.Sequential(
             BasicConv2d(in_channels, ch3x3red, kernel_size=1),
-            BasicConv2d(ch3x3red, ch3x3, kernel_size=3, padding=1)
+            BasicConv2d(ch3x3red, ch3x3, kernel_size=3, padding=1),
         )
 
         self.branch3 = nn.Sequential(
             BasicConv2d(in_channels, ch5x5red, kernel_size=1),
-            BasicConv2d(ch5x5red, ch5x5, kernel_size=3, padding=1)
+            BasicConv2d(ch5x5red, ch5x5, kernel_size=3, padding=1),
         )
 
         self.branch4 = nn.Sequential(
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1, ceil_mode=True),
-            BasicConv2d(in_channels, pool_proj, kernel_size=1)
+            BasicConv2d(in_channels, pool_proj, kernel_size=1),
         )
 
     def forward(self, x):
@@ -49,7 +47,6 @@ class Inception(nn.Module):
 
 
 class InceptionGAux(nn.Module):
-
     def __init__(self, in_channels, num_classes, sigmoid=False):
         super(InceptionAux, self).__init__()
         self.conv = BasicConv2d(in_channels, 128, kernel_size=1)
@@ -73,7 +70,7 @@ class InceptionGAux(nn.Module):
         # N x 2048
         x = self.fc2(x)
         # N x 1024
-        
+
         if self.sigmoid:
             x = self.sigmoid(x)
 
@@ -81,7 +78,6 @@ class InceptionGAux(nn.Module):
 
 
 class InceptionA(nn.Module):
-
     def __init__(self, in_channels, pool_features):
         super(InceptionA, self).__init__()
         self.branch1x1 = BasicConv2d(in_channels, 64, kernel_size=1)
@@ -113,7 +109,6 @@ class InceptionA(nn.Module):
 
 
 class InceptionB(nn.Module):
-
     def __init__(self, in_channels):
         super(InceptionB, self).__init__()
         self.branch3x3 = BasicConv2d(in_channels, 384, kernel_size=3, stride=2)
@@ -136,7 +131,6 @@ class InceptionB(nn.Module):
 
 
 class InceptionC(nn.Module):
-
     def __init__(self, in_channels, channels_7x7):
         super(InceptionC, self).__init__()
         self.branch1x1 = BasicConv2d(in_channels, 192, kernel_size=1)
@@ -175,7 +169,6 @@ class InceptionC(nn.Module):
 
 
 class InceptionD(nn.Module):
-
     def __init__(self, in_channels):
         super(InceptionD, self).__init__()
         self.branch3x3_1 = BasicConv2d(in_channels, 192, kernel_size=1)
@@ -201,7 +194,6 @@ class InceptionD(nn.Module):
 
 
 class InceptionE(nn.Module):
-
     def __init__(self, in_channels):
         super(InceptionE, self).__init__()
         self.branch1x1 = BasicConv2d(in_channels, 320, kernel_size=1)
@@ -243,7 +235,6 @@ class InceptionE(nn.Module):
 
 
 class InceptionAux(nn.Module):
-
     def __init__(self, in_channels, num_classes):
         super(InceptionAux, self).__init__()
         self.conv0 = BasicConv2d(in_channels, 128, kernel_size=1)
@@ -253,11 +244,7 @@ class InceptionAux(nn.Module):
         fc = nn.Linear(768, num_classes)
         fc.stddev = 0.001
 
-        self.group1 = nn.Sequential(
-            OrderedDict([
-                ('fc', fc)
-            ])
-        )
+        self.group1 = nn.Sequential(OrderedDict([("fc", fc)]))
 
     def forward(self, x):
         # 17 x 17 x 768
@@ -275,7 +262,6 @@ class InceptionAux(nn.Module):
 
 
 class InceptionMAux(nn.Module):
-
     def __init__(self, in_channels, num_classes):
         super(InceptionAux, self).__init__()
         self.conv0 = BasicConv2d(in_channels, 128, kernel_size=1)
@@ -288,17 +274,8 @@ class InceptionMAux(nn.Module):
         fc2 = nn.Linear(768, 1)
         fc2.stddev = 0.001
 
-        self.group1 = nn.Sequential(
-            OrderedDict([
-                ('fc1', fc1)
-            ])
-        )
-        self.group2 = nn.Sequential(
-            OrderedDict([
-                ('fc2', fc2),
-                ('sm2', nn.Sigmoid())
-            ])
-        )
+        self.group1 = nn.Sequential(OrderedDict([("fc1", fc1)]))
+        self.group2 = nn.Sequential(OrderedDict([("fc2", fc2), ("sm2", nn.Sigmoid())]))
 
     def forward(self, x):
         # 17 x 17 x 768

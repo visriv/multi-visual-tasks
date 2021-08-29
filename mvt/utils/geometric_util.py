@@ -11,21 +11,21 @@ except ImportError:
 
 
 cv2_interp_codes = {
-    'nearest': cv2.INTER_NEAREST,
-    'bilinear': cv2.INTER_LINEAR,
-    'bicubic': cv2.INTER_CUBIC,
-    'area': cv2.INTER_AREA,
-    'lanczos': cv2.INTER_LANCZOS4
+    "nearest": cv2.INTER_NEAREST,
+    "bilinear": cv2.INTER_LINEAR,
+    "bicubic": cv2.INTER_CUBIC,
+    "area": cv2.INTER_AREA,
+    "lanczos": cv2.INTER_LANCZOS4,
 }
 
 if Image is not None:
     pillow_interp_codes = {
-        'nearest': Image.NEAREST,
-        'bilinear': Image.BILINEAR,
-        'bicubic': Image.BICUBIC,
-        'box': Image.BOX,
-        'lanczos': Image.LANCZOS,
-        'hamming': Image.HAMMING
+        "nearest": Image.NEAREST,
+        "bilinear": Image.BILINEAR,
+        "bicubic": Image.BICUBIC,
+        "box": Image.BOX,
+        "lanczos": Image.LANCZOS,
+        "hamming": Image.HAMMING,
     }
 
 
@@ -41,12 +41,9 @@ def _scale_size(size, scale):
     return int(w * float(scale) + 0.5), int(h * float(scale) + 0.5)
 
 
-def imresize(img,
-             size,
-             return_scale=False,
-             interpolation='bilinear',
-             out=None,
-             backend=None):
+def imresize(
+    img, size, return_scale=False, interpolation="bilinear", out=None, backend=None
+):
     """Resize image to a given size.
     Args:
         img (ndarray): The input image.
@@ -66,21 +63,24 @@ def imresize(img,
     h, w = img.shape[:2]
     if backend is None:
         backend = imread_backend
-    if backend not in ['cv2', 'pillow']:
-        raise ValueError(f'backend: {backend} is not supported for resize.'
-                         f"Supported backends are 'cv2', 'pillow'")
+    if backend not in ["cv2", "pillow"]:
+        raise ValueError(
+            f"backend: {backend} is not supported for resize."
+            f"Supported backends are 'cv2', 'pillow'"
+        )
     if min(size) == -1:
         scale = float(max(size)) / min(h, w)
         size = int(w * scale), int(h * scale)
-    if backend == 'pillow':
-        assert img.dtype == np.uint8, 'Pillow backend only support uint8 type'
+    if backend == "pillow":
+        assert img.dtype == np.uint8, "Pillow backend only support uint8 type"
         pil_image = Image.fromarray(img)
         pil_image = pil_image.resize(size, pillow_interp_codes[interpolation])
 
         resized_img = np.array(pil_image)
     else:
         resized_img = cv2.resize(
-            img, tuple(size), dst=out, interpolation=cv2_interp_codes[interpolation])
+            img, tuple(size), dst=out, interpolation=cv2_interp_codes[interpolation]
+        )
     if not return_scale:
         return resized_img
     else:
@@ -89,11 +89,9 @@ def imresize(img,
         return resized_img, w_scale, h_scale
 
 
-def imresize_like(img,
-                  dst_img,
-                  return_scale=False,
-                  interpolation='bilinear',
-                  backend=None):
+def imresize_like(
+    img, dst_img, return_scale=False, interpolation="bilinear", backend=None
+):
     """Resize image to the same size of a given image.
     Args:
         img (ndarray): The input image.
@@ -125,16 +123,16 @@ def rescale_size(old_size, scale, return_scale=False):
     w, h = old_size
     if isinstance(scale, (float, int)):
         if scale <= 0:
-            raise ValueError(f'Invalid scale {scale}, must be positive.')
+            raise ValueError(f"Invalid scale {scale}, must be positive.")
         scale_factor = scale
     elif isinstance(scale, (list, tuple)):
         max_long_edge = max(scale)
         max_short_edge = min(scale)
-        scale_factor = min(max_long_edge / max(h, w),
-                           max_short_edge / min(h, w))
+        scale_factor = min(max_long_edge / max(h, w), max_short_edge / min(h, w))
     else:
         raise TypeError(
-            f'Scale must be a number or tuple of int, but got {type(scale)}')
+            f"Scale must be a number or tuple of int, but got {type(scale)}"
+        )
 
     new_size = _scale_size((w, h), scale_factor)
 
@@ -144,11 +142,7 @@ def rescale_size(old_size, scale, return_scale=False):
         return new_size
 
 
-def imrescale(img,
-              scale,
-              return_scale=False,
-              interpolation='bilinear',
-              backend=None):
+def imrescale(img, scale, return_scale=False, interpolation="bilinear", backend=None):
     """Resize image while keeping the aspect ratio.
     Args:
         img (ndarray): The input image.
@@ -165,15 +159,14 @@ def imrescale(img,
     """
     h, w = img.shape[:2]
     new_size, scale_factor = rescale_size((w, h), scale, return_scale=True)
-    rescaled_img = imresize(
-        img, new_size, interpolation=interpolation, backend=backend)
+    rescaled_img = imresize(img, new_size, interpolation=interpolation, backend=backend)
     if return_scale:
         return rescaled_img, scale_factor
     else:
         return rescaled_img
 
 
-def imflip(img, direction='horizontal'):
+def imflip(img, direction="horizontal"):
     """Flip an image horizontally or vertically.
     Args:
         img (ndarray): Image to be flipped.
@@ -182,16 +175,16 @@ def imflip(img, direction='horizontal'):
     Returns:
         ndarray: The flipped image.
     """
-    assert direction in ['horizontal', 'vertical', 'diagonal']
-    if direction == 'horizontal':
+    assert direction in ["horizontal", "vertical", "diagonal"]
+    if direction == "horizontal":
         return np.flip(img, axis=1)
-    elif direction == 'vertical':
+    elif direction == "vertical":
         return np.flip(img, axis=0)
     else:
         return np.flip(img, axis=(0, 1))
 
 
-def imflip_(img, direction='horizontal'):
+def imflip_(img, direction="horizontal"):
     """Inplace flip an image horizontally or vertically.
     Args:
         img (ndarray): Image to be flipped.
@@ -200,22 +193,24 @@ def imflip_(img, direction='horizontal'):
     Returns:
         ndarray: The flipped image (inplace).
     """
-    assert direction in ['horizontal', 'vertical', 'diagonal']
-    if direction == 'horizontal':
+    assert direction in ["horizontal", "vertical", "diagonal"]
+    if direction == "horizontal":
         return cv2.flip(img, 1, img)
-    elif direction == 'vertical':
+    elif direction == "vertical":
         return cv2.flip(img, 0, img)
     else:
         return cv2.flip(img, -1, img)
 
 
-def imrotate(img,
-             angle,
-             center=None,
-             scale=1.0,
-             border_value=0,
-             interpolation='bilinear',
-             auto_bound=False):
+def imrotate(
+    img,
+    angle,
+    center=None,
+    scale=1.0,
+    border_value=0,
+    interpolation="bilinear",
+    auto_bound=False,
+):
     """Rotate an image.
     Args:
         img (ndarray): Image to be rotated.
@@ -233,7 +228,7 @@ def imrotate(img,
         ndarray: The rotated image.
     """
     if center is not None and auto_bound:
-        raise ValueError('`auto_bound` conflicts with `center`')
+        raise ValueError("`auto_bound` conflicts with `center`")
     h, w = img.shape[:2]
     if center is None:
         center = ((w - 1) * 0.5, (h - 1) * 0.5)
@@ -251,9 +246,11 @@ def imrotate(img,
         h = int(np.round(new_h))
     rotated = cv2.warpAffine(
         img,
-        matrix, (w, h),
+        matrix,
+        (w, h),
         flags=cv2_interp_codes[interpolation],
-        borderValue=border_value)
+        borderValue=border_value,
+    )
 
     return rotated, matrix
 
@@ -297,6 +294,7 @@ def bbox_scaling(bboxes, scale, clip_shape=None):
     else:
         return scaled_bboxes
 
+
 def imcrop_center(img, size, scale=1.0, pad_fill=None):
     """Center crop image.
     Args:
@@ -311,9 +309,9 @@ def imcrop_center(img, size, scale=1.0, pad_fill=None):
             `resized_img`.
     """
     h, w = img.shape[:2]
-    pad_w = (w - size[0])//2
-    pad_h = (h - size[1])//2
-    bboxes = np.array([pad_w, pad_h, pad_w+size[0]-1, pad_h+size[1]-1])
+    pad_w = (w - size[0]) // 2
+    pad_h = (h - size[1]) // 2
+    bboxes = np.array([pad_w, pad_h, pad_w + size[0] - 1, pad_h + size[1] - 1])
     return imcrop(img, bboxes, scale=scale, pad_fill=pad_fill)
 
 
@@ -344,22 +342,23 @@ def imcrop(img, bboxes, scale=1.0, pad_fill=None):
     for i in range(clipped_bbox.shape[0]):
         x1, y1, x2, y2 = tuple(clipped_bbox[i, :])
         if pad_fill is None:
-            patch = img[y1:y2 + 1, x1:x2 + 1, ...]
+            patch = img[y1 : y2 + 1, x1 : x2 + 1, ...]
         else:
             _x1, _y1, _x2, _y2 = tuple(scaled_bboxes[i, :])
             if chn == 1:
                 patch_shape = (_y2 - _y1 + 1, _x2 - _x1 + 1)
             else:
                 patch_shape = (_y2 - _y1 + 1, _x2 - _x1 + 1, chn)
-            patch = np.array(
-                pad_fill, dtype=img.dtype) * np.ones(
-                    patch_shape, dtype=img.dtype)
+            patch = np.array(pad_fill, dtype=img.dtype) * np.ones(
+                patch_shape, dtype=img.dtype
+            )
             x_start = 0 if _x1 >= 0 else -_x1
             y_start = 0 if _y1 >= 0 else -_y1
             w = x2 - x1 + 1
             h = y2 - y1 + 1
-            patch[y_start:y_start + h, x_start:x_start + w,
-                  ...] = img[y1:y1 + h, x1:x1 + w, ...]
+            patch[y_start : y_start + h, x_start : x_start + w, ...] = img[
+                y1 : y1 + h, x1 : x1 + w, ...
+            ]
         patches.append(patch)
 
     if bboxes.ndim == 1:
@@ -368,12 +367,7 @@ def imcrop(img, bboxes, scale=1.0, pad_fill=None):
         return patches
 
 
-def impad(img,
-          *,
-          shape=None,
-          padding=None,
-          pad_val=0,
-          padding_mode='constant'):
+def impad(img, *, shape=None, padding=None, pad_val=0, padding_mode="constant"):
     """Pad the given image to a certain shape or pad on all sides with
     specified padding mode and padding value.
     Args:
@@ -413,8 +407,9 @@ def impad(img,
     if isinstance(pad_val, tuple):
         assert len(pad_val) == img.shape[-1]
     elif not isinstance(pad_val, numbers.Number):
-        raise TypeError('pad_val must be a int or a tuple. '
-                        f'But received {type(pad_val)}')
+        raise TypeError(
+            "pad_val must be a int or a tuple. " f"But received {type(pad_val)}"
+        )
 
     # check padding
     if isinstance(padding, tuple) and len(padding) in [2, 4]:
@@ -423,17 +418,19 @@ def impad(img,
     elif isinstance(padding, numbers.Number):
         padding = (padding, padding, padding, padding)
     else:
-        raise ValueError('Padding must be a int or a 2, or 4 element tuple.'
-                         f'But received {padding}')
+        raise ValueError(
+            "Padding must be a int or a 2, or 4 element tuple."
+            f"But received {padding}"
+        )
 
     # check padding mode
-    assert padding_mode in ['constant', 'edge', 'reflect', 'symmetric']
+    assert padding_mode in ["constant", "edge", "reflect", "symmetric"]
 
     border_type = {
-        'constant': cv2.BORDER_CONSTANT,
-        'edge': cv2.BORDER_REPLICATE,
-        'reflect': cv2.BORDER_REFLECT_101,
-        'symmetric': cv2.BORDER_REFLECT
+        "constant": cv2.BORDER_CONSTANT,
+        "edge": cv2.BORDER_REPLICATE,
+        "reflect": cv2.BORDER_REFLECT_101,
+        "symmetric": cv2.BORDER_REFLECT,
     }
     img = cv2.copyMakeBorder(
         img,
@@ -442,7 +439,8 @@ def impad(img,
         padding[0],
         padding[2],
         border_type[padding_mode],
-        value=pad_val)
+        value=pad_val,
+    )
 
     return img
 
@@ -461,7 +459,7 @@ def impad_to_multiple(img, divisor, pad_val=0):
     return impad(img, shape=(pad_h, pad_w), pad_val=pad_val)
 
 
-def _get_shear_matrix(magnitude, direction='horizontal'):
+def _get_shear_matrix(magnitude, direction="horizontal"):
     """Generate the shear matrix for transformation.
     Args:
         magnitude (int | float): The magnitude used for shear.
@@ -470,18 +468,16 @@ def _get_shear_matrix(magnitude, direction='horizontal'):
     Returns:
         ndarray: The shear matrix with dtype float32.
     """
-    if direction == 'horizontal':
+    if direction == "horizontal":
         shear_matrix = np.float32([[1, magnitude, 0], [0, 1, 0]])
-    elif direction == 'vertical':
+    elif direction == "vertical":
         shear_matrix = np.float32([[1, 0, 0], [magnitude, 1, 0]])
     return shear_matrix
 
 
-def imshear(img,
-            magnitude,
-            direction='horizontal',
-            border_value=0,
-            interpolation='bilinear'):
+def imshear(
+    img, magnitude, direction="horizontal", border_value=0, interpolation="bilinear"
+):
     """Shear an image.
     Args:
         img (ndarray): Image to be sheared with format (h, w)
@@ -495,8 +491,7 @@ def imshear(img,
     Returns:
         ndarray: The sheared image.
     """
-    assert direction in ['horizontal',
-                         'vertical'], f'Invalid direction: {direction}'
+    assert direction in ["horizontal", "vertical"], f"Invalid direction: {direction}"
     height, width = img.shape[:2]
     if img.ndim == 2:
         channels = 1
@@ -505,13 +500,12 @@ def imshear(img,
     if isinstance(border_value, int):
         border_value = tuple([border_value] * channels)
     elif isinstance(border_value, tuple):
-        assert len(border_value) == channels, \
-            'Expected the num of elements in tuple equals the channels' \
-            'of input image. Found {} vs {}'.format(
-                len(border_value), channels)
+        assert len(border_value) == channels, (
+            "Expected the num of elements in tuple equals the channels"
+            "of input image. Found {} vs {}".format(len(border_value), channels)
+        )
     else:
-        raise ValueError(
-            f'Invalid type {type(border_value)} for `border_value`')
+        raise ValueError(f"Invalid type {type(border_value)} for `border_value`")
     shear_matrix = _get_shear_matrix(magnitude, direction)
     sheared = cv2.warpAffine(
         img,
@@ -522,11 +516,12 @@ def imshear(img,
         # than 3) will raise TypeError in `cv2.warpAffine`.
         # Here simply slice the first 3 values in `border_value`.
         borderValue=border_value[:3],
-        flags=cv2_interp_codes[interpolation])
+        flags=cv2_interp_codes[interpolation],
+    )
     return sheared
 
 
-def _get_translate_matrix(offset, direction='horizontal'):
+def _get_translate_matrix(offset, direction="horizontal"):
     """Generate the translate matrix.
     Args:
         offset (int | float): The offset used for translate.
@@ -535,18 +530,16 @@ def _get_translate_matrix(offset, direction='horizontal'):
     Returns:
         ndarray: The translate matrix with dtype float32.
     """
-    if direction == 'horizontal':
+    if direction == "horizontal":
         translate_matrix = np.float32([[1, 0, offset], [0, 1, 0]])
-    elif direction == 'vertical':
+    elif direction == "vertical":
         translate_matrix = np.float32([[1, 0, 0], [0, 1, offset]])
     return translate_matrix
 
 
-def imtranslate(img,
-                offset,
-                direction='horizontal',
-                border_value=0,
-                interpolation='bilinear'):
+def imtranslate(
+    img, offset, direction="horizontal", border_value=0, interpolation="bilinear"
+):
     """Translate an image.
     Args:
         img (ndarray): Image to be translated with format
@@ -560,8 +553,7 @@ def imtranslate(img,
     Returns:
         ndarray: The translated image.
     """
-    assert direction in ['horizontal',
-                         'vertical'], f'Invalid direction: {direction}'
+    assert direction in ["horizontal", "vertical"], f"Invalid direction: {direction}"
     height, width = img.shape[:2]
     if img.ndim == 2:
         channels = 1
@@ -570,13 +562,12 @@ def imtranslate(img,
     if isinstance(border_value, int):
         border_value = tuple([border_value] * channels)
     elif isinstance(border_value, tuple):
-        assert len(border_value) == channels, \
-            'Expected the num of elements in tuple equals the channels' \
-            'of input image. Found {} vs {}'.format(
-                len(border_value), channels)
+        assert len(border_value) == channels, (
+            "Expected the num of elements in tuple equals the channels"
+            "of input image. Found {} vs {}".format(len(border_value), channels)
+        )
     else:
-        raise ValueError(
-            f'Invalid type {type(border_value)} for `border_value`.')
+        raise ValueError(f"Invalid type {type(border_value)} for `border_value`.")
     translate_matrix = _get_translate_matrix(offset, direction)
     translated = cv2.warpAffine(
         img,
@@ -587,16 +578,19 @@ def imtranslate(img,
         # large than 3) will raise TypeError in `cv2.warpAffine`.
         # Here simply slice the first 3 values in `border_value`.
         borderValue=border_value[:3],
-        flags=cv2_interp_codes[interpolation])
+        flags=cv2_interp_codes[interpolation],
+    )
     return translated
 
 
-def letterbox(img, 
-              new_shape=(640, 640), 
-              color=(114, 114, 114), 
-              auto=True, 
-              scaleFill=False, 
-              scaleup=True):
+def letterbox(
+    img,
+    new_shape=(640, 640),
+    color=(114, 114, 114),
+    auto=True,
+    scaleFill=False,
+    scaleup=True,
+):
     # Resize image
     shape = img.shape[:2]  # current shape [height, width]
     if isinstance(new_shape, int):
@@ -628,5 +622,6 @@ def letterbox(img,
     left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
     # add border
     img = cv2.copyMakeBorder(
-        img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
+        img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color
+    )
     return img, ratio, (dw, dh)

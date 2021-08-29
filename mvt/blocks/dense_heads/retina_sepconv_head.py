@@ -9,23 +9,25 @@ from mvt.utils.init_util import bias_init_with_prob, kaiming_init
 
 @HEADS.register_module()
 class RetinaSepConvHead(AnchorHead):
-    """"RetinaHead with separate BN and separable conv.
+    """ "RetinaHead with separate BN and separable conv.
     In RetinaHead, conv/norm layers are shared across different FPN levels,
     while in RetinaSepBNHead, conv layers are shared across different FPN
     levels, but BN layers are separated.
     In EfficientDet, using separable conv as conv module.
     """
 
-    def __init__(self,
-                 num_classes,
-                 num_ins,
-                 in_channels,
-                 stacked_convs=4,
-                 octave_base_scale=4,
-                 scales_per_octave=3,
-                 conv_cfg=None,
-                 norm_cfg=None,
-                 **kwargs):
+    def __init__(
+        self,
+        num_classes,
+        num_ins,
+        in_channels,
+        stacked_convs=4,
+        octave_base_scale=4,
+        scales_per_octave=3,
+        conv_cfg=None,
+        norm_cfg=None,
+        **kwargs
+    ):
         self.stacked_convs = stacked_convs
         self.octave_base_scale = octave_base_scale
         self.scales_per_octave = scales_per_octave
@@ -33,10 +35,10 @@ class RetinaSepConvHead(AnchorHead):
         self.norm_cfg = norm_cfg
         self.num_ins = num_ins
         octave_scales = np.array(
-            [2 ** (i / scales_per_octave) for i in range(scales_per_octave)])
+            [2 ** (i / scales_per_octave) for i in range(scales_per_octave)]
+        )
         self.anchor_scales = octave_scales * octave_base_scale
-        super(RetinaSepConvHead, self).__init__(
-            num_classes, in_channels, **kwargs)
+        super(RetinaSepConvHead, self).__init__(num_classes, in_channels, **kwargs)
 
     def _init_layers(self):
         self.relu = nn.ReLU(inplace=True)
@@ -56,7 +58,9 @@ class RetinaSepConvHead(AnchorHead):
                         padding=1,
                         activation="Swish",
                         bias=True,
-                        norm_cfg=self.norm_cfg))
+                        norm_cfg=self.norm_cfg,
+                    )
+                )
                 reg_convs.append(
                     SeparableConv2d(
                         chn,
@@ -66,37 +70,50 @@ class RetinaSepConvHead(AnchorHead):
                         padding=1,
                         activation="Swish",
                         bias=True,
-                        norm_cfg=self.norm_cfg))
+                        norm_cfg=self.norm_cfg,
+                    )
+                )
             self.cls_convs.append(cls_convs)
             self.reg_convs.append(reg_convs)
         for i in range(self.stacked_convs):
             for j in range(1, self.num_ins):
                 self.cls_convs[j][i].depthwise = self.cls_convs[0][i].depthwise
-                self.cls_convs[j][i].pointwise.conv = self.cls_convs[0][i].pointwise.conv
+                self.cls_convs[j][i].pointwise.conv = self.cls_convs[0][
+                    i
+                ].pointwise.conv
                 self.reg_convs[j][i].depthwise = self.reg_convs[0][i].depthwise
-                self.reg_convs[j][i].pointwise.conv = self.reg_convs[0][i].pointwise.conv
+                self.reg_convs[j][i].pointwise.conv = self.reg_convs[0][
+                    i
+                ].pointwise.conv
         self.retina_cls = SeparableConv2d(
             self.feat_channels,
             self.num_anchors * self.cls_out_channels,
             3,
             padding=1,
             bias=True,
-            norm_cfg=None)
+            norm_cfg=None,
+        )
         self.retina_reg = SeparableConv2d(
-            self.feat_channels, self.num_anchors * 4, 3, padding=1, bias=True, norm_cfg=None)
+            self.feat_channels,
+            self.num_anchors * 4,
+            3,
+            padding=1,
+            bias=True,
+            norm_cfg=None,
+        )
 
     def init_weights(self):
         for m in self.cls_convs[0]:
-            kaiming_init(m.depthwise, mode='fan_in')
-            kaiming_init(m.pointwise.conv, mode='fan_in')
+            kaiming_init(m.depthwise, mode="fan_in")
+            kaiming_init(m.pointwise.conv, mode="fan_in")
         for m in self.reg_convs[0]:
-            kaiming_init(m.depthwise, mode='fan_in')
-            kaiming_init(m.pointwise.conv, mode='fan_in')
+            kaiming_init(m.depthwise, mode="fan_in")
+            kaiming_init(m.pointwise.conv, mode="fan_in")
         bias_cls = bias_init_with_prob(0.01)
-        kaiming_init(self.retina_cls.depthwise, mode='fan_in')
-        kaiming_init(self.retina_cls.pointwise.conv, mode='fan_in', bias=bias_cls)
-        kaiming_init(self.retina_reg.depthwise, mode='fan_in')
-        kaiming_init(self.retina_reg.pointwise.conv, mode='fan_in')
+        kaiming_init(self.retina_cls.depthwise, mode="fan_in")
+        kaiming_init(self.retina_cls.pointwise.conv, mode="fan_in", bias=bias_cls)
+        kaiming_init(self.retina_reg.depthwise, mode="fan_in")
+        kaiming_init(self.retina_reg.pointwise.conv, mode="fan_in")
 
     def forward(self, feats):
         cls_scores = []

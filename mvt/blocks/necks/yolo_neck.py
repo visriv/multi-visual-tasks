@@ -31,23 +31,23 @@ class DetectionBlock(nn.Module):
             Default: dict(type='LeakyReLU', negative_slope=0.1).
     """
 
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 conv_cfg=None,
-                 norm_cfg=dict(type='BN', requires_grad=True),
-                 act_cfg=dict(type='LeakyReLU', negative_slope=0.1)):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        conv_cfg=None,
+        norm_cfg=dict(type="BN", requires_grad=True),
+        act_cfg=dict(type="LeakyReLU", negative_slope=0.1),
+    ):
         super(DetectionBlock, self).__init__()
         double_out_channels = out_channels * 2
 
         # shortcut
         cfg = dict(conv_cfg=conv_cfg, norm_cfg=norm_cfg, act_cfg=act_cfg)
         self.conv1 = ConvModule(in_channels, out_channels, 1, **cfg)
-        self.conv2 = ConvModule(
-            out_channels, double_out_channels, 3, padding=1, **cfg)
+        self.conv2 = ConvModule(out_channels, double_out_channels, 3, padding=1, **cfg)
         self.conv3 = ConvModule(double_out_channels, out_channels, 1, **cfg)
-        self.conv4 = ConvModule(
-            out_channels, double_out_channels, 3, padding=1, **cfg)
+        self.conv4 = ConvModule(out_channels, double_out_channels, 3, padding=1, **cfg)
         self.conv5 = ConvModule(double_out_channels, out_channels, 1, **cfg)
 
     def forward(self, x):
@@ -84,15 +84,17 @@ class YOLOV3Neck(nn.Module):
             Default: dict(type='LeakyReLU', negative_slope=0.1).
     """
 
-    def __init__(self,
-                 num_scales,
-                 in_channels,
-                 out_channels,
-                 conv_cfg=None,
-                 norm_cfg=dict(type='BN', requires_grad=True),
-                 act_cfg=dict(type='LeakyReLU', negative_slope=0.1)):
+    def __init__(
+        self,
+        num_scales,
+        in_channels,
+        out_channels,
+        conv_cfg=None,
+        norm_cfg=dict(type="BN", requires_grad=True),
+        act_cfg=dict(type="LeakyReLU", negative_slope=0.1),
+    ):
         super(YOLOV3Neck, self).__init__()
-        assert (num_scales == len(in_channels) == len(out_channels))
+        assert num_scales == len(in_channels) == len(out_channels)
         self.num_scales = num_scales
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -105,10 +107,9 @@ class YOLOV3Neck(nn.Module):
         self.detect1 = DetectionBlock(in_channels[0], out_channels[0], **cfg)
         for i in range(1, self.num_scales):
             in_c, out_c = self.in_channels[i], self.out_channels[i]
-            self.add_module(f'conv{i}', ConvModule(in_c, out_c, 1, **cfg))
+            self.add_module(f"conv{i}", ConvModule(in_c, out_c, 1, **cfg))
             # in_c + out_c : High-lvl feats will be cat with low-lvl feats
-            self.add_module(f'detect{i+1}',
-                            DetectionBlock(in_c + out_c, out_c, **cfg))
+            self.add_module(f"detect{i+1}", DetectionBlock(in_c + out_c, out_c, **cfg))
 
     def forward(self, feats):
         assert len(feats) == self.num_scales
@@ -119,14 +120,14 @@ class YOLOV3Neck(nn.Module):
         outs.append(out)
 
         for i, x in enumerate(reversed(feats[:-1])):
-            conv = getattr(self, f'conv{i+1}')
+            conv = getattr(self, f"conv{i+1}")
             tmp = conv(out)
 
             # Cat with low-lvl feats
             tmp = F.interpolate(tmp, scale_factor=2)
             tmp = torch.cat((tmp, x), 1)
 
-            detect = getattr(self, f'detect{i+2}')
+            detect = getattr(self, f"detect{i+2}")
             out = detect(tmp)
             outs.append(out)
 
@@ -146,33 +147,50 @@ class DarkNeck(nn.Module):
             # the following is extra
             # layer 3
             # output third scale, largest
-            OrderedDict([
-                ('head_body_1', vn_layer.HeadBody(input_channels * (2 ** 5), first_head=True)),
-            ]),
-
+            OrderedDict(
+                [
+                    (
+                        "head_body_1",
+                        vn_layer.HeadBody(input_channels * (2 ** 5), first_head=True),
+                    ),
+                ]
+            ),
             # layer 4
-            OrderedDict([
-                ('trans_1', vn_layer.Transition(input_channels * (2 ** 4))),
-            ]),
-
+            OrderedDict(
+                [
+                    ("trans_1", vn_layer.Transition(input_channels * (2 ** 4))),
+                ]
+            ),
             # layer 5
             # output second scale
-            OrderedDict([
-                ('head_body_2', vn_layer.HeadBody(input_channels * (2 ** 4 + 2 ** 3))),
-            ]),
-
+            OrderedDict(
+                [
+                    (
+                        "head_body_2",
+                        vn_layer.HeadBody(input_channels * (2 ** 4 + 2 ** 3)),
+                    ),
+                ]
+            ),
             # layer 6
-            OrderedDict([
-                ('trans_2', vn_layer.Transition(input_channels * (2 ** 3))),
-            ]),
-
+            OrderedDict(
+                [
+                    ("trans_2", vn_layer.Transition(input_channels * (2 ** 3))),
+                ]
+            ),
             # layer 7
             # output first scale, smallest
-            OrderedDict([
-                ('head_body_3', vn_layer.HeadBody(input_channels * (2 ** 3 + 2 ** 2))),
-            ]),
+            OrderedDict(
+                [
+                    (
+                        "head_body_3",
+                        vn_layer.HeadBody(input_channels * (2 ** 3 + 2 ** 2)),
+                    ),
+                ]
+            ),
         ]
-        self.layers = nn.ModuleList([nn.Sequential(layer_dict) for layer_dict in layer_list])
+        self.layers = nn.ModuleList(
+            [nn.Sequential(layer_dict) for layer_dict in layer_list]
+        )
         self.init_weights()
 
     def init_weights(self):
@@ -201,33 +219,42 @@ class YoloV4DarkNeck(nn.Module):
     def __init__(self):
         super(YoloV4DarkNeck, self).__init__()
         layer_list = [
-            OrderedDict([
-                ('head_body0_0', vn_layer.MakeNConv([512, 1024], 1024, 3)),
-                ('spp', vn_layer.SpatialPyramidPooling()),
-                ('head_body0_1', vn_layer.MakeNConv([512, 1024], 2048, 3)), ]
+            OrderedDict(
+                [
+                    ("head_body0_0", vn_layer.MakeNConv([512, 1024], 1024, 3)),
+                    ("spp", vn_layer.SpatialPyramidPooling()),
+                    ("head_body0_1", vn_layer.MakeNConv([512, 1024], 2048, 3)),
+                ]
             ),
-            OrderedDict([
-                ('trans_0', vn_layer.FuseStage(512)),
-                ('head_body1_0', vn_layer.MakeNConv([256, 512], 512, 5))]
+            OrderedDict(
+                [
+                    ("trans_0", vn_layer.FuseStage(512)),
+                    ("head_body1_0", vn_layer.MakeNConv([256, 512], 512, 5)),
+                ]
             ),
-
-            OrderedDict([
-                ('trans_1', vn_layer.FuseStage(256)),
-                ('head_body2_1', vn_layer.MakeNConv([128, 256], 256, 5))
-            ]),  # out0
-
-            OrderedDict([
-                ('trans_2', vn_layer.FuseStage(128, is_reversal=True)),
-                ('head_body1_1', vn_layer.MakeNConv([256, 512], 512, 5))]
+            OrderedDict(
+                [
+                    ("trans_1", vn_layer.FuseStage(256)),
+                    ("head_body2_1", vn_layer.MakeNConv([128, 256], 256, 5)),
+                ]
+            ),  # out0
+            OrderedDict(
+                [
+                    ("trans_2", vn_layer.FuseStage(128, is_reversal=True)),
+                    ("head_body1_1", vn_layer.MakeNConv([256, 512], 512, 5)),
+                ]
             ),  # out1
-
-            OrderedDict([
-                ('trans_3', vn_layer.FuseStage(256, is_reversal=True)),
-                ('head_body0_2', vn_layer.MakeNConv([512, 1024], 1024, 5))]
+            OrderedDict(
+                [
+                    ("trans_3", vn_layer.FuseStage(256, is_reversal=True)),
+                    ("head_body0_2", vn_layer.MakeNConv([512, 1024], 1024, 5)),
+                ]
             ),  # out2
         ]
 
-        self.layers = nn.ModuleList([nn.Sequential(layer_dict) for layer_dict in layer_list])
+        self.layers = nn.ModuleList(
+            [nn.Sequential(layer_dict) for layer_dict in layer_list]
+        )
 
     def forward(self, x):
         out3, out4, out5 = x
@@ -276,18 +303,19 @@ class YOLOV4Neck(nn.Module):
             Default: None.
     """
 
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 num_outs=None,
-                 csp_repetition=3,
-                 start_level=0,
-                 end_level=-1,
-                 norm_cfg=dict(
-                     type='BN', requires_grad=True, eps=0.001, momentum=0.03),
-                 act_cfg=dict(type='Mish'),
-                 csp_act_cfg=dict(type='Mish'),
-                 upsample_cfg=dict(mode='nearest')):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        num_outs=None,
+        csp_repetition=3,
+        start_level=0,
+        end_level=-1,
+        norm_cfg=dict(type="BN", requires_grad=True, eps=0.001, momentum=0.03),
+        act_cfg=dict(type="Mish"),
+        csp_act_cfg=dict(type="Mish"),
+        upsample_cfg=dict(mode="nearest"),
+    ):
 
         super(YOLOV4Neck, self).__init__()
 
@@ -315,10 +343,7 @@ class YOLOV4Neck(nn.Module):
         self.start_level = start_level
         self.end_level = end_level
 
-        cfg = dict(
-            norm_cfg=norm_cfg,
-            act_cfg=act_cfg,
-            csp_act_cfg=csp_act_cfg)
+        cfg = dict(norm_cfg=norm_cfg, act_cfg=act_cfg, csp_act_cfg=csp_act_cfg)
 
         # 1x1 convs to shrink channels count before upsample and concat
         self.pre_upsample_convs = nn.ModuleList()
@@ -356,13 +381,15 @@ class YOLOV4Neck(nn.Module):
                 in_channels=current_channels,
                 out_channels=target_channels,
                 kernel_size=1,
-                **cfg)
+                **cfg,
+            )
 
             backbone_pre_cat_conv = Conv(
                 in_channels=bottom_channels,
                 out_channels=target_channels,
                 kernel_size=1,
-                **cfg)
+                **cfg,
+            )
 
             post_upcat_csp = BottleneckCSP2(
                 in_channels=2 * target_channels,
@@ -370,7 +397,8 @@ class YOLOV4Neck(nn.Module):
                 out_channels=target_channels,
                 repetition=csp_repetition,
                 shortcut=False,
-                **cfg)
+                **cfg,
+            )
             self.pre_upsample_convs.insert(0, pre_up_conv)
             self.backbone_pre_concat_convs.insert(0, backbone_pre_cat_conv)
             self.post_upsample_concat_csp.insert(0, post_upcat_csp)
@@ -389,7 +417,8 @@ class YOLOV4Neck(nn.Module):
                 kernel_size=3,
                 stride=2,
                 padding=1,
-                **cfg)
+                **cfg,
+            )
 
             post_downcat_csp = BottleneckCSP2(
                 in_channels=2 * top_channels,
@@ -397,7 +426,8 @@ class YOLOV4Neck(nn.Module):
                 out_channels=top_channels,
                 repetition=csp_repetition,
                 shortcut=False,
-                **cfg)
+                **cfg,
+            )
             self.downsample_convs.append(down_conv)
             self.post_downsample_concat_csp.append(post_downcat_csp)
             to_output_channels.append(top_channels)
@@ -411,7 +441,8 @@ class YOLOV4Neck(nn.Module):
                 in_channels=before_conv_channels,
                 out_channels=out_channels,
                 kernel_size=3,
-                **cfg)
+                **cfg,
+            )
             self.out_convs.append(out_conv)
 
     # default init_weights for conv(msra) and norm in ConvModule
@@ -419,7 +450,7 @@ class YOLOV4Neck(nn.Module):
         """Initialize the weights of FPN module."""
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                xavier_init(m, distribution='uniform')
+                xavier_init(m, distribution="uniform")
 
     def forward(self, inputs):
         """Forward function."""
@@ -436,15 +467,14 @@ class YOLOV4Neck(nn.Module):
             backbone_pre_cat_conv = self.backbone_pre_concat_convs[i - 1]
             post_upcat_csp = self.post_upsample_concat_csp[i - 1]
 
-            inputs_bottom = backbone_pre_cat_conv(inputs[self.start_level + i -
-                                                         1])
+            inputs_bottom = backbone_pre_cat_conv(inputs[self.start_level + i - 1])
 
             # yolov4 send the input of this 1x1 conv to bottom up process flow
             # for concatenation
             bottom_up_merge.append(x)
             x = pre_up_conv(x)
 
-            if 'scale_factor' in self.upsample_cfg:
+            if "scale_factor" in self.upsample_cfg:
                 x = F.interpolate(x, **self.upsample_cfg)
             else:
                 bottom_shape = inputs_bottom.shape[2:]
@@ -502,18 +532,19 @@ class YOLOV5Neck(nn.Module):
             Default: None.
     """
 
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 num_outs=None,
-                 csp_repetition=3,
-                 start_level=0,
-                 end_level=-1,
-                 norm_cfg=dict(
-                     type='BN', requires_grad=True, eps=0.001, momentum=0.03),
-                 act_cfg=dict(type='Mish'),
-                 csp_act_cfg=dict(type='Mish'),
-                 upsample_cfg=dict(mode='nearest')):
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        num_outs=None,
+        csp_repetition=3,
+        start_level=0,
+        end_level=-1,
+        norm_cfg=dict(type="BN", requires_grad=True, eps=0.001, momentum=0.03),
+        act_cfg=dict(type="Mish"),
+        csp_act_cfg=dict(type="Mish"),
+        upsample_cfg=dict(mode="nearest"),
+    ):
 
         super(YOLOV5Neck, self).__init__()
 
@@ -541,10 +572,7 @@ class YOLOV5Neck(nn.Module):
         self.start_level = start_level
         self.end_level = end_level
 
-        cfg = dict(
-            norm_cfg=norm_cfg,
-            act_cfg=act_cfg,
-            csp_act_cfg=csp_act_cfg)
+        cfg = dict(norm_cfg=norm_cfg, act_cfg=act_cfg, csp_act_cfg=csp_act_cfg)
 
         # shrink channels count before upsample and concat
         self.pre_upsample_convs = nn.ModuleList()
@@ -580,7 +608,8 @@ class YOLOV5Neck(nn.Module):
                 in_channels=current_channels,
                 out_channels=target_channels,
                 kernel_size=1,
-                **cfg)
+                **cfg,
+            )
             to_bottom_up_concat_channels.append(target_channels)
 
             post_upcat_csp = BottleneckCSP(
@@ -589,7 +618,8 @@ class YOLOV5Neck(nn.Module):
                 out_channels=target_channels,
                 repetition=csp_repetition,
                 shortcut=False,
-                **cfg)
+                **cfg,
+            )
             self.pre_upsample_convs.insert(0, pre_up_conv)
             self.post_upsample_concat_csp.insert(0, post_upcat_csp)
 
@@ -610,14 +640,16 @@ class YOLOV5Neck(nn.Module):
                 kernel_size=3,
                 stride=2,
                 padding=1,
-                **cfg)
+                **cfg,
+            )
 
             post_downcat_csp = BottleneckCSP(
                 in_channels=2 * top_channels,
                 out_channels=target_channels,
                 repetition=csp_repetition,
                 shortcut=False,
-                **cfg)
+                **cfg,
+            )
             self.downsample_convs.append(down_conv)
             self.post_downsample_concat_csp.append(post_downcat_csp)
             to_output_channels.append(top_channels)
@@ -629,7 +661,7 @@ class YOLOV5Neck(nn.Module):
         """Initialize the weights of FPN module."""
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                xavier_init(m, distribution='uniform')
+                xavier_init(m, distribution="uniform")
 
     def forward(self, inputs):
         """Forward function."""
@@ -654,7 +686,7 @@ class YOLOV5Neck(nn.Module):
             x = pre_up_conv(x)
             bottom_up_merge.append(x)
 
-            if 'scale_factor' in self.upsample_cfg:
+            if "scale_factor" in self.upsample_cfg:
                 x = F.interpolate(x, **self.upsample_cfg)
             else:
                 bottom_shape = inputs_bottom.shape[2:]

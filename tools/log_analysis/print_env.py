@@ -6,6 +6,5 @@
 from mvt.utils.runtime_util import collect_env
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(collect_env())
-

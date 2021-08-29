@@ -1,10 +1,9 @@
 from mvt.utils.reg_util import Registry
 
-HOOKS = Registry('hook')
+HOOKS = Registry("hook")
 
 
 class Hook:
-
     def before_run(self, runner):
         pass
 

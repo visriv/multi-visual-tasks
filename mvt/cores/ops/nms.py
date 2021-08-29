@@ -43,7 +43,7 @@ def common_nms(boxes, scores, iou_threshold):
         scores = torch.from_numpy(scores)
     assert boxes.size(1) == 4
     assert boxes.size(0) == scores.size(0)
-    
+
     inds = nms(boxes, scores, iou_threshold)
     dets = torch.cat((boxes[inds], scores[inds].reshape(-1, 1)), dim=1)
     if is_numpy:
@@ -67,7 +67,7 @@ def batched_nms(boxes, scores, idxs, nms_cfg, class_agnostic=False):
         idxs (torch.Tensor): each index value correspond to a bbox cluster,
             and NMS will not be applied between elements of different idxs,
             shape (N, ).
-        nms_iou_thr (float): IoU threshold used for NMS.            
+        nms_iou_thr (float): IoU threshold used for NMS.
         class_agnostic (bool): if true, nms is class agnostic,
             i.e. IoU thresholding happens over all boxes,
             regardless of the predicted class.
@@ -84,10 +84,10 @@ def batched_nms(boxes, scores, idxs, nms_cfg, class_agnostic=False):
         offsets = idxs.to(boxes) * (max_coordinate + torch.tensor(1).to(boxes))
         boxes_for_nms = boxes + offsets[:, None]
 
-    nms_type = nms_cfg_.pop('type', 'nms')
+    nms_type = nms_cfg_.pop("type", "nms")
     nms_op = eval(nms_type)
 
-    split_thr = nms_cfg_.pop('split_thr', 10000)
+    split_thr = nms_cfg_.pop("split_thr", 10000)
     if boxes_for_nms.shape[0] < split_thr:
         dets, keep = nms_op(boxes_for_nms, scores, **nms_cfg_)
         boxes = boxes[keep]
@@ -107,12 +107,9 @@ def batched_nms(boxes, scores, idxs, nms_cfg, class_agnostic=False):
     return torch.cat([boxes, scores[:, None]], -1), keep
 
 
-def multiclass_nms(multi_bboxes,
-                   multi_scores,
-                   score_thr,
-                   nms_cfg,
-                   max_num=-1,
-                   score_factors=None):
+def multiclass_nms(
+    multi_bboxes, multi_scores, score_thr, nms_cfg, max_num=-1, score_factors=None
+):
     """NMS for multi-class bboxes.
 
     Args:
@@ -136,8 +133,7 @@ def multiclass_nms(multi_bboxes,
     if multi_bboxes.shape[1] > 4:
         bboxes = multi_bboxes.view(multi_scores.size(0), -1, 4)
     else:
-        bboxes = multi_bboxes[:, None].expand(
-            multi_scores.size(0), num_classes, 4)
+        bboxes = multi_bboxes[:, None].expand(multi_scores.size(0), num_classes, 4)
     scores = multi_scores[:, :-1]
 
     # filter out boxes with low scores
@@ -148,9 +144,8 @@ def multiclass_nms(multi_bboxes,
     # as ONNX does not support repeat now,
     # we have to use this ugly code
     bboxes = torch.masked_select(
-        bboxes,
-        torch.stack((valid_mask, valid_mask, valid_mask, valid_mask),
-                    -1)).view(-1, 4)
+        bboxes, torch.stack((valid_mask, valid_mask, valid_mask, valid_mask), -1)
+    ).view(-1, 4)
     if score_factors is not None:
         scores = scores * score_factors[:, None]
     scores = torch.masked_select(scores, valid_mask)
@@ -158,11 +153,13 @@ def multiclass_nms(multi_bboxes,
 
     if bboxes.numel() == 0:
         bboxes = multi_bboxes.new_zeros((0, 5))
-        labels = multi_bboxes.new_zeros((0, ), dtype=torch.long)
+        labels = multi_bboxes.new_zeros((0,), dtype=torch.long)
 
         if torch.onnx.is_in_onnx_export():
-            raise RuntimeError('[ONNX Error] Can not record NMS '
-                               'as it has not been executed this time')
+            raise RuntimeError(
+                "[ONNX Error] Can not record NMS "
+                "as it has not been executed this time"
+            )
         return bboxes, labels
 
     dets, keep = batched_nms(bboxes, scores, labels, nms_cfg)

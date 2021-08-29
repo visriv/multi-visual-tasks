@@ -24,16 +24,12 @@ class EMAHook(Hook):
         resume_from (str): The checkpoint path. Defaults to None.
     """
 
-    def __init__(self,
-                 momentum=0.0002,
-                 interval=1,
-                 warm_up=100,
-                 resume_from=None):
+    def __init__(self, momentum=0.0002, interval=1, warm_up=100, resume_from=None):
         assert isinstance(interval, int) and interval > 0
         self.warm_up = warm_up
         self.interval = interval
         assert momentum > 0 and momentum < 1
-        self.momentum = momentum**interval
+        self.momentum = momentum ** interval
         self.checkpoint = resume_from
 
     def before_run(self, runner):
@@ -58,8 +54,7 @@ class EMAHook(Hook):
         """Update ema parameter every self.interval iterations."""
         curr_step = runner.iter
         # We warm up the momentum considering the instability at beginning
-        momentum = min(self.momentum,
-                       (1 + curr_step) / (self.warm_up + curr_step))
+        momentum = min(self.momentum, (1 + curr_step) / (self.warm_up + curr_step))
         if curr_step % self.interval != 0:
             return
         for name, parameter in self.model_parameters.items():
@@ -109,12 +104,14 @@ class StateEMAHook(Hook):
         resume_from (str): The checkpoint path. Defaults to None.
     """
 
-    def __init__(self,
-                 momentum=0.9999,
-                 interval=None,
-                 nominal_batch_size=None,
-                 warm_up=2000,
-                 resume_from=None):
+    def __init__(
+        self,
+        momentum=0.9999,
+        interval=None,
+        nominal_batch_size=None,
+        warm_up=2000,
+        resume_from=None,
+    ):
         self.interval = 1
         self.nominal_batch_size = None
         self.warm_up = warm_up
@@ -127,7 +124,7 @@ class StateEMAHook(Hook):
 
         assert momentum > 0 and momentum < 1
         self.momentum = momentum
-        if resume_from == '':
+        if resume_from == "":
             self.checkpoint = None
         else:
             self.checkpoint = resume_from
@@ -163,11 +160,13 @@ class StateEMAHook(Hook):
             ema_buffer = state_dict[buffer_name]
 
             momentum = self.momentum * (
-                1 - math.exp(-runner.iter / (self.warm_up * self.interval)))
+                1 - math.exp(-runner.iter / (self.warm_up * self.interval))
+            )
 
             if online_value.dtype.is_floating_point:
                 ema_buffer.mul_(momentum).add_(
-                    online_value.data.float(), alpha=1 - momentum)
+                    online_value.data.float(), alpha=1 - momentum
+                )
             else:
                 ema_buffer.data.copy_(online_value.data.float())
 
@@ -183,8 +182,9 @@ class StateEMAHook(Hook):
             assert self.nominal_batch_size is not None
             samples_per_gpu = runner.data_loader.sampler.samples_per_gpu
             _, word_size = get_dist_info()
-            self.interval = math.ceil(self.nominal_batch_size /
-                                      (samples_per_gpu * word_size))
+            self.interval = math.ceil(
+                self.nominal_batch_size / (samples_per_gpu * word_size)
+            )
         self._swap_ema_parameters(runner)
 
     def _swap_ema_parameters(self, runner):

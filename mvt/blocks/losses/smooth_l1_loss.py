@@ -5,12 +5,9 @@ from ..block_builder import LOSSES
 from mvt.utils.loss_util import weight_reduce_loss
 
 
-def smooth_l1_loss(pred,
-                   target,
-                   weight=None,
-                   reduction='mean',
-                   avg_factor=None,
-                   beta=1.0):
+def smooth_l1_loss(
+    pred, target, weight=None, reduction="mean", avg_factor=None, beta=1.0
+):
     """Smooth L1 loss.
 
     Args:
@@ -26,17 +23,12 @@ def smooth_l1_loss(pred,
     assert beta > 0
     assert pred.size() == target.size() and target.numel() > 0
     diff = torch.abs(pred - target)
-    loss = torch.where(diff < beta, 0.5 * diff * diff / beta,
-                       diff - 0.5 * beta)
+    loss = torch.where(diff < beta, 0.5 * diff * diff / beta, diff - 0.5 * beta)
     loss = weight_reduce_loss(loss, weight, reduction, avg_factor)
     return loss
 
 
-def l1_loss(pred,
-            target,
-            weight=None,
-            reduction='mean',
-            avg_factor=None):
+def l1_loss(pred, target, weight=None, reduction="mean", avg_factor=None):
     """L1 loss.
     Args:
         pred (torch.Tensor): The prediction.
@@ -62,19 +54,21 @@ class SmoothL1Loss(nn.Module):
         loss_weight (float, optional): The weight of loss.
     """
 
-    def __init__(self, beta=1.0, reduction='mean', loss_weight=1.0):
+    def __init__(self, beta=1.0, reduction="mean", loss_weight=1.0):
         super(SmoothL1Loss, self).__init__()
         self.beta = beta
         self.reduction = reduction
         self.loss_weight = loss_weight
 
-    def forward(self,
-                pred,
-                target,
-                weight=None,
-                avg_factor=None,
-                reduction_override=None,
-                **kwargs):
+    def forward(
+        self,
+        pred,
+        target,
+        weight=None,
+        avg_factor=None,
+        reduction_override=None,
+        **kwargs
+    ):
         """Forward function.
 
         Args:
@@ -88,17 +82,17 @@ class SmoothL1Loss(nn.Module):
                 override the original reduction method of the loss.
                 Defaults to None.
         """
-        assert reduction_override in (None, 'none', 'mean', 'sum')
-        reduction = (
-            reduction_override if reduction_override else self.reduction)
+        assert reduction_override in (None, "none", "mean", "sum")
+        reduction = reduction_override if reduction_override else self.reduction
         loss_bbox = self.loss_weight * smooth_l1_loss(
             pred,
             target,
             weight,
             beta=self.beta,
             reduction=reduction,
-            avg_factor=avg_factor)
-            
+            avg_factor=avg_factor,
+        )
+
         return loss_bbox
 
 
@@ -112,17 +106,14 @@ class L1Loss(nn.Module):
         loss_weight (float, optional): The weight of loss.
     """
 
-    def __init__(self, reduction='mean', loss_weight=1.0):
+    def __init__(self, reduction="mean", loss_weight=1.0):
         super(L1Loss, self).__init__()
         self.reduction = reduction
         self.loss_weight = loss_weight
 
-    def forward(self,
-                pred,
-                target,
-                weight=None,
-                avg_factor=None,
-                reduction_override=None):
+    def forward(
+        self, pred, target, weight=None, avg_factor=None, reduction_override=None
+    ):
         """Forward function.
 
         Args:
@@ -136,9 +127,9 @@ class L1Loss(nn.Module):
                 override the original reduction method of the loss.
                 Defaults to None.
         """
-        assert reduction_override in (None, 'none', 'mean', 'sum')
-        reduction = (
-            reduction_override if reduction_override else self.reduction)
+        assert reduction_override in (None, "none", "mean", "sum")
+        reduction = reduction_override if reduction_override else self.reduction
         loss_bbox = self.loss_weight * l1_loss(
-            pred, target, weight, reduction=reduction, avg_factor=avg_factor)
+            pred, target, weight, reduction=reduction, avg_factor=avg_factor
+        )
         return loss_bbox
