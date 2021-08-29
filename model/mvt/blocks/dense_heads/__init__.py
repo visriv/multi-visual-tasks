@@ -10,8 +10,14 @@ from .arcmargin_head import ArcMarginHead
 
 
 __all__ = [
-    'AnchorFreeHead', 'AnchorHead', 
-    'RPNHead', 'YOLOV3Head', 'TinyYOLOV4Head', 
-    'YOLOCSPHead', 'LinearEmbHead',
-    'MlpEmbHead', 'MlpLocEmbHead', 'ArcMarginHead'
+    "AnchorFreeHead",
+    "AnchorHead",
+    "RPNHead",
+    "YOLOV3Head",
+    "TinyYOLOV4Head",
+    "YOLOCSPHead",
+    "LinearEmbHead",
+    "MlpEmbHead",
+    "MlpLocEmbHead",
+    "ArcMarginHead",
 ]

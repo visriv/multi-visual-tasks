@@ -13,8 +13,7 @@ from yacs.config import CfgNode
 def merge_dict_into_cfg(cfg, meta_dict):
     """Merge dict into cfg"""
     if not isinstance(meta_dict, dict):
-        raise TypeError(
-            f"meta_dict should be a dict, but got {type(meta_dict)}")
+        raise TypeError(f"meta_dict should be a dict, but got {type(meta_dict)}")
     for dict_key in meta_dict:
         if isinstance(meta_dict[dict_key], dict):
             if dict_key not in cfg:
@@ -38,8 +37,8 @@ def _dict_update(meta_dict, additional_dict, task_data, mode):
     additional_dict[mode] = {}
     for data_key in task_data[mode]:
         if data_key == "BASE":
-            mvt_root = Path(os.getenv('MVT_ROOT', './'))
-            cfg_path = mvt_root / 'model/configs' / task_data[mode]["BASE"]
+            mvt_root = Path(os.getenv("MVT_ROOT", "./"))
+            cfg_path = mvt_root / "model/configs" / task_data[mode]["BASE"]
             with open(str(cfg_path)) as fd:
                 data_info = yaml.load(fd, Loader=yaml.FullLoader)
             meta_dict[mode] = data_info[mode]
@@ -55,8 +54,10 @@ def update_meta_dict(dst_dict, src_dict):
             raise AttributeError("The item is not in dst_dict!")
         if isinstance(src_dict[item_key], dict):
             if not isinstance(dst_dict[item_key], dict):
-                raise TypeError(f"The item in dst_dict should be a dict, "
-                                f"but got {type(dst_dict[item_key])}")
+                raise TypeError(
+                    f"The item in dst_dict should be a dict, "
+                    f"but got {type(dst_dict[item_key])}"
+                )
             update_meta_dict(dst_dict[item_key], src_dict[item_key])
         else:
             dst_dict[item_key] = src_dict[item_key]
@@ -71,8 +72,9 @@ def get_task_cfg(cfg, task_yaml_file):
     additional_dict = {}
     for task_key in task_data:
         if not isinstance(task_data[task_key], dict):
-            raise TypeError("The first level attribute in task file "
-                            "should be a dict!")
+            raise TypeError(
+                "The first level attribute in task file " "should be a dict!"
+            )
         if task_key == "MODEL":
             _dict_update(meta_dict, additional_dict, task_data, "MODEL")
         elif task_key == "DATA":
@@ -116,14 +118,12 @@ def _assert_with_logging(cond, msg):
 
 
 def get_dict_from_list(src_list):
-    """Get dict from a list. 
+    """Get dict from a list.
     For example, `src_list = ['a', 0.5]`.
     """
     _assert_with_logging(
         len(src_list) % 2 == 0,
-        "Override list has odd length: {}; it must be a list of pairs".format(
-            src_list
-        ),
+        "Override list has odd length: {}; it must be a list of pairs".format(src_list),
     )
     dst_dict = {}
     for src_key, src_value in zip(src_list[0::2], src_list[1::2]):

@@ -28,11 +28,11 @@ def to_tensor(data):
     elif isinstance(data, float):
         return torch.FloatTensor([data])
     else:
-        raise TypeError(f'type {type(data)} cannot be converted to tensor.')
+        raise TypeError(f"type {type(data)} cannot be converted to tensor.")
 
 
 @PIPELINES.register_module()
-class ToTensor():
+class ToTensor:
     """Convert some results to :obj:`torch.Tensor` by given keys.
 
     Args:
@@ -60,11 +60,11 @@ class ToTensor():
 
     def __repr__(self):
 
-        return self.__class__.__name__ + f'(keys={self.keys})'
+        return self.__class__.__name__ + f"(keys={self.keys})"
 
 
 @PIPELINES.register_module()
-class ImageToTensor():
+class ImageToTensor:
     """Convert image to :obj:`torch.Tensor` by given keys.
     The dimension order of input image is (H, W, C). The pipeline will convert
     it to (C, H, W). If only 2 dimension (H, W) is given, the output would be
@@ -99,11 +99,11 @@ class ImageToTensor():
 
     def __repr__(self):
 
-        return self.__class__.__name__ + f'(keys={self.keys})'
+        return self.__class__.__name__ + f"(keys={self.keys})"
 
 
 @PIPELINES.register_module()
-class Transpose():
+class Transpose:
     """Transpose some results by given keys.
 
     Args:
@@ -133,12 +133,11 @@ class Transpose():
 
     def __repr__(self):
 
-        return self.__class__.__name__ + \
-            f'(keys={self.keys}, order={self.order})'
+        return self.__class__.__name__ + f"(keys={self.keys}, order={self.order})"
 
 
 @PIPELINES.register_module()
-class DefaultFormatBundle():
+class DefaultFormatBundle:
     """Default formatting bundle.
     It simplifies the pipeline of formatting common fields, including "img",
     "proposals", "gt_bboxes", "gt_labels", "gt_masks" and "gt_semantic_seg".
@@ -164,38 +163,49 @@ class DefaultFormatBundle():
                 default bundle.
         """
 
-        if 'img' in results:
-            img = results['img']
+        if "img" in results:
+            img = results["img"]
             # add default meta keys
             results = self._add_default_meta_keys(results)
             if len(img.shape) < 3:
                 img = np.expand_dims(img, -1)
             img = np.ascontiguousarray(img.transpose(2, 0, 1))
-            results['img'] = DataContainer(to_tensor(img), stack=True)
-            
+            results["img"] = DataContainer(to_tensor(img), stack=True)
+
         # gt_label is for classfication
         for key in [
-                'proposals', 'gt_bboxes', 'gt_bboxes_ignore', 
-                'gt_labels', 'gt_label', 'label', 'bbox'
-            ]: 
+            "proposals",
+            "gt_bboxes",
+            "gt_bboxes_ignore",
+            "gt_labels",
+            "gt_label",
+            "label",
+            "bbox",
+        ]:
             if key not in results:
                 continue
             results[key] = DataContainer(to_tensor(results[key]))
-        if 'gt_masks' in results:
-            results['gt_masks'] = DataContainer(results['gt_masks'], cpu_only=True)
-        if 'gt_semantic_seg' in results:
-            if len(results['gt_semantic_seg'].shape) == 2:
-                results['gt_semantic_seg'] = DataContainer(
-                    to_tensor(np.ascontiguousarray(results['gt_semantic_seg'][None, ...])), stack=True)
+        if "gt_masks" in results:
+            results["gt_masks"] = DataContainer(results["gt_masks"], cpu_only=True)
+        if "gt_semantic_seg" in results:
+            if len(results["gt_semantic_seg"].shape) == 2:
+                results["gt_semantic_seg"] = DataContainer(
+                    to_tensor(
+                        np.ascontiguousarray(results["gt_semantic_seg"][None, ...])
+                    ),
+                    stack=True,
+                )
             else:
-                results['gt_semantic_seg'] = DataContainer(
-                    to_tensor(np.ascontiguousarray(results['gt_semantic_seg'])), stack=True)
-        if 'target' in results: # for pose
-            results['target'] = DataContainer(
-                to_tensor(results['target']), stack=True)
-        if 'target_weight' in results: # for pose
-            results['target_weight'] = DataContainer(
-                to_tensor(results['target_weight']), stack=True, pad_dims=1)
+                results["gt_semantic_seg"] = DataContainer(
+                    to_tensor(np.ascontiguousarray(results["gt_semantic_seg"])),
+                    stack=True,
+                )
+        if "target" in results:  # for pose
+            results["target"] = DataContainer(to_tensor(results["target"]), stack=True)
+        if "target_weight" in results:  # for pose
+            results["target_weight"] = DataContainer(
+                to_tensor(results["target_weight"]), stack=True, pad_dims=1
+            )
         return results
 
     def _add_default_meta_keys(self, results):
@@ -211,16 +221,18 @@ class DefaultFormatBundle():
             results (dict): Updated result dict contains the data to convert.
         """
 
-        img = results['img']
-        results.setdefault('pad_shape', img.shape)
-        results.setdefault('scale_factor', 1.0)
+        img = results["img"]
+        results.setdefault("pad_shape", img.shape)
+        results.setdefault("scale_factor", 1.0)
         num_channels = 1 if len(img.shape) < 3 else img.shape[2]
         results.setdefault(
-            'img_norm_cfg',
+            "img_norm_cfg",
             dict(
                 mean=np.zeros(num_channels, dtype=np.float32),
                 std=np.ones(num_channels, dtype=np.float32),
-                to_rgb=False))
+                to_rgb=False,
+            ),
+        )
         return results
 
     def __repr__(self):
@@ -229,7 +241,7 @@ class DefaultFormatBundle():
 
 
 @PIPELINES.register_module()
-class Collect():
+class Collect:
     """Collect data from the loader relevant to the specific task.
     This is usually the last stage of the data loader pipeline. Typically keys
     is set to some subset of "img", "proposals", "gt_bboxes",
@@ -258,11 +270,22 @@ class Collect():
             'img_norm_cfg')``
     """
 
-    def __init__(self,
-                 keys,
-                 meta_keys=('img_id', 'filename', 'ori_filename', 'ori_shape',
-                            'img_shape', 'pad_shape', 'scale_factor', 'flip',
-                            'flip_direction', 'img_norm_cfg')):
+    def __init__(
+        self,
+        keys,
+        meta_keys=(
+            "img_id",
+            "filename",
+            "ori_filename",
+            "ori_shape",
+            "img_shape",
+            "pad_shape",
+            "scale_factor",
+            "flip",
+            "flip_direction",
+            "img_norm_cfg",
+        ),
+    ):
 
         self.keys = keys
         self.meta_keys = meta_keys
@@ -285,29 +308,40 @@ class Collect():
         for key in self.meta_keys:
             if key in results:
                 img_meta[key] = results[key]
-        data['img_metas'] = DataContainer(img_meta, cpu_only=True)
+        data["img_metas"] = DataContainer(img_meta, cpu_only=True)
         for key in self.keys:
             data[key] = results[key]
         return data
 
     def __repr__(self):
 
-        return self.__class__.__name__ + \
-            f'(keys={self.keys}, meta_keys={self.meta_keys})'
+        return (
+            self.__class__.__name__ + f"(keys={self.keys}, meta_keys={self.meta_keys})"
+        )
 
 
 @PIPELINES.register_module()
-class EmbCollect():
+class EmbCollect:
     """Collect data from the loader relevant to the specific task.
     This is usually the last stage of the data loader pipeline. Typically keys
     is set to some subset of "img" and "gt_label".
     """
 
-    def __init__(self, 
-                 keys,
-                 meta_keys=('filename', 'ori_filename', 'ori_shape',
-                            'img_shape', 'pad_shape', 'scale_factor', 'flip',
-                            'flip_direction', 'img_norm_cfg')):
+    def __init__(
+        self,
+        keys,
+        meta_keys=(
+            "filename",
+            "ori_filename",
+            "ori_shape",
+            "img_shape",
+            "pad_shape",
+            "scale_factor",
+            "flip",
+            "flip_direction",
+            "img_norm_cfg",
+        ),
+    ):
 
         self.keys = keys
         self.meta_keys = meta_keys
@@ -322,17 +356,16 @@ class EmbCollect():
         for key, value in results.items():
             if key in self.meta_keys:
                 img_meta[key] = value
-        data['img_metas'] = DataContainer(img_meta, cpu_only=True)
+        data["img_metas"] = DataContainer(img_meta, cpu_only=True)
         return data
 
     def __repr__(self):
 
-        return self.__class__.__name__ + \
-            f'(keys={self.keys})'
+        return self.__class__.__name__ + f"(keys={self.keys})"
 
 
 @PIPELINES.register_module()
-class WrapFieldsToLists():
+class WrapFieldsToLists:
     """Wrap fields of the data dictionary into lists for evaluation.
     This class can be used as a last step of a test or validation
     pipeline for single image evaluation or inference.
@@ -367,5 +400,5 @@ class WrapFieldsToLists():
         return results
 
     def __repr__(self):
-        
-        return f'{self.__class__.__name__}()'
+
+        return f"{self.__class__.__name__}()"

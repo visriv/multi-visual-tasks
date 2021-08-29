@@ -8,7 +8,6 @@ from model.mvt.blocks.block_builder import build_backbone, build_head, build_nec
 
 @EMBEDDERS.register_module()
 class ImgClsLocEmbedder(BaseEmbedder):
-
     def __init__(self, cfg):
 
         super(ImgClsLocEmbedder, self).__init__()
@@ -22,7 +21,7 @@ class ImgClsLocEmbedder(BaseEmbedder):
 
         if "PRETRAINED_MODEL_PATH" in cfg:
             if cfg.PRETRAINED_MODEL_PATH != "":
-                mvt_root = os.getenv('MVT_ROOT', './')
+                mvt_root = os.getenv("MVT_ROOT", "./")
                 path = os.path.join(mvt_root, cfg.PRETRAINED_MODEL_PATH)
                 self.init_weights(pretrained=path)
             else:
@@ -42,9 +41,8 @@ class ImgClsLocEmbedder(BaseEmbedder):
         self.head.init_weights()
 
     def extract_feat(self, img):
-        """Directly extract features from the backbone + neck
-        """
-        
+        """Directly extract features from the backbone + neck"""
+
         x = self.backbone(img)
         if self.with_neck:
             x = self.neck(x)
@@ -83,7 +81,7 @@ class ImgClsLocEmbedder(BaseEmbedder):
         losses.update(loss)
 
         return losses
-    
+
     def forward_test(self, x, bbox, **kwargs):
         """
         Args:
@@ -96,4 +94,3 @@ class ImgClsLocEmbedder(BaseEmbedder):
         """Test without augmentation."""
         x = self.extract_feat(x)
         return self.head.simple_test(x, bbox)
-    

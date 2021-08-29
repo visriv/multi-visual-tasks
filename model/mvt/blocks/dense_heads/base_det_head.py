@@ -18,14 +18,16 @@ class BaseDetHead(nn.Module, metaclass=ABCMeta):
         """Transform network output for a batch into bbox predictions."""
         pass
 
-    def forward_train(self,
-                      x,
-                      img_metas,
-                      gt_bboxes,
-                      gt_labels=None,
-                      gt_bboxes_ignore=None,
-                      proposal_cfg=None,
-                      **kwargs):
+    def forward_train(
+        self,
+        x,
+        img_metas,
+        gt_bboxes,
+        gt_labels=None,
+        gt_bboxes_ignore=None,
+        proposal_cfg=None,
+        **kwargs
+    ):
         """
         Args:
             x (list[Tensor]): Features from FPN.
@@ -45,7 +47,7 @@ class BaseDetHead(nn.Module, metaclass=ABCMeta):
                 losses: (dict[str, Tensor]): A dictionary of loss components.
                 proposal_list (list[Tensor]): Proposals of each image.
         """
-        
+
         outs = self(x)
         if gt_labels is None:
             loss_inputs = outs + (gt_bboxes, img_metas)
@@ -57,4 +59,3 @@ class BaseDetHead(nn.Module, metaclass=ABCMeta):
         else:
             proposal_list = self.get_bboxes(*outs, img_metas, cfg=proposal_cfg)
             return losses, proposal_list
-    

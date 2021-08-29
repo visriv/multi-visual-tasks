@@ -23,25 +23,25 @@ from .misc_util import is_str
 from .path_util import check_file_exist, mkdir_or_exist
 
 file_handlers = {
-    'json': JsonHandler(),
-    'yaml': YamlHandler(),
-    'yml': YamlHandler(),
-    'pickle': PickleHandler(),
-    'pkl': PickleHandler()
+    "json": JsonHandler(),
+    "yaml": YamlHandler(),
+    "yml": YamlHandler(),
+    "pickle": PickleHandler(),
+    "pkl": PickleHandler(),
 }
 
-supported_backends = ['cv2', 'pillow']
+supported_backends = ["cv2", "pillow"]
 
 imread_flags = {
-    'color': IMREAD_COLOR,
-    'grayscale': IMREAD_GRAYSCALE,
-    'unchanged': IMREAD_UNCHANGED
+    "color": IMREAD_COLOR,
+    "grayscale": IMREAD_GRAYSCALE,
+    "unchanged": IMREAD_UNCHANGED,
 }
 
-imread_backend = 'cv2'
+imread_backend = "cv2"
 
 
-def _pillow2array(img, flag='color', channel_order='bgr'):
+def _pillow2array(img, flag="color", channel_order="bgr"):
     """Convert a pillow image to numpy array.
     Args:
         img (:obj:`PIL.Image.Image`): The image loaded using PIL
@@ -54,43 +54,43 @@ def _pillow2array(img, flag='color', channel_order='bgr'):
         np.ndarray: The converted numpy array
     """
     channel_order = channel_order.lower()
-    if channel_order not in ['rgb', 'bgr']:
+    if channel_order not in ["rgb", "bgr"]:
         raise ValueError('channel order must be either "rgb" or "bgr"')
 
-    if flag == 'unchanged':
+    if flag == "unchanged":
         array = np.array(img)
         if array.ndim >= 3 and array.shape[2] >= 3:  # color image
             array[:, :, :3] = array[:, :, (2, 1, 0)]  # RGB to BGR
     else:
         # If the image mode is not 'RGB', convert it to 'RGB' first.
-        if img.mode != 'RGB':
-            if img.mode != 'LA':
+        if img.mode != "RGB":
+            if img.mode != "LA":
                 # Most formats except 'LA' can be directly converted to RGB
-                img = img.convert('RGB')
+                img = img.convert("RGB")
             else:
                 # When the mode is 'LA', the default conversion will fill in
                 #  the canvas with black, which sometimes shadows black objects
                 #  in the foreground.
                 #
                 # Therefore, a random color (124, 117, 104) is used for canvas
-                img_rgba = img.convert('RGBA')
-                img = Image.new('RGB', img_rgba.size, (124, 117, 104))
+                img_rgba = img.convert("RGBA")
+                img = Image.new("RGB", img_rgba.size, (124, 117, 104))
                 img.paste(img_rgba, mask=img_rgba.split()[3])  # 3 is alpha
-        if flag == 'color':
+        if flag == "color":
             array = np.array(img)
-            if channel_order != 'rgb':
+            if channel_order != "rgb":
                 array = array[:, :, ::-1]  # RGB to BGR
-        elif flag == 'grayscale':
-            img = img.convert('L')
+        elif flag == "grayscale":
+            img = img.convert("L")
             array = np.array(img)
         else:
             raise ValueError(
-                'flag must be "color", "grayscale" or "unchanged", '
-                f'but got {flag}')
+                'flag must be "color", "grayscale" or "unchanged", ' f"but got {flag}"
+            )
     return array
 
 
-def imread(img_or_path, flag='color', channel_order='bgr', backend=None):
+def imread(img_or_path, flag="color", channel_order="bgr", backend=None):
     """Read an image.
 
     Args:
@@ -105,7 +105,7 @@ def imread(img_or_path, flag='color', channel_order='bgr', backend=None):
             `cv2`, `pillow`, `turbojpeg`, `None`. If backend is None, the
             global imread_backend specified by ``use_backend()`` will be
             used. Default: None.
-            
+
     Returns:
         ndarray: Loaded image array.
     """
@@ -113,29 +113,31 @@ def imread(img_or_path, flag='color', channel_order='bgr', backend=None):
     if backend is None:
         backend = imread_backend
     if backend not in supported_backends:
-        raise ValueError(f'backend: {backend} is not supported. Supported '
-                         "backends are 'cv2', 'turbojpeg', 'pillow'")
+        raise ValueError(
+            f"backend: {backend} is not supported. Supported "
+            "backends are 'cv2', 'turbojpeg', 'pillow'"
+        )
     if isinstance(img_or_path, Path):
         img_or_path = str(img_or_path)
 
     if isinstance(img_or_path, np.ndarray):
         return img_or_path
     elif is_str(img_or_path):
-        check_file_exist(img_or_path,
-                         f'img file does not exist: {img_or_path}')
-        if backend == 'pillow':
+        check_file_exist(img_or_path, f"img file does not exist: {img_or_path}")
+        if backend == "pillow":
             img = Image.open(img_or_path)
             img = _pillow2array(img, flag, channel_order)
             return img
         else:
             flag = imread_flags[flag] if is_str(flag) else flag
             img = cv2.imread(img_or_path, flag)
-            if flag == IMREAD_COLOR and channel_order == 'rgb':
+            if flag == IMREAD_COLOR and channel_order == "rgb":
                 cv2.cvtColor(img, cv2.COLOR_BGR2RGB, img)
             return img
     else:
-        raise TypeError('"img" must be a numpy array or a str or '
-                        'a pathlib.Path object')
+        raise TypeError(
+            '"img" must be a numpy array or a str or ' "a pathlib.Path object"
+        )
 
 
 def imwrite(img, file_path, params=None, auto_mkdir=True):
@@ -155,7 +157,7 @@ def imwrite(img, file_path, params=None, auto_mkdir=True):
     return cv2.imwrite(file_path, img, params)
 
 
-def imfrombytes(content, flag='color', channel_order='bgr', backend=None):
+def imfrombytes(content, flag="color", channel_order="bgr", backend=None):
     """Read an image from bytes.
     Args:
         content (bytes): Image bytes got from files or other streams.
@@ -170,10 +172,12 @@ def imfrombytes(content, flag='color', channel_order='bgr', backend=None):
     if backend is None:
         backend = imread_backend
     if backend not in supported_backends:
-        raise ValueError(f'backend: {backend} is not supported. Supported '
-                         "backends are 'cv2', 'pillow'")
+        raise ValueError(
+            f"backend: {backend} is not supported. Supported "
+            "backends are 'cv2', 'pillow'"
+        )
 
-    if backend == 'pillow':
+    if backend == "pillow":
         buff = io.BytesIO(content)
         img = Image.open(buff)
         img = _pillow2array(img, flag, channel_order)
@@ -181,9 +185,9 @@ def imfrombytes(content, flag='color', channel_order='bgr', backend=None):
         img_np = np.frombuffer(content, np.uint8)
         flag = imread_flags[flag] if is_str(flag) else flag
         img = cv2.imdecode(img_np, flag)
-        if flag == IMREAD_COLOR and channel_order == 'rgb':
+        if flag == IMREAD_COLOR and channel_order == "rgb":
             cv2.cvtColor(img, cv2.COLOR_BGR2RGB, img)
-            
+
     return img
 
 
@@ -203,14 +207,14 @@ def file_load(file, file_format=None, **kwargs):
     if isinstance(file, Path):
         file = str(file)
     if file_format is None and isinstance(file, str):
-        file_format = file.split('.')[-1]
+        file_format = file.split(".")[-1]
     if file_format not in file_handlers:
-        raise TypeError(f'Unsupported format: {file_format}')
+        raise TypeError(f"Unsupported format: {file_format}")
 
     handler = file_handlers[file_format]
     if isinstance(file, str):
         obj = handler.load_from_path(file, **kwargs)
-    elif hasattr(file, 'read'):
+    elif hasattr(file, "read"):
         obj = handler.load_from_fileobj(file, **kwargs)
     else:
         raise TypeError('"file" must be a filepath str or a file-object')
@@ -234,25 +238,24 @@ def obj_dump(obj, file=None, file_format=None, **kwargs):
         file = str(file)
     if file_format is None:
         if isinstance(file, str):
-            file_format = file.split('.')[-1]
+            file_format = file.split(".")[-1]
         elif file is None:
-            raise ValueError(
-                'file_format must be specified since file is None')
+            raise ValueError("file_format must be specified since file is None")
     if file_format not in file_handlers:
-        raise TypeError(f'Unsupported format: {file_format}')
+        raise TypeError(f"Unsupported format: {file_format}")
 
     handler = file_handlers[file_format]
     if file is None:
         return handler.dump_to_str(obj, **kwargs)
     elif isinstance(file, str):
         handler.dump_to_path(obj, file, **kwargs)
-    elif hasattr(file, 'write'):
+    elif hasattr(file, "write"):
         handler.dump_to_fileobj(obj, file, **kwargs)
     else:
         raise TypeError('"file" must be a filename str or a file-object')
 
 
-def list_from_file(filename, prefix='', offset=0, max_num=0):
+def list_from_file(filename, prefix="", offset=0, max_num=0):
     """Load a text file and parse the content as a list of strings.
     Args:
         filename (str): Filename.
@@ -265,13 +268,13 @@ def list_from_file(filename, prefix='', offset=0, max_num=0):
     """
     cnt = 0
     item_list = []
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         for _ in range(offset):
             f.readline()
         for line in f:
             if max_num > 0 and cnt >= max_num:
                 break
-            item_list.append(prefix + line.rstrip('\n'))
+            item_list.append(prefix + line.rstrip("\n"))
             cnt += 1
     return item_list
 
@@ -289,9 +292,9 @@ def dict_from_file(filename, key_type=str):
         dict: The parsed contents.
     """
     mapping = {}
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         for line in f:
-            items = line.rstrip('\n').split()
+            items = line.rstrip("\n").split()
             assert len(items) >= 2
             key = key_type(items[0])
             val = items[1:] if len(items) > 2 else items[1]
@@ -301,15 +304,15 @@ def dict_from_file(filename, key_type=str):
 
 def rm_suffix(s, suffix=None):
     if suffix is None:
-        return s[:s.rfind('.')]
+        return s[: s.rfind(".")]
     else:
-        return s[:s.rfind(suffix)]
+        return s[: s.rfind(suffix)]
 
 
 def calculate_md5(fpath, chunk_size=1024 * 1024):
     md5 = hashlib.md5()
-    with open(fpath, 'rb') as f:
-        for chunk in iter(lambda: f.read(chunk_size), b''):
+    with open(fpath, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
             md5.update(chunk)
     return md5.hexdigest()
 
@@ -327,7 +330,7 @@ def check_integrity(fpath, md5=None):
 
 
 def download_url_to_file(url, fpath):
-    with urllib.request.urlopen(url) as resp, open(fpath, 'wb') as of:
+    with urllib.request.urlopen(url) as resp, open(fpath, "wb") as of:
         shutil.copyfileobj(resp, of)
 
 
@@ -350,46 +353,48 @@ def download_url(url, root, filename=None, md5=None):
     os.makedirs(root, exist_ok=True)
 
     if check_integrity(fpath, md5):
-        print(f'Using downloaded and verified file: {fpath}')
+        print(f"Using downloaded and verified file: {fpath}")
     else:
         try:
-            print(f'Downloading {url} to {fpath}')
+            print(f"Downloading {url} to {fpath}")
             download_url_to_file(url, fpath)
         except (urllib.error.URLError, IOError) as e:
-            if url[:5] == 'https':
-                url = url.replace('https:', 'http:')
-                print('Failed download. Trying https -> http instead.'
-                      f' Downloading {url} to {fpath}')
+            if url[:5] == "https":
+                url = url.replace("https:", "http:")
+                print(
+                    "Failed download. Trying https -> http instead."
+                    f" Downloading {url} to {fpath}"
+                )
                 download_url_to_file(url, fpath)
             else:
                 raise e
         # check integrity of downloaded file
         if not check_integrity(fpath, md5):
-            raise RuntimeError('File not found or corrupted.')
+            raise RuntimeError("File not found or corrupted.")
 
 
 def _is_tarxz(filename):
-    return filename.endswith('.tar.xz')
+    return filename.endswith(".tar.xz")
 
 
 def _is_tar(filename):
-    return filename.endswith('.tar')
+    return filename.endswith(".tar")
 
 
 def _is_targz(filename):
-    return filename.endswith('.tar.gz')
+    return filename.endswith(".tar.gz")
 
 
 def _is_tgz(filename):
-    return filename.endswith('.tgz')
+    return filename.endswith(".tgz")
 
 
 def _is_gzip(filename):
-    return filename.endswith('.gz') and not filename.endswith('.tar.gz')
+    return filename.endswith(".gz") and not filename.endswith(".tar.gz")
 
 
 def _is_zip(filename):
-    return filename.endswith('.zip')
+    return filename.endswith(".zip")
 
 
 def extract_archive(from_path, to_path=None, remove_finished=False):
@@ -397,36 +402,38 @@ def extract_archive(from_path, to_path=None, remove_finished=False):
         to_path = os.path.dirname(from_path)
 
     if _is_tar(from_path):
-        with tarfile.open(from_path, 'r') as tar:
+        with tarfile.open(from_path, "r") as tar:
             tar.extractall(path=to_path)
     elif _is_targz(from_path) or _is_tgz(from_path):
-        with tarfile.open(from_path, 'r:gz') as tar:
+        with tarfile.open(from_path, "r:gz") as tar:
             tar.extractall(path=to_path)
     elif _is_tarxz(from_path):
-        with tarfile.open(from_path, 'r:xz') as tar:
+        with tarfile.open(from_path, "r:xz") as tar:
             tar.extractall(path=to_path)
     elif _is_gzip(from_path):
         to_path = os.path.join(
-            to_path,
-            os.path.splitext(os.path.basename(from_path))[0])
-        with open(to_path, 'wb') as out_f, gzip.GzipFile(from_path) as zip_f:
+            to_path, os.path.splitext(os.path.basename(from_path))[0]
+        )
+        with open(to_path, "wb") as out_f, gzip.GzipFile(from_path) as zip_f:
             out_f.write(zip_f.read())
     elif _is_zip(from_path):
-        with zipfile.ZipFile(from_path, 'r') as z:
+        with zipfile.ZipFile(from_path, "r") as z:
             z.extractall(to_path)
     else:
-        raise ValueError(f'Extraction of {from_path} not supported')
+        raise ValueError(f"Extraction of {from_path} not supported")
 
     if remove_finished:
         os.remove(from_path)
 
 
-def download_and_extract_archive(url,
-                                 download_root,
-                                 extract_root=None,
-                                 filename=None,
-                                 md5=None,
-                                 remove_finished=False):
+def download_and_extract_archive(
+    url,
+    download_root,
+    extract_root=None,
+    filename=None,
+    md5=None,
+    remove_finished=False,
+):
     download_root = os.path.expanduser(download_root)
     if extract_root is None:
         extract_root = download_root
@@ -436,8 +443,9 @@ def download_and_extract_archive(url,
     download_url(url, download_root, filename, md5)
 
     archive = os.path.join(download_root, filename)
-    print(f'Extracting {archive} to {extract_root}')
+    print(f"Extracting {archive} to {extract_root}")
     extract_archive(archive, extract_root, remove_finished)
+
 
 class BaseStorageBackend(metaclass=ABCMeta):
     """Abstract class of storage backends.
@@ -460,13 +468,13 @@ class HardDiskBackend(BaseStorageBackend):
 
     def get(self, filepath):
         filepath = str(filepath)
-        with open(filepath, 'rb') as f:
+        with open(filepath, "rb") as f:
             value_buf = f.read()
         return value_buf
 
     def get_text(self, filepath):
         filepath = str(filepath)
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             value_buf = f.read()
         return value_buf
 
@@ -483,32 +491,35 @@ class FileClient:
     """
 
     _backends = {
-        'disk': HardDiskBackend,
+        "disk": HardDiskBackend,
     }
 
-    def __init__(self, backend='disk', **kwargs):
+    def __init__(self, backend="disk", **kwargs):
         if backend not in self._backends:
             raise ValueError(
-                f'Backend {backend} is not supported. Currently supported ones'
-                f' are {list(self._backends.keys())}')
+                f"Backend {backend} is not supported. Currently supported ones"
+                f" are {list(self._backends.keys())}"
+            )
         self.backend = backend
         self.client = self._backends[backend](**kwargs)
 
     @classmethod
     def _register_backend(cls, name, backend, force=False):
         if not isinstance(name, str):
-            raise TypeError('the backend name should be a string, '
-                            f'but got {type(name)}')
-        if not inspect.isclass(backend):
             raise TypeError(
-                f'backend should be a class but got {type(backend)}')
+                "the backend name should be a string, " f"but got {type(name)}"
+            )
+        if not inspect.isclass(backend):
+            raise TypeError(f"backend should be a class but got {type(backend)}")
         if not issubclass(backend, BaseStorageBackend):
             raise TypeError(
-                f'backend {backend} is not a subclass of BaseStorageBackend')
+                f"backend {backend} is not a subclass of BaseStorageBackend"
+            )
         if not force and name in cls._backends:
             raise KeyError(
-                f'{name} is already registered as a storage backend, '
-                'add "force=True" if you want to override it')
+                f"{name} is already registered as a storage backend, "
+                'add "force=True" if you want to override it'
+            )
 
         cls._backends[name] = backend
 

@@ -40,39 +40,43 @@ class BaseRunner(metaclass=ABCMeta):
         max_iters (int, optional): Total training iterations.
     """
 
-    def __init__(self,
-                 model,
-                 fp16=False,
-                 optimizer=None,
-                 work_dir=None,
-                 logger=None,
-                 meta=None,
-                 max_iters=None,
-                 max_epochs=None):
-        
-        assert hasattr(model, 'train_step')
+    def __init__(
+        self,
+        model,
+        fp16=False,
+        optimizer=None,
+        work_dir=None,
+        logger=None,
+        meta=None,
+        max_iters=None,
+        max_epochs=None,
+    ):
+
+        assert hasattr(model, "train_step")
 
         # check the type of `optimizer`
         if isinstance(optimizer, dict):
             for name, optim in optimizer.items():
                 if not isinstance(optim, Optimizer):
                     raise TypeError(
-                        f'optimizer must be a dict of torch.optim.Optimizers, '
-                        f'but optimizer["{name}"] is a {type(optim)}')
+                        f"optimizer must be a dict of torch.optim.Optimizers, "
+                        f'but optimizer["{name}"] is a {type(optim)}'
+                    )
         elif not isinstance(optimizer, Optimizer) and optimizer is not None:
             raise TypeError(
-                f'optimizer must be a torch.optim.Optimizer object '
-                f'or dict or None, but got {type(optimizer)}')
+                f"optimizer must be a torch.optim.Optimizer object "
+                f"or dict or None, but got {type(optimizer)}"
+            )
 
         # check the type of `logger`
         if not isinstance(logger, logging.Logger):
-            raise TypeError(f'logger must be a logging.Logger object, '
-                            f'but got {type(logger)}')
+            raise TypeError(
+                f"logger must be a logging.Logger object, " f"but got {type(logger)}"
+            )
 
         # check the type of `meta`
         if meta is not None and not isinstance(meta, dict):
-            raise TypeError(
-                f'meta must be a dict or None, but got {type(meta)}')
+            raise TypeError(f"meta must be a dict or None, but got {type(meta)}")
 
         self.fp16 = fp16
         self.model = model
@@ -90,7 +94,7 @@ class BaseRunner(metaclass=ABCMeta):
             raise TypeError('"work_dir" must be a str or None')
 
         # get model name from the model class
-        if hasattr(self.model, 'module'):
+        if hasattr(self.model, "module"):
             self._model_name = self.model.module.__class__.__name__
         else:
             self._model_name = self.model.__class__.__name__
@@ -104,8 +108,7 @@ class BaseRunner(metaclass=ABCMeta):
         self._inner_iter = 0
 
         if max_epochs is not None and max_iters is not None:
-            raise ValueError(
-                'Only one of `max_epochs` or `max_iters` can be set.')
+            raise ValueError("Only one of `max_epochs` or `max_iters` can be set.")
 
         self._max_epochs = max_epochs
         self._max_iters = max_iters
@@ -180,12 +183,14 @@ class BaseRunner(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def save_checkpoint(self,
-                        out_dir,
-                        filename_tmpl,
-                        save_optimizer=True,
-                        meta=None,
-                        create_symlink=True):
+    def save_checkpoint(
+        self,
+        out_dir,
+        filename_tmpl,
+        save_optimizer=True,
+        meta=None,
+        create_symlink=True,
+    ):
         pass
 
     def current_lr(self):
@@ -198,14 +203,13 @@ class BaseRunner(metaclass=ABCMeta):
         """
 
         if isinstance(self.optimizer, torch.optim.Optimizer):
-            lr = [group['lr'] for group in self.optimizer.param_groups]
+            lr = [group["lr"] for group in self.optimizer.param_groups]
         elif isinstance(self.optimizer, dict):
             lr = dict()
             for name, optim in self.optimizer.items():
-                lr[name] = [group['lr'] for group in optim.param_groups]
+                lr[name] = [group["lr"] for group in optim.param_groups]
         else:
-            raise RuntimeError(
-                'lr is not applicable because optimizer does not exist.')
+            raise RuntimeError("lr is not applicable because optimizer does not exist.")
         return lr
 
     def current_momentum(self):
@@ -220,17 +224,18 @@ class BaseRunner(metaclass=ABCMeta):
         def _get_momentum(optimizer):
             momentums = []
             for group in optimizer.param_groups:
-                if 'momentum' in group.keys():
-                    momentums.append(group['momentum'])
-                elif 'betas' in group.keys():
-                    momentums.append(group['betas'][0])
+                if "momentum" in group.keys():
+                    momentums.append(group["momentum"])
+                elif "betas" in group.keys():
+                    momentums.append(group["betas"][0])
                 else:
                     momentums.append(0)
             return momentums
 
         if self.optimizer is None:
             raise RuntimeError(
-                'momentum is not applicable because optimizer does not exist.')
+                "momentum is not applicable because optimizer does not exist."
+            )
         elif isinstance(self.optimizer, torch.optim.Optimizer):
             momentums = _get_momentum(self.optimizer)
         elif isinstance(self.optimizer, dict):
@@ -239,7 +244,7 @@ class BaseRunner(metaclass=ABCMeta):
                 momentums[name] = _get_momentum(optim)
         return momentums
 
-    def register_hook(self, hook, priority='NORMAL'):
+    def register_hook(self, hook, priority="NORMAL"):
         """Register a hook into the hook list.
         The hook will be inserted into a priority queue, with the specified
         priority (See :class:`Priority` for details of priorities).
@@ -252,7 +257,7 @@ class BaseRunner(metaclass=ABCMeta):
                 Lower value means higher priority.
         """
         assert isinstance(hook, Hook)
-        if hasattr(hook, 'priority'):
+        if hasattr(hook, "priority"):
             raise ValueError('"priority" is a reserved attribute for hooks')
         priority = get_priority(priority)
         hook.priority = priority
@@ -277,13 +282,13 @@ class BaseRunner(metaclass=ABCMeta):
             'priority' arguments during initialization.
         """
         hook_cfg = hook_cfg.copy()
-        priority = hook_cfg.pop('priority', 'NORMAL')
+        priority = hook_cfg.pop("priority", "NORMAL")
         hook = build_module_from_dict(hook_cfg, HOOKS)
         self.register_hook(hook, priority=priority)
 
     def call_hook(self, fn_name):
         """Call all hooks.
-        
+
         Args:
             fn_name (str): The function name in each hook to be called, such as
                 "before_train_epoch".
@@ -291,49 +296,45 @@ class BaseRunner(metaclass=ABCMeta):
         for hook in self._hooks:
             getattr(hook, fn_name)(self)
 
-    def load_checkpoint(self, filename, map_location='cpu', strict=False):
+    def load_checkpoint(self, filename, map_location="cpu", strict=False):
         if self.rank == 0:
-            self.logger.info('load checkpoint from %s', filename)
-        return load_checkpoint(self.model, filename, map_location, strict,
-                               self.logger)
+            self.logger.info("load checkpoint from %s", filename)
+        return load_checkpoint(self.model, filename, map_location, strict, self.logger)
 
-    def resume(self,
-               checkpoint,
-               resume_optimizer=True,
-               map_location='default'):
-        if map_location == 'default':
+    def resume(self, checkpoint, resume_optimizer=True, map_location="default"):
+        if map_location == "default":
             if torch.cuda.is_available():
                 device_id = torch.cuda.current_device()
                 checkpoint = self.load_checkpoint(
                     checkpoint,
-                    map_location=lambda storage, loc: storage.cuda(device_id))
+                    map_location=lambda storage, loc: storage.cuda(device_id),
+                )
             else:
                 checkpoint = self.load_checkpoint(checkpoint)
         else:
-            checkpoint = self.load_checkpoint(
-                checkpoint, map_location=map_location)
+            checkpoint = self.load_checkpoint(checkpoint, map_location=map_location)
 
-        self._epoch = checkpoint['meta']['epoch']
-        self._iter = checkpoint['meta']['iter']
-        if 'optimizer' in checkpoint and resume_optimizer:
+        self._epoch = checkpoint["meta"]["epoch"]
+        self._iter = checkpoint["meta"]["iter"]
+        if "optimizer" in checkpoint and resume_optimizer:
             if isinstance(self.optimizer, Optimizer):
-                self.optimizer.load_state_dict(checkpoint['optimizer'])
+                self.optimizer.load_state_dict(checkpoint["optimizer"])
             elif isinstance(self.optimizer, dict):
                 for k in self.optimizer.keys():
-                    self.optimizer[k].load_state_dict(
-                        checkpoint['optimizer'][k])
+                    self.optimizer[k].load_state_dict(checkpoint["optimizer"][k])
             else:
                 raise TypeError(
-                    'Optimizer should be dict or torch.optim.Optimizer '
-                    f'but got {type(self.optimizer)}')
-        
+                    "Optimizer should be dict or torch.optim.Optimizer "
+                    f"but got {type(self.optimizer)}"
+                )
+
         if self.rank == 0:
-            self.logger.info('resumed epoch %d, iter %d', self.epoch, self.iter)
+            self.logger.info("resumed epoch %d, iter %d", self.epoch, self.iter)
 
     def register_lr_hook(self, lr_config):
         if isinstance(lr_config, dict):
-            assert 'policy' in lr_config
-            policy_type = lr_config.pop('policy')
+            assert "policy" in lr_config
+            policy_type = lr_config.pop("policy")
             # If the type of policy is all in lower case, e.g., 'cyclic',
             # then its first letter will be capitalized, e.g., to be 'Cyclic'.
             # This is for the convenient usage of Lr updater.
@@ -342,8 +343,8 @@ class BaseRunner(metaclass=ABCMeta):
             # the string will not be changed if it contains capital letters.
             if policy_type == policy_type.lower():
                 policy_type = policy_type.title()
-            hook_type = policy_type + 'LrUpdaterHook'
-            lr_config['type'] = hook_type
+            hook_type = policy_type + "LrUpdaterHook"
+            lr_config["type"] = hook_type
             hook = build_module_from_dict(lr_config, HOOKS)
         else:
             hook = lr_config
@@ -353,8 +354,8 @@ class BaseRunner(metaclass=ABCMeta):
         if momentum_config is None:
             return
         if isinstance(momentum_config, dict):
-            assert 'policy' in momentum_config
-            policy_type = momentum_config.pop('policy')
+            assert "policy" in momentum_config
+            policy_type = momentum_config.pop("policy")
             # If the type of policy is all in lower case, e.g., 'cyclic',
             # then its first letter will be capitalized, e.g., to be 'Cyclic'.
             # This is for the convenient usage of momentum updater.
@@ -363,8 +364,8 @@ class BaseRunner(metaclass=ABCMeta):
             # the string will not be changed if it contains capital letters.
             if policy_type == policy_type.lower():
                 policy_type = policy_type.title()
-            hook_type = policy_type + 'MomentumUpdaterHook'
-            momentum_config['type'] = hook_type
+            hook_type = policy_type + "MomentumUpdaterHook"
+            momentum_config["type"] = hook_type
             hook = build_module_from_dict(momentum_config, HOOKS)
         else:
             hook = momentum_config
@@ -374,7 +375,7 @@ class BaseRunner(metaclass=ABCMeta):
         if optimizer_config is None:
             return
         if isinstance(optimizer_config, dict):
-            optimizer_config.setdefault('type', 'OptimizerHook')
+            optimizer_config.setdefault("type", "OptimizerHook")
             hook = build_module_from_dict(optimizer_config, HOOKS)
         else:
             hook = optimizer_config
@@ -384,7 +385,7 @@ class BaseRunner(metaclass=ABCMeta):
         if checkpoint_config is None:
             return
         if isinstance(checkpoint_config, dict):
-            checkpoint_config.setdefault('type', 'CheckpointHook')
+            checkpoint_config.setdefault("type", "CheckpointHook")
             hook = build_module_from_dict(checkpoint_config, HOOKS)
         else:
             hook = checkpoint_config
@@ -393,18 +394,21 @@ class BaseRunner(metaclass=ABCMeta):
     def register_logger_hooks(self, log_config):
         if log_config is None:
             return
-        log_interval = log_config['interval']
-        for info in log_config['hooks']:
+        log_interval = log_config["interval"]
+        for info in log_config["hooks"]:
             logger_hook = build_module_from_dict(
-                info, HOOKS, default_args=dict(interval=log_interval))
-            self.register_hook(logger_hook, priority='VERY_LOW')
+                info, HOOKS, default_args=dict(interval=log_interval)
+            )
+            self.register_hook(logger_hook, priority="VERY_LOW")
 
-    def register_training_hooks(self,
-                                lr_config,
-                                optimizer_config=None,
-                                checkpoint_config=None,
-                                log_config=None,
-                                momentum_config=None):
+    def register_training_hooks(
+        self,
+        lr_config,
+        optimizer_config=None,
+        checkpoint_config=None,
+        log_config=None,
+        momentum_config=None,
+    ):
         """Register default hooks for training.
         Default hooks include:
         - LrUpdaterHook

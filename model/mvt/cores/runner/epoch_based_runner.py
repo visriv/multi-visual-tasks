@@ -18,54 +18,55 @@ class EpochBasedRunner(BaseRunner):
 
     def run_iter(self, data_batch, train_mode, **kwargs):
         if train_mode:
-            outputs = self.model.train_step(data_batch, self.optimizer,
-                                            **kwargs)
+            outputs = self.model.train_step(data_batch, self.optimizer, **kwargs)
         else:
             outputs = self.model.val_step(data_batch, self.optimizer, **kwargs)
         if not isinstance(outputs, dict):
-            raise TypeError('"batch_processor()" or "model.train_step()"'
-                            'and "model.val_step()" must return a dict')
-        if 'log_vars' in outputs:
-            self.log_buffer.update(outputs['log_vars'], outputs['num_samples'])
+            raise TypeError(
+                '"batch_processor()" or "model.train_step()"'
+                'and "model.val_step()" must return a dict'
+            )
+        if "log_vars" in outputs:
+            self.log_buffer.update(outputs["log_vars"], outputs["num_samples"])
         self.outputs = outputs
 
     def train(self, data_loader, **kwargs):
-        
+
         self.model.train()
-        self.mode = 'train'
+        self.mode = "train"
         self.data_loader = data_loader
         self._max_iters = self._max_epochs * len(self.data_loader)
-        self.call_hook('before_train_epoch')
+        self.call_hook("before_train_epoch")
         time.sleep(2)  # Prevent possible deadlock during epoch transition
         for i, data_batch in enumerate(self.data_loader):
             self._inner_iter = i
-            self.call_hook('before_train_iter')
+            self.call_hook("before_train_iter")
             if self.fp16:
                 with torch.cuda.amp.autocast():
                     self.run_iter(data_batch, train_mode=True)
             else:
                 self.run_iter(data_batch, train_mode=True)
-            self.call_hook('after_train_iter')
+            self.call_hook("after_train_iter")
             self._iter += 1
 
-        self.call_hook('after_train_epoch')
+        self.call_hook("after_train_epoch")
         self._epoch += 1
 
     def val(self, data_loader, **kwargs):
 
         self.model.eval()
-        self.mode = 'val'
+        self.mode = "val"
         self.data_loader = data_loader
-        self.call_hook('before_val_epoch')
+        self.call_hook("before_val_epoch")
         time.sleep(2)  # Prevent possible deadlock during epoch transition
         for i, data_batch in enumerate(self.data_loader):
             self._inner_iter = i
-            self.call_hook('before_val_iter')
+            self.call_hook("before_val_iter")
             with torch.no_grad():
                 self.run_iter(data_batch, train_mode=False)
-            self.call_hook('after_val_iter')
+            self.call_hook("after_val_iter")
 
-        self.call_hook('after_val_epoch')
+        self.call_hook("after_val_epoch")
 
     def run(self, data_loaders, workflow, max_epochs=None, **kwargs):
         """Start running.
@@ -83,23 +84,24 @@ class EpochBasedRunner(BaseRunner):
         if max_epochs is not None:
             self._max_epochs = max_epochs
 
-        assert self._max_epochs is not None, (
-            'max_epochs must be specified during instantiation')
+        assert (
+            self._max_epochs is not None
+        ), "max_epochs must be specified during instantiation"
 
         for i, flow in enumerate(workflow):
             mode = flow[0]
             epochs = flow[1]
-            if mode == 'train':
+            if mode == "train":
                 self._max_iters = self._max_epochs * len(data_loaders[i])
                 break
 
-        work_dir = self.work_dir if self.work_dir is not None else 'NONE'
+        work_dir = self.work_dir if self.work_dir is not None else "NONE"
         if self.rank == 0:
-            self.logger.info('Start running, host: %s, work_dir: %s',
-                            get_host_info(), work_dir)
-            self.logger.info('workflow: %s, max: %d epochs', workflow,
-                            self._max_epochs)
-        self.call_hook('before_run')
+            self.logger.info(
+                "Start running, host: %s, work_dir: %s", get_host_info(), work_dir
+            )
+            self.logger.info("workflow: %s, max: %d epochs", workflow, self._max_epochs)
+        self.call_hook("before_run")
 
         while self.epoch < self._max_epochs:
             for i, flow in enumerate(workflow):
@@ -107,28 +109,30 @@ class EpochBasedRunner(BaseRunner):
                 if isinstance(mode, str):  # self.train()
                     if not hasattr(self, mode):
                         raise ValueError(
-                            f'runner has no method named "{mode}" to run an '
-                            'epoch')
+                            f'runner has no method named "{mode}" to run an ' "epoch"
+                        )
                     epoch_runner = getattr(self, mode)
                 else:
                     raise TypeError(
-                        'mode in workflow must be a str, but got {}'.format(
-                            type(mode)))
+                        "mode in workflow must be a str, but got {}".format(type(mode))
+                    )
 
                 for _ in range(epochs):
-                    if mode == 'train' and self.epoch >= self._max_epochs:
+                    if mode == "train" and self.epoch >= self._max_epochs:
                         break
                     epoch_runner(data_loaders[i], **kwargs)
 
         time.sleep(1)  # wait for some hooks like loggers to finish
-        self.call_hook('after_run')
+        self.call_hook("after_run")
 
-    def save_checkpoint(self,
-                        out_dir,
-                        filename_tmpl='epoch_{}.pth',
-                        save_optimizer=True,
-                        meta=None,
-                        create_symlink=True):
+    def save_checkpoint(
+        self,
+        out_dir,
+        filename_tmpl="epoch_{}.pth",
+        save_optimizer=True,
+        meta=None,
+        create_symlink=True,
+    ):
         """Save the checkpoint.
         Args:
             out_dir (str): The directory that checkpoints are saved.
@@ -148,8 +152,7 @@ class EpochBasedRunner(BaseRunner):
         elif isinstance(meta, dict):
             meta.update(epoch=self.epoch + 1, iter=self.iter)
         else:
-            raise TypeError(
-                f'meta should be a dict or None, but got {type(meta)}')
+            raise TypeError(f"meta should be a dict or None, but got {type(meta)}")
         if self.meta is not None:
             meta.update(self.meta)
 
@@ -160,5 +163,5 @@ class EpochBasedRunner(BaseRunner):
         # in some environments, `os.symlink` is not supported, you may need to
         # set `create_symlink` to False
         if create_symlink:
-            dst_file = osp.join(out_dir, 'latest.pth')
+            dst_file = osp.join(out_dir, "latest.pth")
             symlink(filename, dst_file)

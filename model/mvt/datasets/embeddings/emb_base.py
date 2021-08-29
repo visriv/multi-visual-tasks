@@ -35,8 +35,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         self.data_root = root_path
         self.data_cfg = data_cfg
 
-        if ("DATA_INFO" in data_cfg and
-                isinstance(data_cfg.DATA_INFO, list)):
+        if "DATA_INFO" in data_cfg and isinstance(data_cfg.DATA_INFO, list):
             self.ann_file = data_cfg.DATA_INFO[sel_index]
         else:
             raise ValueError("DATA_INFO should be set properly")
@@ -56,8 +55,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         self.pipeline = Compose(self.get_pipeline_list())
         self.sel_index = sel_index
 
-        if ("DATA_PREFIX" in data_cfg and
-                isinstance(data_cfg.DATA_PREFIX, list)):
+        if "DATA_PREFIX" in data_cfg and isinstance(data_cfg.DATA_PREFIX, list):
             self.data_prefix = data_cfg.DATA_PREFIX[sel_index]
         else:
             self.data_prefix = None
@@ -68,7 +66,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         if not (self.data_prefix is None or osp.isabs(self.data_prefix)):
             self.data_prefix = osp.join(self.data_root, self.data_prefix)
 
-        mvt_root = os.getenv('MVT_ROOT')
+        mvt_root = os.getenv("MVT_ROOT")
         if mvt_root and not osp.isabs(self.ann_file):
             self.ann_file = osp.join(mvt_root, self.ann_file)
 
@@ -99,13 +97,11 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
                         sub_item = {}
                         if len(sub_vt) > 0:
                             if not isinstance(sub_vt, CfgNode):
-                                raise TypeError(
-                                    "transform items must be a CfgNode")
+                                raise TypeError("transform items must be a CfgNode")
                         sub_item["type"] = sub_kt
                         for sub_ka, sub_va in sub_vt.items():
                             if isinstance(sub_va, CfgNode):
-                                raise TypeError(
-                                    "Only support two built-in layers")
+                                raise TypeError("Only support two built-in layers")
                             sub_item[sub_ka] = sub_va
                         pipeline_item[k_a].append(sub_item)
                 else:
@@ -139,7 +135,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
 
         gt_labels = []
         for i in range(len(self)):
-            gt_labels.append(self.getitem_info(i)['label'])
+            gt_labels.append(self.getitem_info(i)["label"])
 
         gt_labels = np.array(gt_labels)
         return gt_labels
@@ -153,7 +149,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         Returns:
             int: Image category of specified index.
         """
-        cat_ids = self.getitem_info(idx)['label']
+        cat_ids = self.getitem_info(idx)["label"]
         if isinstance(cat_ids, list):
             return np.array(cat_ids).astype(np.int)
         elif isinstance(cat_ids, np.ndarray):
@@ -164,7 +160,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         """Prepare data and run pipelines"""
 
         results = copy.deepcopy(self.getitem_info(idx))
-        results['img_prefix'] = self.data_prefix
+        results["img_prefix"] = self.data_prefix
         return self.pipeline(results)
 
     def __len__(self):
@@ -201,7 +197,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         elif isinstance(classes, (tuple, list)):
             class_names = classes
         else:
-            raise ValueError(f'Unsupported type {type(classes)} of classes.')
+            raise ValueError(f"Unsupported type {type(classes)} of classes.")
 
         return class_names
 
@@ -215,10 +211,10 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         self.flag = np.zeros(len(self), dtype=np.uint8)
         for i in range(len(self)):
             img_info = self.getitem_info(i)
-            if img_info['width'] / img_info['height'] > 1:
+            if img_info["width"] / img_info["height"] > 1:
                 self.flag[i] = 1
 
-    def evaluate(self, results, metric='accuracy'):
+    def evaluate(self, results, metric="accuracy"):
         """Evaluate the dataset.
 
         Args:
@@ -231,7 +227,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         """
         print(type(results))
         print(len(results))
-        eval_results = {f'accuracy': 10.0}
+        eval_results = {f"accuracy": 10.0}
         return eval_results
 
         # if isinstance(metric, str):

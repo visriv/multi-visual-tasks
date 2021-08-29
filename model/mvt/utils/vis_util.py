@@ -12,6 +12,7 @@ class Color(Enum):
     """An enum that defines common colors.
     Contains red, green, blue, cyan, yellow, magenta, white and black.
     """
+
     red = (0, 0, 255)
     green = (0, 255, 0)
     blue = (255, 0, 0)
@@ -47,10 +48,10 @@ def color_val(color):
         color = color.astype(np.uint8)
         return tuple(color)
     else:
-        raise TypeError(f'Invalid type for color: {type(color)}')
+        raise TypeError(f"Invalid type for color: {type(color)}")
 
 
-def imshow(img, win_name='', wait_time=0):
+def imshow(img, win_name="", wait_time=0):
     """Show an image.
     Args:
         img (str or ndarray): The image to be displayed.
@@ -70,15 +71,17 @@ def imshow(img, win_name='', wait_time=0):
         ret = cv2.waitKey(wait_time)
 
 
-def imshow_bboxes(img,
-                  bboxes,
-                  colors='green',
-                  top_k=-1,
-                  thickness=1,
-                  show=True,
-                  win_name='',
-                  wait_time=0,
-                  out_file=None):
+def imshow_bboxes(
+    img,
+    bboxes,
+    colors="green",
+    top_k=-1,
+    thickness=1,
+    show=True,
+    win_name="",
+    wait_time=0,
+    out_file=None,
+):
     """Draw bboxes on an image.
     Args:
         img (str or ndarray): The image to be displayed.
@@ -112,8 +115,7 @@ def imshow_bboxes(img,
         for j in range(_top_k):
             left_top = (_bboxes[j, 0], _bboxes[j, 1])
             right_bottom = (_bboxes[j, 2], _bboxes[j, 3])
-            cv2.rectangle(
-                img, left_top, right_bottom, colors[i], thickness=thickness)
+            cv2.rectangle(img, left_top, right_bottom, colors[i], thickness=thickness)
 
     if show:
         imshow(img, win_name, wait_time)
@@ -122,19 +124,21 @@ def imshow_bboxes(img,
     return img
 
 
-def imshow_det_bboxes(img,
-                      bboxes,
-                      labels,
-                      class_names=None,
-                      score_thr=0,
-                      bbox_color='green',
-                      text_color='green',
-                      thickness=1,
-                      font_scale=0.5,
-                      show=True,
-                      win_name='',
-                      wait_time=0,
-                      out_file=None):
+def imshow_det_bboxes(
+    img,
+    bboxes,
+    labels,
+    class_names=None,
+    score_thr=0,
+    bbox_color="green",
+    text_color="green",
+    thickness=1,
+    font_scale=0.5,
+    show=True,
+    win_name="",
+    wait_time=0,
+    out_file=None,
+):
     """Draw bboxes and class labels (with scores) on an image.
     Args:
         img (str or ndarray): The image to be displayed.
@@ -174,14 +178,18 @@ def imshow_det_bboxes(img,
         bbox_int = bbox.astype(np.int32)
         left_top = (bbox_int[0], bbox_int[1])
         right_bottom = (bbox_int[2], bbox_int[3])
-        cv2.rectangle(
-            img, left_top, right_bottom, bbox_color, thickness=thickness)
-        label_text = class_names[
-            label] if class_names is not None else f'cls {label}'
+        cv2.rectangle(img, left_top, right_bottom, bbox_color, thickness=thickness)
+        label_text = class_names[label] if class_names is not None else f"cls {label}"
         if len(bbox) > 4:
-            label_text += f'|{bbox[-1]:.02f}'
-        cv2.putText(img, label_text, (bbox_int[0], bbox_int[1] - 2),
-                    cv2.FONT_HERSHEY_COMPLEX, font_scale, text_color)
+            label_text += f"|{bbox[-1]:.02f}"
+        cv2.putText(
+            img,
+            label_text,
+            (bbox_int[0], bbox_int[1] - 2),
+            cv2.FONT_HERSHEY_COMPLEX,
+            font_scale,
+            text_color,
+        )
 
     if show:
         imshow(img, win_name, wait_time)
@@ -192,33 +200,46 @@ def imshow_det_bboxes(img,
 
 def plot_one_box(x, img, color=None, label=None, line_thickness=None):
     # Plots one bounding box on image img
-    tl = line_thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
+    tl = (
+        line_thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1
+    )  # line/font thickness
     color = color_val(color) or [random.randint(0, 255) for _ in range(3)]
     c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
     cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
-    
+
     if label:
         tf = max(tl - 1, 1)  # font thickness
         t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
         c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
         cv2.rectangle(img, c1, c2, color, -1, cv2.LINE_AA)  # filled
-        cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
+        cv2.putText(
+            img,
+            label,
+            (c1[0], c1[1] - 2),
+            0,
+            tl / 3,
+            [225, 255, 255],
+            thickness=tf,
+            lineType=cv2.LINE_AA,
+        )
 
 
-def show_det_result(img,
-                    result,
-                    dataset_name,
-                    score_thr=0.3,
-                    bbox_color='green',
-                    text_color='green',
-                    thickness=1,
-                    font_scale=0.5,
-                    win_name='',
-                    show=False,
-                    wait_time=0):
+def show_det_result(
+    img,
+    result,
+    dataset_name,
+    score_thr=0.3,
+    bbox_color="green",
+    text_color="green",
+    thickness=1,
+    font_scale=0.5,
+    win_name="",
+    show=False,
+    wait_time=0,
+):
     """Draw `result` over `img`. results are merge boxes"""
 
-    img = imread(img, backend='pillow')
+    img = imread(img, backend="pillow")
     img = img.copy()
     height, width = img.shape[:2]
     if isinstance(result, tuple):
@@ -229,11 +250,10 @@ def show_det_result(img,
         bbox_result, segm_result = result, None
     bboxes = np.vstack(bbox_result)
     labels = [
-        np.full(bbox.shape[0], i, dtype=np.int32)
-        for i, bbox in enumerate(bbox_result)
+        np.full(bbox.shape[0], i, dtype=np.int32) for i, bbox in enumerate(bbox_result)
     ]
     labels = np.concatenate(labels)
-        
+
     if score_thr > 0:
         assert bboxes.shape[1] == 5
         scores = bboxes[:, -1]
@@ -250,15 +270,21 @@ def show_det_result(img,
             bbox_int = bbox.astype(np.int32)
             left_top = (bbox_int[0], bbox_int[1])
             right_bottom = (bbox_int[2], bbox_int[3])
-            cv2.rectangle(
-                img, left_top, right_bottom, bbox_color, thickness=thickness)
+            cv2.rectangle(img, left_top, right_bottom, bbox_color, thickness=thickness)
             class_names = get_classes(dataset_name)
-            label_text = class_names[
-                label] if class_names is not None else f'cls {label}'
+            label_text = (
+                class_names[label] if class_names is not None else f"cls {label}"
+            )
             if len(bbox) > 4:
-                label_text += f'|{bbox[-1]:.02f}'
-            cv2.putText(img, label_text, (bbox_int[0], bbox_int[1] - 2),
-                        cv2.FONT_HERSHEY_COMPLEX, font_scale, text_color)
+                label_text += f"|{bbox[-1]:.02f}"
+            cv2.putText(
+                img,
+                label_text,
+                (bbox_int[0], bbox_int[1] - 2),
+                cv2.FONT_HERSHEY_COMPLEX,
+                font_scale,
+                text_color,
+            )
         imshow(img, win_name, wait_time)
 
     return bboxes, labels, height, width

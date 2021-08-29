@@ -15,9 +15,9 @@ from model.mvt.utils.reg_util import Registry
 
 # --------------------------------------------------------------------------- #
 # Registries for datasets
-# --------------------------------------------------------------------------- 
-DATASETS = Registry('dataset')
-PIPELINES = Registry('pipeline')
+# ---------------------------------------------------------------------------
+DATASETS = Registry("dataset")
+PIPELINES = Registry("pipeline")
 
 
 @DATASETS.register_module()
@@ -25,9 +25,9 @@ class ConcatDataset(_ConcatDataset):
     """A wrapper of concatenated dataset.
     Same as :obj:`torch.utils.data.dataset.ConcatDataset`, but
     concat the group flag for image aspect ratio.
-    
+
     Args:
-        datasets (list[:obj:`Dataset`]): A list of datasets.        
+        datasets (list[:obj:`Dataset`]): A list of datasets.
     """
 
     def __init__(self, datasets, separate_eval=True):
@@ -36,10 +36,9 @@ class ConcatDataset(_ConcatDataset):
         self.separate_eval = separate_eval
         if not separate_eval:
             if len(set([type(ds) for ds in datasets])) != 1:
-                raise NotImplementedError(
-                    'All the datasets should have same types')
+                raise NotImplementedError("All the datasets should have same types")
 
-        if hasattr(datasets[0], 'flag'):
+        if hasattr(datasets[0], "flag"):
             flags = []
             for i in range(0, len(datasets)):
                 flags.append(datasets[i].flag)
@@ -58,7 +57,8 @@ class ConcatDataset(_ConcatDataset):
         if idx < 0:
             if -idx > len(self):
                 raise ValueError(
-                    'absolute value of index should not exceed dataset length')
+                    "absolute value of index should not exceed dataset length"
+                )
             idx = len(self) + idx
         dataset_idx = bisect.bisect_right(self.cumulative_sizes, idx)
         if dataset_idx == 0:
@@ -80,44 +80,48 @@ class ConcatDataset(_ConcatDataset):
             dataset if `self.separate_eval=True`.
         """
 
-        assert len(results) == self.cumulative_sizes[-1], \
-            ('Dataset and results have different sizes: '
-             f'{self.cumulative_sizes[-1]} v.s. {len(results)}')
+        assert len(results) == self.cumulative_sizes[-1], (
+            "Dataset and results have different sizes: "
+            f"{self.cumulative_sizes[-1]} v.s. {len(results)}"
+        )
 
         # Check whether all the datasets support evaluation
         for dataset in self.datasets:
-            assert hasattr(dataset, 'evaluate'), \
-                    f'{type(dataset)} does not implement evaluate function'
-        if self.separate_eval: 
+            assert hasattr(
+                dataset, "evaluate"
+            ), f"{type(dataset)} does not implement evaluate function"
+        if self.separate_eval:
             dataset_idx = -1
             total_eval_results = dict()
             for dataset in self.datasets:
-                start_idx = 0 if dataset_idx == -1 else \
-                    self.cumulative_sizes[dataset_idx]
+                start_idx = (
+                    0 if dataset_idx == -1 else self.cumulative_sizes[dataset_idx]
+                )
                 end_idx = self.cumulative_sizes[dataset_idx + 1]
 
                 results_per_dataset = results[start_idx:end_idx]
                 print_log(
-                    f'\nEvaluateing {dataset.ann_file} with '
-                    f'{len(results_per_dataset)} images now',
-                    logger=logger)
+                    f"\nEvaluateing {dataset.ann_file} with "
+                    f"{len(results_per_dataset)} images now",
+                    logger=logger,
+                )
 
                 eval_results_per_dataset = dataset.evaluate(
-                    results_per_dataset, logger=logger, **kwargs)
+                    results_per_dataset, logger=logger, **kwargs
+                )
                 dataset_idx += 1
                 for k, v in eval_results_per_dataset.items():
-                    total_eval_results.update({f'{dataset_idx}_{k}': v})
+                    total_eval_results.update({f"{dataset_idx}_{k}": v})
 
             return total_eval_results
         elif len(set([type(ds) for ds in self.datasets])) != 1:
-            raise NotImplementedError(
-                'All the datasets should have same types')
+            raise NotImplementedError("All the datasets should have same types")
         else:
             original_data_infos = self.datasets[0].data_infos
             self.datasets[0].data_infos = sum(
-                [dataset.data_infos for dataset in self.datasets], [])
-            eval_results = self.datasets[0].evaluate(
-                results, logger=logger, **kwargs)
+                [dataset.data_infos for dataset in self.datasets], []
+            )
+            eval_results = self.datasets[0].evaluate(results, logger=logger, **kwargs)
             self.datasets[0].data_infos = original_data_infos
             return eval_results
 
@@ -139,7 +143,7 @@ class RepeatDataset(object):
         self.dataset = dataset
         self.times = times
         self.CLASSES = dataset.CLASSES
-        if hasattr(self.dataset, 'flag'):
+        if hasattr(self.dataset, "flag"):
             self.flag = np.tile(self.dataset.flag, times)
 
         self._ori_len = len(self.dataset)
@@ -199,10 +203,10 @@ class ClassBalancedDataset(object):
         self.dataset = dataset
         self.oversample_thr = oversample_thr
         self.filter_empty_gt = filter_empty_gt
-        if hasattr(self.dataset, 'ORI_CLASSES'):
+        if hasattr(self.dataset, "ORI_CLASSES"):
             self.CLASSES = dataset.ORI_CLASSES
         else:
-             self.CLASSES = dataset.CLASSES
+            self.CLASSES = dataset.CLASSES
 
         repeat_factors = self._get_repeat_factors(dataset, oversample_thr)
         repeat_indices = []
@@ -211,7 +215,7 @@ class ClassBalancedDataset(object):
         self.repeat_indices = repeat_indices
 
         flags = []
-        if hasattr(self.dataset, 'flag'):
+        if hasattr(self.dataset, "flag"):
             for flag, repeat_factor in zip(self.dataset.flag, repeat_factors):
                 flags.extend([flag] * int(math.ceil(repeat_factor)))
             assert len(flags) == len(repeat_indices)
@@ -225,7 +229,7 @@ class ClassBalancedDataset(object):
             repeat_thr (float): The threshold of frequency. If an image
                 contains the categories whose frequency below the threshold,
                 it would be repeated.
-                
+
         Returns:
             list[float]: The repeat factors for each images in the dataset.
         """
@@ -258,9 +262,7 @@ class ClassBalancedDataset(object):
                 cat_ids = set([len(self.CLASSES)])
             repeat_factor = 1
             if len(cat_ids) > 0:
-                repeat_factor = max(
-                    {category_repeat[cat_id]
-                     for cat_id in cat_ids})
+                repeat_factor = max({category_repeat[cat_id] for cat_id in cat_ids})
             repeat_factors.append(repeat_factor)
 
         return repeat_factors

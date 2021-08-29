@@ -36,25 +36,24 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
 
     _version = 1
 
-    def __init__(self,
-                 num_classes,
-                 in_channels,
-                 feat_channels=256,
-                 stacked_convs=4,
-                 strides=(4, 8, 16, 32, 64),
-                 dcn_on_last_conv=False,
-                 conv_bias='auto',
-                 loss_cls=dict(
-                     type='FocalLoss',
-                     use_sigmoid=True,
-                     gamma=2.0,
-                     alpha=0.25,
-                     loss_weight=1.0),
-                 loss_bbox=dict(type='IoULoss', loss_weight=1.0),
-                 conv_cfg=None,
-                 norm_cfg=None,
-                 train_cfg=None,
-                 test_cfg=None):
+    def __init__(
+        self,
+        num_classes,
+        in_channels,
+        feat_channels=256,
+        stacked_convs=4,
+        strides=(4, 8, 16, 32, 64),
+        dcn_on_last_conv=False,
+        conv_bias="auto",
+        loss_cls=dict(
+            type="FocalLoss", use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0
+        ),
+        loss_bbox=dict(type="IoULoss", loss_weight=1.0),
+        conv_cfg=None,
+        norm_cfg=None,
+        train_cfg=None,
+        test_cfg=None,
+    ):
         super(AnchorFreeHead, self).__init__()
         self.num_classes = num_classes
         self.cls_out_channels = num_classes
@@ -63,7 +62,7 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         self.stacked_convs = stacked_convs
         self.strides = strides
         self.dcn_on_last_conv = dcn_on_last_conv
-        assert conv_bias == 'auto' or isinstance(conv_bias, bool)
+        assert conv_bias == "auto" or isinstance(conv_bias, bool)
         self.conv_bias = conv_bias
         self.loss_cls = build_loss(loss_cls)
         self.loss_bbox = build_loss(loss_bbox)
@@ -86,7 +85,7 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         for i in range(self.stacked_convs):
             chn = self.in_channels if i == 0 else self.feat_channels
             if self.dcn_on_last_conv and i == self.stacked_convs - 1:
-                conv_cfg = dict(type='DCNv2')
+                conv_cfg = dict(type="DCNv2")
             else:
                 conv_cfg = self.conv_cfg
             self.cls_convs.append(
@@ -98,7 +97,9 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
                     padding=1,
                     conv_cfg=conv_cfg,
                     norm_cfg=self.norm_cfg,
-                    bias=self.conv_bias))
+                    bias=self.conv_bias,
+                )
+            )
 
     def _init_reg_convs(self):
         """Initialize bbox regression conv layers of the head."""
@@ -106,7 +107,7 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         for i in range(self.stacked_convs):
             chn = self.in_channels if i == 0 else self.feat_channels
             if self.dcn_on_last_conv and i == self.stacked_convs - 1:
-                conv_cfg = dict(type='DCNv2')
+                conv_cfg = dict(type="DCNv2")
             else:
                 conv_cfg = self.conv_cfg
             self.reg_convs.append(
@@ -118,12 +119,15 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
                     padding=1,
                     conv_cfg=conv_cfg,
                     norm_cfg=self.norm_cfg,
-                    bias=self.conv_bias))
+                    bias=self.conv_bias,
+                )
+            )
 
     def _init_predictor(self):
         """Initialize predictor layers of the head."""
         self.conv_cls = nn.Conv2d(
-            self.feat_channels, self.cls_out_channels, 3, padding=1)
+            self.feat_channels, self.cls_out_channels, 3, padding=1
+        )
         self.conv_reg = nn.Conv2d(self.feat_channels, 4, 3, padding=1)
 
     def init_weights(self):
@@ -138,43 +142,56 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         normal_init(self.conv_cls, std=0.01, bias=bias_cls)
         normal_init(self.conv_reg, std=0.01)
 
-    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
-                              missing_keys, unexpected_keys, error_msgs):
+    def _load_from_state_dict(
+        self,
+        state_dict,
+        prefix,
+        local_metadata,
+        strict,
+        missing_keys,
+        unexpected_keys,
+        error_msgs,
+    ):
         """Hack some keys of the model state dict so that can load checkpoints
         of previous version."""
-        version = local_metadata.get('version', None)
+        version = local_metadata.get("version", None)
         if version is None:
             # the key is different in early versions
             # for example, 'fcos_cls' become 'conv_cls' now
-            bbox_head_keys = [
-                k for k in state_dict.keys() if k.startswith(prefix)
-            ]
+            bbox_head_keys = [k for k in state_dict.keys() if k.startswith(prefix)]
             ori_predictor_keys = []
             new_predictor_keys = []
             # e.g. 'fcos_cls' or 'fcos_reg'
             for key in bbox_head_keys:
                 ori_predictor_keys.append(key)
-                key = key.split('.')
+                key = key.split(".")
                 conv_name = None
-                if key[1].endswith('cls'):
-                    conv_name = 'conv_cls'
-                elif key[1].endswith('reg'):
-                    conv_name = 'conv_reg'
-                elif key[1].endswith('centerness'):
-                    conv_name = 'conv_centerness'
+                if key[1].endswith("cls"):
+                    conv_name = "conv_cls"
+                elif key[1].endswith("reg"):
+                    conv_name = "conv_reg"
+                elif key[1].endswith("centerness"):
+                    conv_name = "conv_centerness"
                 else:
                     assert NotImplementedError
                 if conv_name is not None:
                     key[1] = conv_name
-                    new_predictor_keys.append('.'.join(key))
+                    new_predictor_keys.append(".".join(key))
                 else:
                     ori_predictor_keys.pop(-1)
             for i in range(len(new_predictor_keys)):
                 state_dict[new_predictor_keys[i]] = state_dict.pop(
-                    ori_predictor_keys[i])
-        super()._load_from_state_dict(state_dict, prefix, local_metadata,
-                                      strict, missing_keys, unexpected_keys,
-                                      error_msgs)
+                    ori_predictor_keys[i]
+                )
+        super()._load_from_state_dict(
+            state_dict,
+            prefix,
+            local_metadata,
+            strict,
+            missing_keys,
+            unexpected_keys,
+            error_msgs,
+        )
 
     def forward(self, feats):
         """Forward features from the upstream network.
@@ -218,13 +235,15 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         return cls_score, bbox_pred, cls_feat, reg_feat
 
     @abstractmethod
-    def loss(self,
-             cls_scores,
-             bbox_preds,
-             gt_bboxes,
-             gt_labels,
-             img_metas,
-             gt_bboxes_ignore=None):
+    def loss(
+        self,
+        cls_scores,
+        bbox_preds,
+        gt_bboxes,
+        gt_labels,
+        img_metas,
+        gt_bboxes_ignore=None,
+    ):
         """Compute loss of the head.
 
         Args:
@@ -246,12 +265,7 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         raise NotImplementedError
 
     @abstractmethod
-    def get_bboxes(self,
-                   cls_scores,
-                   bbox_preds,
-                   img_metas,
-                   cfg=None,
-                   rescale=None):
+    def get_bboxes(self, cls_scores, bbox_preds, img_metas, cfg=None, rescale=None):
         """Transform network output for a batch into bbox predictions.
 
         Args:
@@ -283,12 +297,7 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         """
         raise NotImplementedError
 
-    def _get_points_single(self,
-                           featmap_size,
-                           stride,
-                           dtype,
-                           device,
-                           flatten=False):
+    def _get_points_single(self, featmap_size, stride, dtype, device, flatten=False):
         """Get points of a single scale level."""
         h, w = featmap_size
         x_range = torch.arange(w, dtype=dtype, device=device)
@@ -314,8 +323,10 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         mlvl_points = []
         for i in range(len(featmap_sizes)):
             mlvl_points.append(
-                self._get_points_single(featmap_sizes[i], self.strides[i],
-                                        dtype, device, flatten))
+                self._get_points_single(
+                    featmap_sizes[i], self.strides[i], dtype, device, flatten
+                )
+            )
         return mlvl_points
 
     def aug_test(self, feats, img_metas, rescale=False):
@@ -334,5 +345,5 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         Returns:
             list[ndarray]: bbox results of each class
         """
-        
+
         return self.aug_test_bboxes(feats, img_metas, rescale=rescale)

@@ -11,14 +11,14 @@ class BaseClsHead(nn.Module):
 
     def __init__(self):
         super(BaseClsHead, self).__init__()
-    
+
     def simple_test(self, feats):
         """Test without augmentation."""
-        x = self(feats)        
+        x = self(feats)
         x = x.detach().cpu().numpy()
         return x
 
     def forward_train(self, feats, labels):
         x = self(feats)
         losses = self.loss(x, labels)
-        return dict(loss_emb=losses) 
+        return dict(loss_emb=losses)

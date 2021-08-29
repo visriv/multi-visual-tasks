@@ -17,7 +17,7 @@ class SingleStageDetector(BaseDetector):
 
     def __init__(self, cfg):
         super(SingleStageDetector, self).__init__()
-       
+
         if len(cfg.BACKBONE) <= 0:
             raise AttributeError("No BACKBONE definition in cfg!")
         self.type = cfg.TYPE
@@ -31,12 +31,9 @@ class SingleStageDetector(BaseDetector):
 
         self.train_cfg = convert_to_dict(cfg.TRAIN_CFG)
         self.test_cfg = convert_to_dict(cfg.TEST_CFG)
-        default_args = {
-            "train_cfg": self.train_cfg,
-            "test_cfg": self.test_cfg
-        }
+        default_args = {"train_cfg": self.train_cfg, "test_cfg": self.test_cfg}
         self.bbox_head = build_head(cfg.BBOX_HEAD, default_args)
-        
+
         if "PRETRAINED_MODEL_PATH" in cfg:
             if cfg.PRETRAINED_MODEL_PATH != "":
                 self.init_weights(pretrained=cfg.PRETRAINED_MODEL_PATH)
@@ -77,12 +74,9 @@ class SingleStageDetector(BaseDetector):
         outs = self.bbox_head(x)
         return outs
 
-    def forward_train(self,
-                      img,
-                      img_metas,
-                      gt_bboxes,
-                      gt_labels,
-                      gt_bboxes_ignore=None):
+    def forward_train(
+        self, img, img_metas, gt_bboxes, gt_labels, gt_bboxes_ignore=None
+    ):
         """
         Args:
             img (Tensor): Input images of shape (N, C, H, W).
@@ -104,11 +98,8 @@ class SingleStageDetector(BaseDetector):
 
         x = self.extract_feat(img)
         losses = self.bbox_head.forward_train(
-            x, 
-            img_metas,
-            gt_bboxes,
-            gt_labels,
-            gt_bboxes_ignore)
+            x, img_metas, gt_bboxes, gt_labels, gt_bboxes_ignore
+        )
         return losses
 
     def simple_test(self, img, img_metas, rescale=False):
@@ -130,12 +121,12 @@ class SingleStageDetector(BaseDetector):
         # skip post-processing when exporting to ONNX
         if torch.onnx.is_in_onnx_export():
             mlres_list = self.bbox_head.get_bboxes(
-                *outs, img_metas, rescale=rescale, with_nms=False)
+                *outs, img_metas, rescale=rescale, with_nms=False
+            )
             return mlres_list
         else:
-            bbox_list = self.bbox_head.get_bboxes(
-                *outs, img_metas, rescale=rescale)
-                    
+            bbox_list = self.bbox_head.get_bboxes(*outs, img_metas, rescale=rescale)
+
             bbox_results = [
                 bbox2result(det_bboxes, det_labels, self.bbox_head.num_classes)
                 for det_bboxes, det_labels in bbox_list
@@ -160,10 +151,11 @@ class SingleStageDetector(BaseDetector):
                 The outer list corresponds to each image. The inner list
                 corresponds to each class.
         """
-        
-        assert hasattr(self.bbox_head, 'aug_test'), \
-            f'{self.bbox_head.__class__.__name__}' \
-            ' does not support test-time augmentation'
+
+        assert hasattr(self.bbox_head, "aug_test"), (
+            f"{self.bbox_head.__class__.__name__}"
+            " does not support test-time augmentation"
+        )
 
         feats = self.extract_feats(imgs)
         return [self.bbox_head.aug_test(feats, img_metas, rescale=rescale)]

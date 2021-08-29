@@ -21,7 +21,6 @@ def deprecated_api_warning(name_dict, cls_name=None):
     """
 
     def api_warning_wrapper(old_func):
-
         @functools.wraps(old_func)
         def new_func(*args, **kwargs):
             # get the arg spec of the decorated method
@@ -29,15 +28,16 @@ def deprecated_api_warning(name_dict, cls_name=None):
             # get name of the function
             func_name = old_func.__name__
             if cls_name is not None:
-                func_name = f'{cls_name}.{func_name}'
+                func_name = f"{cls_name}.{func_name}"
             if args:
-                arg_names = args_info.args[:len(args)]
+                arg_names = args_info.args[: len(args)]
                 for src_arg_name, dst_arg_name in name_dict.items():
                     if src_arg_name in arg_names:
                         warnings.warn(
                             f'"{src_arg_name}" is deprecated in '
                             f'`{func_name}`, please use "{dst_arg_name}" '
-                            'instead')
+                            "instead"
+                        )
                         arg_names[arg_names.index(src_arg_name)] = dst_arg_name
             if kwargs:
                 for src_arg_name, dst_arg_name in name_dict.items():
@@ -45,7 +45,8 @@ def deprecated_api_warning(name_dict, cls_name=None):
                         warnings.warn(
                             f'"{src_arg_name}" is deprecated in '
                             f'`{func_name}`, please use "{dst_arg_name}" '
-                            'instead')
+                            "instead"
+                        )
                         kwargs[dst_arg_name] = kwargs.pop(src_arg_name)
 
             # apply converted arguments to the decorated method
@@ -55,6 +56,7 @@ def deprecated_api_warning(name_dict, cls_name=None):
         return new_func
 
     return api_warning_wrapper
+
 
 def infer_abbr(class_type):
     """Infer abbreviation from the class name.
@@ -75,30 +77,30 @@ def infer_abbr(class_type):
         str: The inferred abbreviation.
     """
     if not inspect.isclass(class_type):
-        raise TypeError(
-            f'class_type must be a type, but got {type(class_type)}')
-    if hasattr(class_type, '_abbr_'):
+        raise TypeError(f"class_type must be a type, but got {type(class_type)}")
+    if hasattr(class_type, "_abbr_"):
         return class_type._abbr_
     if issubclass(class_type, _InstanceNorm):  # IN is a subclass of BN
-        return 'in'
+        return "in"
     elif issubclass(class_type, _BatchNorm):
-        return 'bn'
+        return "bn"
     elif issubclass(class_type, nn.GroupNorm):
-        return 'gn'
+        return "gn"
     elif issubclass(class_type, nn.LayerNorm):
-        return 'ln'
+        return "ln"
     else:
         class_name = class_type.__name__.lower()
-        if 'batch' in class_name:
-            return 'bn'
-        elif 'group' in class_name:
-            return 'gn'
-        elif 'layer' in class_name:
-            return 'ln'
-        elif 'instance' in class_name:
-            return 'in'
+        if "batch" in class_name:
+            return "bn"
+        elif "group" in class_name:
+            return "gn"
+        elif "layer" in class_name:
+            return "ln"
+        elif "instance" in class_name:
+            return "in"
         else:
-            return 'norm'
+            return "norm"
+
 
 def is_norm(layer, exclude=None):
     """Check if a layer is a normalization layer.
@@ -110,11 +112,12 @@ def is_norm(layer, exclude=None):
     """
     if exclude is not None:
         if not isinstance(exclude, tuple):
-            exclude = (exclude, )
+            exclude = (exclude,)
         if not isinstance(exclude, tuple):
             raise TypeError(
                 f'"exclude" must be either None or type or a tuple of types, '
-                f'but got {type(exclude)}: {exclude}')
+                f"but got {type(exclude)}: {exclude}"
+            )
 
     if exclude and isinstance(layer, exclude):
         return False

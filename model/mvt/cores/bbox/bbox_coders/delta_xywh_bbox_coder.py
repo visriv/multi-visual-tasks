@@ -20,9 +20,9 @@ class DeltaXYWHBBoxCoder(BaseBBoxCoder):
             target for delta coordinates
     """
 
-    def __init__(self,
-                 target_means=(0., 0., 0., 0.),
-                 target_stds=(1., 1., 1., 1.)):
+    def __init__(
+        self, target_means=(0.0, 0.0, 0.0, 0.0), target_stds=(1.0, 1.0, 1.0, 1.0)
+    ):
         super(DeltaXYWHBBoxCoder, self).__init__()
         self.means = target_means
         self.stds = target_stds
@@ -45,11 +45,7 @@ class DeltaXYWHBBoxCoder(BaseBBoxCoder):
         encoded_bboxes = bbox2delta(bboxes, gt_bboxes, self.means, self.stds)
         return encoded_bboxes
 
-    def decode(self,
-               bboxes,
-               pred_bboxes,
-               max_shape=None,
-               wh_ratio_clip=16 / 1000):
+    def decode(self, bboxes, pred_bboxes, max_shape=None, wh_ratio_clip=16 / 1000):
         """Apply transformation `pred_bboxes` to `boxes`.
 
         Args:
@@ -65,13 +61,14 @@ class DeltaXYWHBBoxCoder(BaseBBoxCoder):
         """
 
         assert pred_bboxes.size(0) == bboxes.size(0)
-        decoded_bboxes = delta2bbox(bboxes, pred_bboxes, self.means, self.stds,
-                                    max_shape, wh_ratio_clip)
+        decoded_bboxes = delta2bbox(
+            bboxes, pred_bboxes, self.means, self.stds, max_shape, wh_ratio_clip
+        )
 
         return decoded_bboxes
 
 
-def bbox2delta(proposals, gt, means=(0., 0., 0., 0.), stds=(1., 1., 1., 1.)):
+def bbox2delta(proposals, gt, means=(0.0, 0.0, 0.0, 0.0), stds=(1.0, 1.0, 1.0, 1.0)):
     """Compute deltas of proposals w.r.t. gt.
 
     We usually compute the deltas of x, y, w, h of proposals w.r.t ground
@@ -122,12 +119,14 @@ def bbox2delta(proposals, gt, means=(0., 0., 0., 0.), stds=(1., 1., 1., 1.)):
     return deltas
 
 
-def delta2bbox(rois,
-               deltas,
-               means=(0., 0., 0., 0.),
-               stds=(1., 1., 1., 1.),
-               max_shape=None,
-               wh_ratio_clip=16 / 1000):
+def delta2bbox(
+    rois,
+    deltas,
+    means=(0.0, 0.0, 0.0, 0.0),
+    stds=(1.0, 1.0, 1.0, 1.0),
+    max_shape=None,
+    wh_ratio_clip=16 / 1000,
+):
     """Apply deltas to shift/scale base boxes.
 
     Typically the rois are anchor or proposed bounding boxes and the deltas are

@@ -6,7 +6,15 @@ from .darknetcsp import DarknetCSP
 
 
 __all__ = [
-    'Darknet', 'ResBlock', 'ResLayer', 'BasicBlock', 'Bottleneck', 
-    'ResNet', 'ResNetV1c', 'ResNetV1d', 'CSPDarknet53', 
-    'TinyYOLOV4Net', 'DarknetCSP'
+    "Darknet",
+    "ResBlock",
+    "ResLayer",
+    "BasicBlock",
+    "Bottleneck",
+    "ResNet",
+    "ResNetV1c",
+    "ResNetV1d",
+    "CSPDarknet53",
+    "TinyYOLOV4Net",
+    "DarknetCSP",
 ]

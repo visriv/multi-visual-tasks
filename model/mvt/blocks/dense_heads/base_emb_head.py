@@ -12,10 +12,10 @@ class BaseEmbHead(nn.Module):
 
     def __init__(self):
         super(BaseEmbHead, self).__init__()
-    
+
     def simple_test(self, feats):
         """Test without augmentation."""
-        x = self(feats)        
+        x = self(feats)
         x = x.detach().cpu().numpy()
         return x
 
@@ -23,4 +23,3 @@ class BaseEmbHead(nn.Module):
         x = self(feats)
         losses = self.loss(x, labels)
         return dict(loss_emb=losses)
-    

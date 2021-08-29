@@ -14,7 +14,7 @@ def imconvert(img, src, dst):
     Returns:
         ndarray: The converted image.
     """
-    code = getattr(cv2, f'COLOR_{src.upper()}2{dst.upper()}')
+    code = getattr(cv2, f"COLOR_{src.upper()}2{dst.upper()}")
     out_img = cv2.cvtColor(img, code)
     return out_img
 
@@ -91,10 +91,11 @@ def _convert_input_type_range(img):
     if img_type == np.float32:
         pass
     elif img_type == np.uint8:
-        img /= 255.
+        img /= 255.0
     else:
-        raise TypeError('The img type should be np.float32 or np.uint8, '
-                        f'but got {img_type}')
+        raise TypeError(
+            "The img type should be np.float32 or np.uint8, " f"but got {img_type}"
+        )
     return img
 
 
@@ -117,12 +118,13 @@ def _convert_output_type_range(img, dst_type):
         (ndarray): The converted image with desired type and range.
     """
     if dst_type not in (np.uint8, np.float32):
-        raise TypeError('The dst_type should be np.float32 or np.uint8, '
-                        f'but got {dst_type}')
+        raise TypeError(
+            "The dst_type should be np.float32 or np.uint8, " f"but got {dst_type}"
+        )
     if dst_type == np.uint8:
         img = img.round()
     else:
-        img /= 255.
+        img /= 255.0
     return img.astype(dst_type)
 
 
@@ -149,9 +151,17 @@ def rgb2ycbcr(img, y_only=False):
     if y_only:
         out_img = np.dot(img, [65.481, 128.553, 24.966]) + 16.0
     else:
-        out_img = np.matmul(
-            img, [[65.481, -37.797, 112.0], [128.553, -74.203, -93.786],
-                  [24.966, 112.0, -18.214]]) + [16, 128, 128]
+        out_img = (
+            np.matmul(
+                img,
+                [
+                    [65.481, -37.797, 112.0],
+                    [128.553, -74.203, -93.786],
+                    [24.966, 112.0, -18.214],
+                ],
+            )
+            + [16, 128, 128]
+        )
     out_img = _convert_output_type_range(out_img, img_type)
     return out_img
 
@@ -179,9 +189,17 @@ def bgr2ycbcr(img, y_only=False):
     if y_only:
         out_img = np.dot(img, [24.966, 128.553, 65.481]) + 16.0
     else:
-        out_img = np.matmul(
-            img, [[24.966, 112.0, -18.214], [128.553, -74.203, -93.786],
-                  [65.481, -37.797, 112.0]]) + [16, 128, 128]
+        out_img = (
+            np.matmul(
+                img,
+                [
+                    [24.966, 112.0, -18.214],
+                    [128.553, -74.203, -93.786],
+                    [65.481, -37.797, 112.0],
+                ],
+            )
+            + [16, 128, 128]
+        )
     out_img = _convert_output_type_range(out_img, img_type)
     return out_img
 
@@ -205,11 +223,18 @@ def ycbcr2rgb(img):
     """
     img_type = img.dtype
     img = _convert_input_type_range(img) * 255
-    out_img = np.matmul(img, [[0.00456621, 0.00456621, 0.00456621],
-                              [0, -0.00153632, 0.00791071],
-                              [0.00625893, -0.00318811, 0]]) * 255.0 + [
-                                  -222.921, 135.576, -276.836
-                              ]
+    out_img = (
+        np.matmul(
+            img,
+            [
+                [0.00456621, 0.00456621, 0.00456621],
+                [0, -0.00153632, 0.00791071],
+                [0.00625893, -0.00318811, 0],
+            ],
+        )
+        * 255.0
+        + [-222.921, 135.576, -276.836]
+    )
     out_img = _convert_output_type_range(out_img, img_type)
     return out_img
 
@@ -233,18 +258,25 @@ def ycbcr2bgr(img):
     """
     img_type = img.dtype
     img = _convert_input_type_range(img) * 255
-    out_img = np.matmul(img, [[0.00456621, 0.00456621, 0.00456621],
-                              [0.00791071, -0.00153632, 0],
-                              [0, -0.00318811, 0.00625893]]) * 255.0 + [
-                                  -276.836, 135.576, -222.921
-                              ]
+    out_img = (
+        np.matmul(
+            img,
+            [
+                [0.00456621, 0.00456621, 0.00456621],
+                [0.00791071, -0.00153632, 0],
+                [0, -0.00318811, 0.00625893],
+            ],
+        )
+        * 255.0
+        + [-276.836, 135.576, -222.921]
+    )
     out_img = _convert_output_type_range(out_img, img_type)
     return out_img
 
 
 def convert_color_factory(src, dst):
 
-    code = getattr(cv2, f'COLOR_{src.upper()}2{dst.upper()}')
+    code = getattr(cv2, f"COLOR_{src.upper()}2{dst.upper()}")
 
     def convert_color(img):
         out_img = cv2.cvtColor(img, code)
@@ -371,7 +403,7 @@ def adjust_color(img, alpha=1, beta=None, gamma=0):
 
 def imequalize(img):
     """Equalize the image histogram.
-    
+
     This function applies a non-linear mapping to the input image,
     in order to create a uniform distribution of grayscale values
     in the output image.
@@ -410,7 +442,7 @@ def imequalize(img):
     return equalized_img
 
 
-def adjust_brightness(img, factor=1.):
+def adjust_brightness(img, factor=1.0):
     """Adjust image brightness.
     This function controls the brightness of an image. An
     enhancement factor of 0.0 gives a black image.
@@ -431,12 +463,12 @@ def adjust_brightness(img, factor=1.):
     # achieve as close results as PIL.ImageEnhance.Brightness.
     # Set beta=1-factor, and gamma=0
     brightened_img = cv2.addWeighted(
-        img.astype(np.float32), factor, degenerated.astype(np.float32),
-        1 - factor, 0)
+        img.astype(np.float32), factor, degenerated.astype(np.float32), 1 - factor, 0
+    )
     return brightened_img.astype(img.dtype)
 
 
-def adjust_contrast(img, factor=1.):
+def adjust_contrast(img, factor=1.0):
     """Adjust image contrast.
     This function controls the contrast of an image. An
     enhancement factor of 0.0 gives a solid grey
@@ -455,8 +487,8 @@ def adjust_contrast(img, factor=1.):
     degenerated = (np.ones_like(img[..., 0]) * mean).astype(img.dtype)
     degenerated = gray2bgr(degenerated)
     contrasted_img = cv2.addWeighted(
-        img.astype(np.float32), factor, degenerated.astype(np.float32),
-        1 - factor, 0)
+        img.astype(np.float32), factor, degenerated.astype(np.float32), 1 - factor, 0
+    )
     return contrasted_img.astype(img.dtype)
 
 
@@ -476,9 +508,10 @@ def lut_transform(img, lut_table):
     assert isinstance(img, np.ndarray)
     assert 0 <= np.min(img) and np.max(img) <= 255
     assert isinstance(lut_table, np.ndarray)
-    assert lut_table.shape == (256, )
+    assert lut_table.shape == (256,)
 
     return cv2.LUT(np.array(img, dtype=np.uint8), lut_table)
+
 
 def clahe(img, clip_limit=40.0, tile_grid_size=(8, 8)):
     """Use CLAHE method to process the image.
@@ -519,7 +552,7 @@ def tensor2imgs(tensor, mean=(0, 0, 0), std=(1, 1, 1), to_rgb=True):
     """
 
     if torch is None:
-        raise RuntimeError('pytorch is not installed')
+        raise RuntimeError("pytorch is not installed")
     assert torch.is_tensor(tensor) and tensor.ndim == 4
     assert len(mean) == 3
     assert len(std) == 3
@@ -530,20 +563,19 @@ def tensor2imgs(tensor, mean=(0, 0, 0), std=(1, 1, 1), to_rgb=True):
     imgs = []
     for img_id in range(num_imgs):
         img = tensor[img_id, ...].cpu().numpy().transpose(1, 2, 0)
-        img = imdenormalize(
-            img, mean, std, to_bgr=to_rgb).astype(np.uint8)
+        img = imdenormalize(img, mean, std, to_bgr=to_rgb).astype(np.uint8)
         imgs.append(np.ascontiguousarray(img))
     return imgs
 
 
-bgr2rgb = convert_color_factory('bgr', 'rgb')
+bgr2rgb = convert_color_factory("bgr", "rgb")
 
-rgb2bgr = convert_color_factory('rgb', 'bgr')
+rgb2bgr = convert_color_factory("rgb", "bgr")
 
-bgr2hsv = convert_color_factory('bgr', 'hsv')
+bgr2hsv = convert_color_factory("bgr", "hsv")
 
-hsv2bgr = convert_color_factory('hsv', 'bgr')
+hsv2bgr = convert_color_factory("hsv", "bgr")
 
-bgr2hls = convert_color_factory('bgr', 'hls')
+bgr2hls = convert_color_factory("bgr", "hls")
 
-hls2bgr = convert_color_factory('hls', 'bgr')
+hls2bgr = convert_color_factory("hls", "bgr")

@@ -11,11 +11,13 @@ from collections.abc import Sequence
 
 from model.mvt.utils.log_util import print_log
 from model.mvt.utils.data_util import get_classes
-from model.mvt.utils.metric_util import (cal_recalls, 
-                                         tpfp_imagenet, 
-                                         tpfp_default, 
-                                         average_precision,
-                                         total_intersect_and_union)
+from model.mvt.utils.metric_util import (
+    cal_recalls,
+    tpfp_imagenet,
+    tpfp_default,
+    average_precision,
+    total_intersect_and_union,
+)
 from model.mvt.utils.bbox_util import bbox_overlaps_np
 
 
@@ -32,12 +34,12 @@ def get_cls_results(det_results, annotations, class_id):
     cls_gts = []
     cls_gts_ignore = []
     for ann in annotations:
-        gt_inds = ann['labels'] == class_id
-        cls_gts.append(ann['bboxes'][gt_inds, :])
+        gt_inds = ann["labels"] == class_id
+        cls_gts.append(ann["bboxes"][gt_inds, :])
 
-        if ann.get('labels_ignore', None) is not None:
-            ignore_inds = ann['labels_ignore'] == class_id
-            cls_gts_ignore.append(ann['bboxes_ignore'][ignore_inds, :])
+        if ann.get("labels_ignore", None) is not None:
+            ignore_inds = ann["labels_ignore"] == class_id
+            cls_gts_ignore.append(ann["bboxes_ignore"][ignore_inds, :])
         else:
             cls_gts_ignore.append(np.empty((0, 4), dtype=np.float32))
 
@@ -65,13 +67,15 @@ def set_recall_param(proposal_nums, iou_thrs):
     return _proposal_nums, _iou_thrs
 
 
-def eval_map(det_results,
-             annotations,
-             scale_ranges=None,
-             iou_thr=0.5,
-             dataset=None,
-             logger=None,
-             nproc=4):
+def eval_map(
+    det_results,
+    annotations,
+    scale_ranges=None,
+    iou_thr=0.5,
+    dataset=None,
+    logger=None,
+    nproc=4,
+):
     """Evaluate mAP of a dataset.
 
     Args:
@@ -106,26 +110,33 @@ def eval_map(det_results,
     num_imgs = len(det_results)
     num_scales = len(scale_ranges) if scale_ranges is not None else 1
     num_classes = len(det_results[0])  # positive class num
-    area_ranges = ([(rg[0]**2, rg[1]**2) for rg in scale_ranges]
-                   if scale_ranges is not None else None)
+    area_ranges = (
+        [(rg[0] ** 2, rg[1] ** 2) for rg in scale_ranges]
+        if scale_ranges is not None
+        else None
+    )
 
     pool = Pool(nproc)
     eval_results = []
     for i in range(num_classes):
         # get gt and det bboxes of this class
-        cls_dets, cls_gts, cls_gts_ignore = get_cls_results(
-            det_results, annotations, i)
+        cls_dets, cls_gts, cls_gts_ignore = get_cls_results(det_results, annotations, i)
         # choose proper function according to datasets to compute tp and fp
-        if dataset in ['det', 'vid']:
+        if dataset in ["det", "vid"]:
             tpfp_func = tpfp_imagenet
         else:
             tpfp_func = tpfp_default
         # compute tp and fp for each image with multiple processes
         tpfp = pool.starmap(
             tpfp_func,
-            zip(cls_dets, cls_gts, cls_gts_ignore,
+            zip(
+                cls_dets,
+                cls_gts,
+                cls_gts_ignore,
                 [iou_thr for _ in range(num_imgs)],
-                [area_ranges for _ in range(num_imgs)]))
+                [area_ranges for _ in range(num_imgs)],
+            ),
+        )
         tp, fp = tuple(zip(*tpfp))
         # calculate gt number of each scale
         # ignored gts or gts beyond the specific scale are not counted
@@ -134,11 +145,9 @@ def eval_map(det_results,
             if area_ranges is None:
                 num_gts[0] += bbox.shape[0]
             else:
-                gt_areas = (bbox[:, 2] - bbox[:, 0]) * (
-                    bbox[:, 3] - bbox[:, 1])
+                gt_areas = (bbox[:, 2] - bbox[:, 0]) * (bbox[:, 3] - bbox[:, 1])
                 for k, (min_area, max_area) in enumerate(area_ranges):
-                    num_gts[k] += np.sum((gt_areas >= min_area)
-                                         & (gt_areas < max_area))
+                    num_gts[k] += np.sum((gt_areas >= min_area) & (gt_areas < max_area))
         # sort all det bboxes by score, also sort tp and fp
         cls_dets = np.vstack(cls_dets)
         num_dets = cls_dets.shape[0]
@@ -156,21 +165,22 @@ def eval_map(det_results,
             recalls = recalls[0, :]
             precisions = precisions[0, :]
             num_gts = num_gts.item()
-        mode = 'area' if dataset != 'voc07' else '11points'
+        mode = "area" if dataset != "voc07" else "11points"
         ap = average_precision(recalls, precisions, mode)
-        eval_results.append({
-            'num_gts': num_gts,
-            'num_dets': num_dets,
-            'recall': recalls,
-            'precision': precisions,
-            'ap': ap
-        })
+        eval_results.append(
+            {
+                "num_gts": num_gts,
+                "num_dets": num_dets,
+                "recall": recalls,
+                "precision": precisions,
+                "ap": ap,
+            }
+        )
     pool.close()
     if scale_ranges is not None:
         # shape (num_classes, num_scales)
-        all_ap = np.vstack([cls_result['ap'] for cls_result in eval_results])
-        all_num_gts = np.vstack(
-            [cls_result['num_gts'] for cls_result in eval_results])
+        all_ap = np.vstack([cls_result["ap"] for cls_result in eval_results])
+        all_num_gts = np.vstack([cls_result["num_gts"] for cls_result in eval_results])
         mean_ap = []
         for i in range(num_scales):
             if np.any(all_num_gts[:, i] > 0):
@@ -180,21 +190,16 @@ def eval_map(det_results,
     else:
         aps = []
         for cls_result in eval_results:
-            if cls_result['num_gts'] > 0:
-                aps.append(cls_result['ap'])
+            if cls_result["num_gts"] > 0:
+                aps.append(cls_result["ap"])
         mean_ap = np.array(aps).mean().item() if aps else 0.0
 
-    print_map_summary(
-        mean_ap, eval_results, dataset, area_ranges, logger=logger)
+    print_map_summary(mean_ap, eval_results, dataset, area_ranges, logger=logger)
 
     return mean_ap, eval_results
 
 
-def eval_recalls(gts,
-                 proposals,
-                 proposal_nums=None,
-                 iou_thrs=0.5,
-                 logger=None):
+def eval_recalls(gts, proposals, proposal_nums=None, iou_thrs=0.5, logger=None):
     """Calculate recalls.
 
     Args:
@@ -239,15 +244,11 @@ def eval_recalls(gts,
     return recalls
 
 
-def print_map_summary(mean_ap,
-                      results,
-                      dataset=None,
-                      scale_ranges=None,
-                      logger=None):
+def print_map_summary(mean_ap, results, dataset=None, scale_ranges=None, logger=None):
     """Print mAP and results of each class.
     A table will be printed to show the gts/dets/recall/AP of each class and
     the mAP.
-    
+
     Args:
         mean_ap (float): Calculated from `eval_map()`.
         results (list[dict]): Calculated from `eval_map()`.
@@ -257,11 +258,11 @@ def print_map_summary(mean_ap,
             summary. See `print_log()` for details. Default: None.
     """
 
-    if logger == 'silent':
+    if logger == "silent":
         return
 
-    if isinstance(results[0]['ap'], np.ndarray):
-        num_scales = len(results[0]['ap'])
+    if isinstance(results[0]["ap"], np.ndarray):
+        num_scales = len(results[0]["ap"])
     else:
         num_scales = 1
 
@@ -274,10 +275,10 @@ def print_map_summary(mean_ap,
     aps = np.zeros((num_scales, num_classes), dtype=np.float32)
     num_gts = np.zeros((num_scales, num_classes), dtype=int)
     for i, cls_result in enumerate(results):
-        if cls_result['recall'].size > 0:
-            recalls[:, i] = np.array(cls_result['recall'], ndmin=2)[:, -1]
-        aps[:, i] = cls_result['ap']
-        num_gts[:, i] = cls_result['num_gts']
+        if cls_result["recall"].size > 0:
+            recalls[:, i] = np.array(cls_result["recall"], ndmin=2)[:, -1]
+        aps[:, i] = cls_result["ap"]
+        num_gts[:, i] = cls_result["num_gts"]
 
     if dataset is None:
         label_names = [str(i) for i in range(num_classes)]
@@ -289,29 +290,29 @@ def print_map_summary(mean_ap,
     if not isinstance(mean_ap, list):
         mean_ap = [mean_ap]
 
-    header = ['class', 'gts', 'dets', 'recall', 'ap']
+    header = ["class", "gts", "dets", "recall", "ap"]
     for i in range(num_scales):
         if scale_ranges is not None:
-            print_log(f'Scale range {scale_ranges[i]}', logger=logger)
+            print_log(f"Scale range {scale_ranges[i]}", logger=logger)
         table_data = [header]
         for j in range(num_classes):
             row_data = [
-                label_names[j], num_gts[i, j], results[j]['num_dets'],
-                f'{recalls[i, j]:.3f}', f'{aps[i, j]:.3f}'
+                label_names[j],
+                num_gts[i, j],
+                results[j]["num_dets"],
+                f"{recalls[i, j]:.3f}",
+                f"{aps[i, j]:.3f}",
             ]
             table_data.append(row_data)
-        table_data.append(['mAP', '', '', '', f'{mean_ap[i]:.3f}'])
+        table_data.append(["mAP", "", "", "", f"{mean_ap[i]:.3f}"])
         table = AsciiTable(table_data)
         table.inner_footing_row_border = True
-        print_log('\n' + table.table, logger=logger)
+        print_log("\n" + table.table, logger=logger)
 
 
-def print_recall_summary(recalls,
-                         proposal_nums,
-                         iou_thrs,
-                         row_idxs=None,
-                         col_idxs=None,
-                         logger=None):
+def print_recall_summary(
+    recalls, proposal_nums, iou_thrs, row_idxs=None, col_idxs=None, logger=None
+):
     """Print recalls in a table.
 
     Args:
@@ -329,14 +330,14 @@ def print_recall_summary(recalls,
         row_idxs = np.arange(proposal_nums.size)
     if col_idxs is None:
         col_idxs = np.arange(iou_thrs.size)
-    row_header = [''] + iou_thrs[col_idxs].tolist()
+    row_header = [""] + iou_thrs[col_idxs].tolist()
     table_data = [row_header]
     for i, num in enumerate(proposal_nums[row_idxs]):
-        row = [f'{val:.3f}' for val in recalls[row_idxs[i], col_idxs].tolist()]
+        row = [f"{val:.3f}" for val in recalls[row_idxs[i], col_idxs].tolist()]
         row.insert(0, num)
         table_data.append(row)
     table = AsciiTable(table_data)
-    print_log('\n' + table.table, logger=logger)
+    print_log("\n" + table.table, logger=logger)
 
 
 def plot_num_recall(recalls, proposal_nums):
@@ -356,10 +357,11 @@ def plot_num_recall(recalls, proposal_nums):
         _recalls = recalls
 
     import matplotlib.pyplot as plt
+
     f = plt.figure()
     plt.plot([0] + _proposal_nums, [0] + _recalls)
-    plt.xlabel('Proposal num')
-    plt.ylabel('Recall')
+    plt.xlabel("Proposal num")
+    plt.ylabel("Recall")
     plt.axis([0, proposal_nums.max(), 0, 1])
     f.show()
 
@@ -381,22 +383,25 @@ def plot_iou_recall(recalls, iou_thrs):
         _recalls = recalls
 
     import matplotlib.pyplot as plt
+
     f = plt.figure()
-    plt.plot(_iou_thrs + [1.0], _recalls + [0.])
-    plt.xlabel('IoU')
-    plt.ylabel('Recall')
+    plt.plot(_iou_thrs + [1.0], _recalls + [0.0])
+    plt.xlabel("IoU")
+    plt.ylabel("Recall")
     plt.axis([iou_thrs.min(), 1, 0, 1])
     f.show()
 
 
-def eval_seg_metrics(results,
-                     gt_seg_maps,
-                     num_classes,
-                     ignore_index,
-                     metrics=['mIoU'],
-                     nan_to_num=None,
-                     label_map=dict(),
-                     reduce_zero_label=False):
+def eval_seg_metrics(
+    results,
+    gt_seg_maps,
+    num_classes,
+    ignore_index,
+    metrics=["mIoU"],
+    nan_to_num=None,
+    label_map=dict(),
+    reduce_zero_label=False,
+):
     """Calculate evaluation metrics
     Args:
         results (list[ndarray]): List of prediction segmentation maps.
@@ -416,39 +421,41 @@ def eval_seg_metrics(results,
 
     if isinstance(metrics, str):
         metrics = [metrics]
-    allowed_metrics = ['mIoU', 'mDice']
+    allowed_metrics = ["mIoU", "mDice"]
     if not set(metrics).issubset(set(allowed_metrics)):
-        raise KeyError('metrics {} is not supported'.format(metrics))
-    total_area_intersect, total_area_union, total_area_pred_label, \
-        total_area_label = total_intersect_and_union(results, gt_seg_maps,
-                                                     num_classes, ignore_index,
-                                                     label_map,
-                                                     reduce_zero_label)
+        raise KeyError("metrics {} is not supported".format(metrics))
+    (
+        total_area_intersect,
+        total_area_union,
+        total_area_pred_label,
+        total_area_label,
+    ) = total_intersect_and_union(
+        results, gt_seg_maps, num_classes, ignore_index, label_map, reduce_zero_label
+    )
     all_acc = total_area_intersect.sum() / total_area_label.sum()
     acc = total_area_intersect / total_area_label
     ret_metrics = [all_acc, acc]
     for metric in metrics:
-        if metric == 'mIoU':
+        if metric == "mIoU":
             iou = total_area_intersect / total_area_union
             ret_metrics.append(iou)
-        elif metric == 'mDice':
-            dice = 2 * total_area_intersect / (
-                total_area_pred_label + total_area_label)
+        elif metric == "mDice":
+            dice = 2 * total_area_intersect / (total_area_pred_label + total_area_label)
             ret_metrics.append(dice)
     if nan_to_num is not None:
-        ret_metrics = [
-            np.nan_to_num(metric, nan=nan_to_num) for metric in ret_metrics
-        ]
+        ret_metrics = [np.nan_to_num(metric, nan=nan_to_num) for metric in ret_metrics]
     return ret_metrics
 
 
-def mean_iou(results,
-             gt_seg_maps,
-             num_classes,
-             ignore_index,
-             nan_to_num=None,
-             label_map=dict(),
-             reduce_zero_label=False):
+def mean_iou(
+    results,
+    gt_seg_maps,
+    num_classes,
+    ignore_index,
+    nan_to_num=None,
+    label_map=dict(),
+    reduce_zero_label=False,
+):
     """Calculate Mean Intersection and Union (mIoU)
 
     Args:
@@ -472,20 +479,23 @@ def mean_iou(results,
         gt_seg_maps=gt_seg_maps,
         num_classes=num_classes,
         ignore_index=ignore_index,
-        metrics=['mIoU'],
+        metrics=["mIoU"],
         nan_to_num=nan_to_num,
         label_map=label_map,
-        reduce_zero_label=reduce_zero_label)
+        reduce_zero_label=reduce_zero_label,
+    )
     return all_acc, acc, iou
 
 
-def mean_dice(results,
-              gt_seg_maps,
-              num_classes,
-              ignore_index,
-              nan_to_num=None,
-              label_map=dict(),
-              reduce_zero_label=False):
+def mean_dice(
+    results,
+    gt_seg_maps,
+    num_classes,
+    ignore_index,
+    nan_to_num=None,
+    label_map=dict(),
+    reduce_zero_label=False,
+):
     """Calculate Mean Dice (mDice)
 
     Args:
@@ -509,8 +519,9 @@ def mean_dice(results,
         gt_seg_maps=gt_seg_maps,
         num_classes=num_classes,
         ignore_index=ignore_index,
-        metrics=['mDice'],
+        metrics=["mDice"],
         nan_to_num=nan_to_num,
         label_map=label_map,
-        reduce_zero_label=reduce_zero_label)
+        reduce_zero_label=reduce_zero_label,
+    )
     return all_acc, acc, dice

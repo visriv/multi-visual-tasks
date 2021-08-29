@@ -18,23 +18,24 @@ class LrUpdaterHook(Hook):
             number of iteration that warmup lasts
     """
 
-    def __init__(self,
-                 by_epoch=True,
-                 warmup=None,
-                 warmup_iters=0,
-                 warmup_ratio=0.1,
-                 warmup_by_epoch=False):
+    def __init__(
+        self,
+        by_epoch=True,
+        warmup=None,
+        warmup_iters=0,
+        warmup_ratio=0.1,
+        warmup_by_epoch=False,
+    ):
         # validate the "warmup" argument
         if warmup is not None:
-            if warmup not in ['constant', 'linear', 'exp']:
+            if warmup not in ["constant", "linear", "exp"]:
                 raise ValueError(
                     f'"{warmup}" is not a supported type for warming up, valid'
-                    ' types are "constant" and "linear"')
+                    ' types are "constant" and "linear"'
+                )
         if warmup is not None:
-            assert warmup_iters > 0, \
-                '"warmup_iters" must be a positive integer'
-            assert 0 < warmup_ratio <= 1.0, \
-                '"warmup_ratio" must be in range (0,1]'
+            assert warmup_iters > 0, '"warmup_iters" must be a positive integer'
+            assert 0 < warmup_ratio <= 1.0, '"warmup_ratio" must be in range (0,1]'
 
         self.by_epoch = by_epoch
         self.warmup = warmup
@@ -55,11 +56,10 @@ class LrUpdaterHook(Hook):
         if isinstance(runner.optimizer, dict):
             for k, optim in runner.optimizer.items():
                 for param_group, lr in zip(optim.param_groups, lr_groups[k]):
-                    param_group['lr'] = lr
+                    param_group["lr"] = lr
         else:
-            for param_group, lr in zip(runner.optimizer.param_groups,
-                                       lr_groups):
-                param_group['lr'] = lr
+            for param_group, lr in zip(runner.optimizer.param_groups, lr_groups):
+                param_group["lr"] = lr
 
     def get_lr(self, runner, base_lr):
         raise NotImplementedError
@@ -69,8 +69,7 @@ class LrUpdaterHook(Hook):
             lr_groups = {}
             for k in runner.optimizer.keys():
                 _lr_group = [
-                    self.get_lr(runner, _base_lr)
-                    for _base_lr in self.base_lr[k]
+                    self.get_lr(runner, _base_lr) for _base_lr in self.base_lr[k]
                 ]
                 lr_groups.update({k: _lr_group})
 
@@ -79,13 +78,13 @@ class LrUpdaterHook(Hook):
             return [self.get_lr(runner, _base_lr) for _base_lr in self.base_lr]
 
     def get_warmup_lr(self, cur_iters):
-        if self.warmup == 'constant':
+        if self.warmup == "constant":
             warmup_lr = [_lr * self.warmup_ratio for _lr in self.regular_lr]
-        elif self.warmup == 'linear':
+        elif self.warmup == "linear":
             k = (1 - cur_iters / self.warmup_iters) * (1 - self.warmup_ratio)
             warmup_lr = [_lr * (1 - k) for _lr in self.regular_lr]
-        elif self.warmup == 'exp':
-            k = self.warmup_ratio**(1 - cur_iters / self.warmup_iters)
+        elif self.warmup == "exp":
+            k = self.warmup_ratio ** (1 - cur_iters / self.warmup_iters)
             warmup_lr = [_lr * k for _lr in self.regular_lr]
         return warmup_lr
 
@@ -96,16 +95,14 @@ class LrUpdaterHook(Hook):
             self.base_lr = {}
             for k, optim in runner.optimizer.items():
                 for group in optim.param_groups:
-                    group.setdefault('initial_lr', group['lr'])
-                _base_lr = [
-                    group['initial_lr'] for group in optim.param_groups
-                ]
+                    group.setdefault("initial_lr", group["lr"])
+                _base_lr = [group["initial_lr"] for group in optim.param_groups]
                 self.base_lr.update({k: _base_lr})
         else:
             for group in runner.optimizer.param_groups:
-                group.setdefault('initial_lr', group['lr'])
+                group.setdefault("initial_lr", group["lr"])
             self.base_lr = [
-                group['initial_lr'] for group in runner.optimizer.param_groups
+                group["initial_lr"] for group in runner.optimizer.param_groups
             ]
 
     def before_train_epoch(self, runner):
@@ -140,7 +137,6 @@ class LrUpdaterHook(Hook):
 
 @HOOKS.register_module()
 class FixedLrUpdaterHook(LrUpdaterHook):
-
     def __init__(self, **kwargs):
         super(FixedLrUpdaterHook, self).__init__(**kwargs)
 
@@ -150,7 +146,6 @@ class FixedLrUpdaterHook(LrUpdaterHook):
 
 @HOOKS.register_module()
 class StepLrUpdaterHook(LrUpdaterHook):
-
     def __init__(self, step, gamma=0.1, **kwargs):
         assert isinstance(step, (list, int))
         if isinstance(step, list):
@@ -168,32 +163,30 @@ class StepLrUpdaterHook(LrUpdaterHook):
         progress = runner.epoch if self.by_epoch else runner.iter
 
         if isinstance(self.step, int):
-            return base_lr * (self.gamma**(progress // self.step))
+            return base_lr * (self.gamma ** (progress // self.step))
 
         exp = len(self.step)
         for i, s in enumerate(self.step):
             if progress < s:
                 exp = i
                 break
-        return base_lr * self.gamma**exp
+        return base_lr * self.gamma ** exp
 
 
 @HOOKS.register_module()
 class ExpLrUpdaterHook(LrUpdaterHook):
-
     def __init__(self, gamma, **kwargs):
         self.gamma = gamma
         super(ExpLrUpdaterHook, self).__init__(**kwargs)
 
     def get_lr(self, runner, base_lr):
         progress = runner.epoch if self.by_epoch else runner.iter
-        return base_lr * self.gamma**progress
+        return base_lr * self.gamma ** progress
 
 
 @HOOKS.register_module()
 class PolyLrUpdaterHook(LrUpdaterHook):
-
-    def __init__(self, power=1., min_lr=0., **kwargs):
+    def __init__(self, power=1.0, min_lr=0.0, **kwargs):
         self.power = power
         self.min_lr = min_lr
         super(PolyLrUpdaterHook, self).__init__(**kwargs)
@@ -205,26 +198,24 @@ class PolyLrUpdaterHook(LrUpdaterHook):
         else:
             progress = runner.iter
             max_progress = runner.max_iters
-        coeff = (1 - progress / max_progress)**self.power
+        coeff = (1 - progress / max_progress) ** self.power
         return (base_lr - self.min_lr) * coeff + self.min_lr
 
 
 @HOOKS.register_module()
 class InvLrUpdaterHook(LrUpdaterHook):
-
-    def __init__(self, gamma, power=1., **kwargs):
+    def __init__(self, gamma, power=1.0, **kwargs):
         self.gamma = gamma
         self.power = power
         super(InvLrUpdaterHook, self).__init__(**kwargs)
 
     def get_lr(self, runner, base_lr):
         progress = runner.epoch if self.by_epoch else runner.iter
-        return base_lr * (1 + self.gamma * progress)**(-self.power)
+        return base_lr * (1 + self.gamma * progress) ** (-self.power)
 
 
 @HOOKS.register_module()
 class CosineAnnealingLrUpdaterHook(LrUpdaterHook):
-
     def __init__(self, min_lr=None, min_lr_ratio=None, **kwargs):
         assert (min_lr is None) ^ (min_lr_ratio is None)
         self.min_lr = min_lr
@@ -259,23 +250,21 @@ class CosineRestartLrUpdaterHook(LrUpdaterHook):
             Default: None.
     """
 
-    def __init__(self,
-                 periods,
-                 restart_weights=[1],
-                 min_lr=None,
-                 min_lr_ratio=None,
-                 **kwargs):
+    def __init__(
+        self, periods, restart_weights=[1], min_lr=None, min_lr_ratio=None, **kwargs
+    ):
         assert (min_lr is None) ^ (min_lr_ratio is None)
         self.periods = periods
         self.min_lr = min_lr
         self.min_lr_ratio = min_lr_ratio
         self.restart_weights = restart_weights
-        assert (len(self.periods) == len(self.restart_weights)
-                ), 'periods and restart_weights should have the same length.'
+        assert len(self.periods) == len(
+            self.restart_weights
+        ), "periods and restart_weights should have the same length."
         super(CosineRestartLrUpdaterHook, self).__init__(**kwargs)
 
         self.cumulative_periods = [
-            sum(self.periods[0:i + 1]) for i in range(0, len(self.periods))
+            sum(self.periods[0 : i + 1]) for i in range(0, len(self.periods))
         ]
 
     def get_lr(self, runner, base_lr):
@@ -314,8 +303,10 @@ def get_position_from_periods(iteration, cumulative_periods):
     for i, period in enumerate(cumulative_periods):
         if iteration < period:
             return i
-    raise ValueError(f'Current iteration {iteration} exceeds '
-                     f'cumulative_periods {cumulative_periods}')
+    raise ValueError(
+        f"Current iteration {iteration} exceeds "
+        f"cumulative_periods {cumulative_periods}"
+    )
 
 
 @HOOKS.register_module()
@@ -335,33 +326,39 @@ class CyclicLrUpdaterHook(LrUpdaterHook):
         by_epoch (bool): Whether to update LR by epoch.
     """
 
-    def __init__(self,
-                 by_epoch=False,
-                 target_ratio=(10, 1e-4),
-                 cyclic_times=1,
-                 step_ratio_up=0.4,
-                 **kwargs):
+    def __init__(
+        self,
+        by_epoch=False,
+        target_ratio=(10, 1e-4),
+        cyclic_times=1,
+        step_ratio_up=0.4,
+        **kwargs,
+    ):
         if isinstance(target_ratio, float):
             target_ratio = (target_ratio, target_ratio / 1e5)
         elif isinstance(target_ratio, tuple):
-            target_ratio = (target_ratio[0], target_ratio[0] / 1e5) \
-                if len(target_ratio) == 1 else target_ratio
+            target_ratio = (
+                (target_ratio[0], target_ratio[0] / 1e5)
+                if len(target_ratio) == 1
+                else target_ratio
+            )
         else:
-            raise ValueError('target_ratio should be either float '
-                             f'or tuple, got {type(target_ratio)}')
+            raise ValueError(
+                "target_ratio should be either float "
+                f"or tuple, got {type(target_ratio)}"
+            )
 
-        assert len(target_ratio) == 2, \
-            '"target_ratio" must be list or tuple of two floats'
-        assert 0 <= step_ratio_up < 1.0, \
-            '"step_ratio_up" must be in range [0,1)'
+        assert (
+            len(target_ratio) == 2
+        ), '"target_ratio" must be list or tuple of two floats'
+        assert 0 <= step_ratio_up < 1.0, '"step_ratio_up" must be in range [0,1)'
 
         self.target_ratio = target_ratio
         self.cyclic_times = cyclic_times
         self.step_ratio_up = step_ratio_up
         self.lr_phases = []  # init lr_phases
 
-        assert not by_epoch, \
-            'currently only support "by_epoch" = False'
+        assert not by_epoch, 'currently only support "by_epoch" = False'
         super(CyclicLrUpdaterHook, self).__init__(by_epoch, **kwargs)
 
     def before_run(self, runner):
@@ -371,22 +368,35 @@ class CyclicLrUpdaterHook(LrUpdaterHook):
         max_iter_per_phase = runner.max_iters // self.cyclic_times
         iter_up_phase = int(self.step_ratio_up * max_iter_per_phase)
         self.lr_phases.append(
-            [0, iter_up_phase, max_iter_per_phase, 1, self.target_ratio[0]])
-        self.lr_phases.append([
-            iter_up_phase, max_iter_per_phase, max_iter_per_phase,
-            self.target_ratio[0], self.target_ratio[1]
-        ])
+            [0, iter_up_phase, max_iter_per_phase, 1, self.target_ratio[0]]
+        )
+        self.lr_phases.append(
+            [
+                iter_up_phase,
+                max_iter_per_phase,
+                max_iter_per_phase,
+                self.target_ratio[0],
+                self.target_ratio[1],
+            ]
+        )
 
     def get_lr(self, runner, base_lr):
         curr_iter = runner.iter
-        for (start_iter, end_iter, max_iter_per_phase, start_ratio,
-             end_ratio) in self.lr_phases:
+        for (
+            start_iter,
+            end_iter,
+            max_iter_per_phase,
+            start_ratio,
+            end_ratio,
+        ) in self.lr_phases:
             curr_iter %= max_iter_per_phase
             if start_iter <= curr_iter < end_iter:
                 progress = curr_iter - start_iter
-                return annealing_cos(base_lr * start_ratio,
-                                     base_lr * end_ratio,
-                                     progress / (end_iter - start_iter))
+                return annealing_cos(
+                    base_lr * start_ratio,
+                    base_lr * end_ratio,
+                    progress / (end_iter - start_iter),
+                )
 
 
 def annealing_cos(start, end, factor, weight=1):
@@ -403,4 +413,3 @@ def annealing_cos(start, end, factor, weight=1):
     """
     cos_out = cos(pi * factor) + 1
     return end + 0.5 * weight * (start - end) * cos_out
-    

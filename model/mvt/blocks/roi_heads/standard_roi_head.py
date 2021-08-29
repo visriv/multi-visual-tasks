@@ -19,12 +19,12 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
         if self.train_cfg:
             if isinstance(self.train_cfg, CfgNode):
                 self.bbox_assigner = build_assigner(self.train_cfg.assigner)
-                self.bbox_sampler = build_sampler(
-                    self.train_cfg.sampler, context=self)
+                self.bbox_sampler = build_sampler(self.train_cfg.sampler, context=self)
             else:
-                self.bbox_assigner = build_assigner(self.train_cfg['assigner'])
+                self.bbox_assigner = build_assigner(self.train_cfg["assigner"])
                 self.bbox_sampler = build_sampler(
-                    self.train_cfg['sampler'], context=self)
+                    self.train_cfg["sampler"], context=self
+                )
 
     def init_bbox_head(self, bbox_roi_extractor, bbox_head):
         """Initialize ``bbox_head``"""
@@ -65,24 +65,25 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
         rois = bbox2roi([proposals])
         if self.with_bbox:
             bbox_results = self._bbox_forward(x, rois)
-            outs = outs + (bbox_results['cls_score'],
-                           bbox_results['bbox_pred'])
+            outs = outs + (bbox_results["cls_score"], bbox_results["bbox_pred"])
         # mask head
         if self.with_mask:
             mask_rois = rois[:100]
             mask_results = self._mask_forward(x, mask_rois)
-            outs = outs + (mask_results['mask_pred'], )
+            outs = outs + (mask_results["mask_pred"],)
         return outs
 
-    def forward_train(self,
-                      x,
-                      img_metas,
-                      proposal_list,
-                      gt_bboxes,
-                      gt_labels,
-                      gt_bboxes_ignore=None,
-                      gt_masks=None):
-        """ Train with 
+    def forward_train(
+        self,
+        x,
+        img_metas,
+        proposal_list,
+        gt_bboxes,
+        gt_labels,
+        gt_bboxes_ignore=None,
+        gt_masks=None,
+    ):
+        """Train with
 
         Args:
             x (list[Tensor]): list of multi-level img features.
@@ -111,30 +112,31 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
             sampling_results = []
             for i in range(num_imgs):
                 assign_result = self.bbox_assigner.assign(
-                    proposal_list[i], gt_bboxes[i], gt_bboxes_ignore[i],
-                    gt_labels[i])
+                    proposal_list[i], gt_bboxes[i], gt_bboxes_ignore[i], gt_labels[i]
+                )
                 sampling_result = self.bbox_sampler.sample(
                     assign_result,
                     proposal_list[i],
                     gt_bboxes[i],
                     gt_labels[i],
-                    feats=[lvl_feat[i][None] for lvl_feat in x])
+                    feats=[lvl_feat[i][None] for lvl_feat in x],
+                )
                 sampling_results.append(sampling_result)
 
         losses = dict()
         # bbox head forward and loss
         if self.with_bbox:
-            bbox_results = self._bbox_forward_train(x, sampling_results,
-                                                    gt_bboxes, gt_labels,
-                                                    img_metas)
-            losses.update(bbox_results['loss_bbox'])
+            bbox_results = self._bbox_forward_train(
+                x, sampling_results, gt_bboxes, gt_labels, img_metas
+            )
+            losses.update(bbox_results["loss_bbox"])
 
         # mask head forward and loss
         if self.with_mask:
-            mask_results = self._mask_forward_train(x, sampling_results,
-                                                    bbox_results['bbox_feats'],
-                                                    gt_masks, img_metas)
-            losses.update(mask_results['loss_mask'])
+            mask_results = self._mask_forward_train(
+                x, sampling_results, bbox_results["bbox_feats"], gt_masks, img_metas
+            )
+            losses.update(mask_results["loss_mask"])
 
         return losses
 
@@ -142,32 +144,33 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
         """Box head forward function used in both training and testing."""
         # TODO: a more flexible way to decide which feature maps to use
         bbox_feats = self.bbox_roi_extractor(
-            x[:self.bbox_roi_extractor.num_inputs], rois)
+            x[: self.bbox_roi_extractor.num_inputs], rois
+        )
         if self.with_shared_head:
             bbox_feats = self.shared_head(bbox_feats)
         cls_score, bbox_pred = self.bbox_head(bbox_feats)
 
         bbox_results = dict(
-            cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)
+            cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats
+        )
         return bbox_results
 
-    def _bbox_forward_train(self, x, sampling_results, gt_bboxes, gt_labels,
-                            img_metas):
+    def _bbox_forward_train(self, x, sampling_results, gt_bboxes, gt_labels, img_metas):
         """Run forward function and calculate loss for box head in training."""
         rois = bbox2roi([res.bboxes for res in sampling_results])
         bbox_results = self._bbox_forward(x, rois)
 
-        bbox_targets = self.bbox_head.get_targets(sampling_results, gt_bboxes,
-                                                  gt_labels, self.train_cfg)
-        loss_bbox = self.bbox_head.loss(bbox_results['cls_score'],
-                                        bbox_results['bbox_pred'], rois,
-                                        *bbox_targets)
+        bbox_targets = self.bbox_head.get_targets(
+            sampling_results, gt_bboxes, gt_labels, self.train_cfg
+        )
+        loss_bbox = self.bbox_head.loss(
+            bbox_results["cls_score"], bbox_results["bbox_pred"], rois, *bbox_targets
+        )
 
         bbox_results.update(loss_bbox=loss_bbox)
         return bbox_results
 
-    def _mask_forward_train(self, x, sampling_results, bbox_feats, gt_masks,
-                            img_metas):
+    def _mask_forward_train(self, x, sampling_results, bbox_feats, gt_masks, img_metas):
         """Run forward function and calculate loss for mask head in
         training."""
         if not self.share_roi_extractor:
@@ -179,35 +182,38 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
             for res in sampling_results:
                 pos_inds.append(
                     torch.ones(
-                        res.pos_bboxes.shape[0],
-                        device=device,
-                        dtype=torch.uint8))
+                        res.pos_bboxes.shape[0], device=device, dtype=torch.uint8
+                    )
+                )
                 pos_inds.append(
                     torch.zeros(
-                        res.neg_bboxes.shape[0],
-                        device=device,
-                        dtype=torch.uint8))
+                        res.neg_bboxes.shape[0], device=device, dtype=torch.uint8
+                    )
+                )
             pos_inds = torch.cat(pos_inds)
 
             mask_results = self._mask_forward(
-                x, pos_inds=pos_inds, bbox_feats=bbox_feats)
+                x, pos_inds=pos_inds, bbox_feats=bbox_feats
+            )
 
-        mask_targets = self.mask_head.get_targets(sampling_results, gt_masks,
-                                                  self.train_cfg)
+        mask_targets = self.mask_head.get_targets(
+            sampling_results, gt_masks, self.train_cfg
+        )
         pos_labels = torch.cat([res.pos_gt_labels for res in sampling_results])
-        loss_mask = self.mask_head.loss(mask_results['mask_pred'],
-                                        mask_targets, pos_labels)
+        loss_mask = self.mask_head.loss(
+            mask_results["mask_pred"], mask_targets, pos_labels
+        )
 
         mask_results.update(loss_mask=loss_mask, mask_targets=mask_targets)
         return mask_results
 
     def _mask_forward(self, x, rois=None, pos_inds=None, bbox_feats=None):
         """Mask head forward function used in both training and testing."""
-        assert ((rois is not None) ^
-                (pos_inds is not None and bbox_feats is not None))
+        assert (rois is not None) ^ (pos_inds is not None and bbox_feats is not None)
         if rois is not None:
             mask_feats = self.mask_roi_extractor(
-                x[:self.mask_roi_extractor.num_inputs], rois)
+                x[: self.mask_roi_extractor.num_inputs], rois
+            )
             if self.with_shared_head:
                 mask_feats = self.shared_head(mask_feats)
         else:
@@ -218,24 +224,23 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
         mask_results = dict(mask_pred=mask_pred, mask_feats=mask_feats)
         return mask_results
 
-    async def async_simple_test(self,
-                                x,
-                                proposal_list,
-                                img_metas,
-                                proposals=None,
-                                rescale=False):
+    async def async_simple_test(
+        self, x, proposal_list, img_metas, proposals=None, rescale=False
+    ):
         """Async test without augmentation."""
-        assert self.with_bbox, 'Bbox head must be implemented.'
+        assert self.with_bbox, "Bbox head must be implemented."
 
         det_bboxes, det_labels = await self.async_test_bboxes(
-            x, img_metas, proposal_list, self.test_cfg, rescale=rescale)
-        
+            x, img_metas, proposal_list, self.test_cfg, rescale=rescale
+        )
+
         if not self.with_mask:
             if torch.onnx.is_in_onnx_export():
                 return det_bboxes, det_labels
             else:
-                bbox_results = bbox2result(det_bboxes, det_labels,
-                                   self.bbox_head.num_classes)
+                bbox_results = bbox2result(
+                    det_bboxes, det_labels, self.bbox_head.num_classes
+                )
                 return bbox_results
         else:
             segm_results = await self.async_test_mask(
@@ -244,45 +249,46 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
                 det_bboxes,
                 det_labels,
                 rescale=rescale,
-                mask_test_cfg=self.test_cfg.get('mask'))
+                mask_test_cfg=self.test_cfg.get("mask"),
+            )
             if torch.onnx.is_in_onnx_export():
                 return det_bboxes, det_labels, segm_results
             else:
-                bbox_results = bbox2result(det_bboxes, det_labels,
-                                   self.bbox_head.num_classes)
+                bbox_results = bbox2result(
+                    det_bboxes, det_labels, self.bbox_head.num_classes
+                )
                 return bbox_results, segm_results
 
-    def simple_test(self,
-                    x,
-                    proposal_list,
-                    img_metas,
-                    proposals=None,
-                    rescale=False):
+    def simple_test(self, x, proposal_list, img_metas, proposals=None, rescale=False):
         """Test without augmentation."""
-        assert self.with_bbox, 'Bbox head must be implemented.'
+        assert self.with_bbox, "Bbox head must be implemented."
 
         det_bboxes, det_labels = self.simple_test_bboxes(
-            x, img_metas, proposal_list, self.test_cfg, rescale=rescale)
-        
+            x, img_metas, proposal_list, self.test_cfg, rescale=rescale
+        )
+
         if not self.with_mask:
             if torch.onnx.is_in_onnx_export():
                 return det_bboxes, det_labels
             else:
                 bbox_results = [
-                    bbox2result(det_bboxes[i], det_labels[i],
-                                self.bbox_head.num_classes)
+                    bbox2result(
+                        det_bboxes[i], det_labels[i], self.bbox_head.num_classes
+                    )
                     for i in range(len(det_bboxes))
                 ]
                 return bbox_results
         else:
             segm_results = self.simple_test_mask(
-                x, img_metas, det_bboxes, det_labels, rescale=rescale)
+                x, img_metas, det_bboxes, det_labels, rescale=rescale
+            )
             if torch.onnx.is_in_onnx_export():
                 return det_bboxes, det_labels, segm_results
             else:
                 bbox_results = [
-                    bbox2result(det_bboxes[i], det_labels[i],
-                                self.bbox_head.num_classes)
+                    bbox2result(
+                        det_bboxes[i], det_labels[i], self.bbox_head.num_classes
+                    )
                     for i in range(len(det_bboxes))
                 ]
                 return list(zip(bbox_results, segm_results))
@@ -293,31 +299,31 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin):
         If rescale is False, then returned bboxes and masks will fit the scale
         of imgs[0].
         """
-        det_bboxes, det_labels = self.aug_test_bboxes(x, img_metas,
-                                                      proposal_list,
-                                                      self.test_cfg)
+        det_bboxes, det_labels = self.aug_test_bboxes(
+            x, img_metas, proposal_list, self.test_cfg
+        )
 
         if rescale:
             _det_bboxes = det_bboxes
         else:
             _det_bboxes = det_bboxes.clone()
-            _det_bboxes[:, :4] *= det_bboxes.new_tensor(
-                img_metas[0][0]['scale_factor'])  
+            _det_bboxes[:, :4] *= det_bboxes.new_tensor(img_metas[0][0]["scale_factor"])
 
         # det_bboxes always keep the original scale
         if self.with_mask:
-            segm_results = self.aug_test_mask(x, img_metas, det_bboxes,
-                                              det_labels)
+            segm_results = self.aug_test_mask(x, img_metas, det_bboxes, det_labels)
             if torch.onnx.is_in_onnx_export():
-                return _det_bboxes, det_labels, segm_results 
+                return _det_bboxes, det_labels, segm_results
             else:
-                bbox_results = bbox2result(_det_bboxes, det_labels,
-                                           self.bbox_head.num_classes)
+                bbox_results = bbox2result(
+                    _det_bboxes, det_labels, self.bbox_head.num_classes
+                )
                 return [(bbox_results, segm_results)]
         else:
             if torch.onnx.is_in_onnx_export():
                 return _det_bboxes, det_labels
             else:
-                bbox_results = bbox2result(_det_bboxes, det_labels,
-                                           self.bbox_head.num_classes)
+                bbox_results = bbox2result(
+                    _det_bboxes, det_labels, self.bbox_head.num_classes
+                )
                 return [bbox_results]

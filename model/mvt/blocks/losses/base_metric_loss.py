@@ -2,13 +2,13 @@ import inspect
 import torch
 
 from model.mvt.cores.metric_ops import common_utils as c_u
-from model.mvt.cores.metric_ops.module_with_records_and_reducer import ModuleWithRecordsReducerAndDistance
+from model.mvt.cores.metric_ops.module_with_records_and_reducer import (
+    ModuleWithRecordsReducerAndDistance,
+)
 from model.mvt.cores.metric_ops.mixins import EmbeddingRegularizerMixin
 
 
-class BaseMetricLoss(
-    EmbeddingRegularizerMixin, ModuleWithRecordsReducerAndDistance
-):
+class BaseMetricLoss(EmbeddingRegularizerMixin, ModuleWithRecordsReducerAndDistance):
     def compute_loss(self, embeddings, labels, indices_tuple=None):
         """
         This has to be implemented and is what actually computes the loss.

@@ -6,5 +6,9 @@ from .det_retail_one import DetRetailOneDataset
 
 
 __all__ = [
-    'DetBaseDataset', 'VOCDataset', 'CocoDataset', 'DetRetailDataset', 'DetRetailOneDataset'
-    ]
+    "DetBaseDataset",
+    "VOCDataset",
+    "CocoDataset",
+    "DetRetailDataset",
+    "DetRetailOneDataset",
+]

@@ -4,10 +4,8 @@ from torch import distributed as dist
 from torch.nn.parallel import DataParallel
 from torch.nn.parallel._functions import Scatter as OrigScatter
 from torch.nn.parallel._functions import _get_stream
-from torch.nn.parallel.distributed import (DistributedDataParallel,
-                                           _find_tensors)
-from torch._utils import (_flatten_dense_tensors, _take_tensors,
-                          _unflatten_dense_tensors)
+from torch.nn.parallel.distributed import DistributedDataParallel, _find_tensors
+from torch._utils import _flatten_dense_tensors, _take_tensors, _unflatten_dense_tensors
 import os
 import functools
 from itertools import chain
@@ -17,19 +15,19 @@ from .misc_util import get_dist_info
 from .data_util import DataContainer
 
 
-def init_dist(launcher, backend='nccl', **kwargs):
+def init_dist(launcher, backend="nccl", **kwargs):
     if mp.get_start_method(allow_none=True) is None:
-        mp.set_start_method('spawn')
-    if launcher == 'pytorch':
+        mp.set_start_method("spawn")
+    if launcher == "pytorch":
         _init_dist_pytorch(backend, **kwargs)
     else:
-        raise ValueError(f'Invalid launcher type: {launcher}')
+        raise ValueError(f"Invalid launcher type: {launcher}")
 
 
 def _init_dist_pytorch(backend, **kwargs):
     # TODO: use local_rank instead of rank % num_gpus
-    rank = int(os.environ['RANK'])
-    if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    rank = int(os.environ["RANK"])
+    if "CUDA_VISIBLE_DEVICES" not in os.environ:
         num_gpus = torch.cuda.device_count()
         torch.cuda.set_device(rank % num_gpus)
     else:
@@ -78,7 +76,8 @@ def allreduce_grads(params, coalesce=True, bucket_size_mb=-1):
             Defaults to -1.
     """
     grads = [
-        param.grad.data for param in params
+        param.grad.data
+        for param in params
         if param.requires_grad and param.grad is not None
     ]
     _, world_size = get_dist_info()
@@ -109,12 +108,13 @@ def _allreduce_coalesced(tensors, world_size, bucket_size_mb=-1):
         dist.all_reduce(flat_tensors)
         flat_tensors.div_(world_size)
         for tensor, synced in zip(
-                bucket, _unflatten_dense_tensors(flat_tensors, bucket)):
+            bucket, _unflatten_dense_tensors(flat_tensors, bucket)
+        ):
             tensor.copy_(synced)
 
 
 def reduce_mean(tensor):
-    """"Obtain the mean of tensor on different GPUs."""
+    """ "Obtain the mean of tensor on different GPUs."""
     if not (dist.is_available() and dist.is_initialized()):
         return tensor
     tensor = tensor.clone()
@@ -130,8 +130,8 @@ def _scatter(input, devices, streams=None):
     if isinstance(input, list):
         chunk_size = (len(input) - 1) // len(devices) + 1
         outputs = [
-            _scatter(input[i], [devices[i // chunk_size]],
-                    [streams[i // chunk_size]]) for i in range(len(input))
+            _scatter(input[i], [devices[i // chunk_size]], [streams[i // chunk_size]])
+            for i in range(len(input))
         ]
         return outputs
     elif isinstance(input, torch.Tensor):
@@ -142,12 +142,12 @@ def _scatter(input, devices, streams=None):
             with torch.cuda.device(devices[0]), torch.cuda.stream(stream):
                 output = output.cuda(devices[0], non_blocking=True)
         # else:
-            # unsquzee the first dimension thus the tensor's shape is the
-            # same as those scattered with GPU.
-            # output = output.unsqueeze(0)
+        # unsquzee the first dimension thus the tensor's shape is the
+        # same as those scattered with GPU.
+        # output = output.unsqueeze(0)
         return output
     else:
-        raise Exception(f'Unknown type {type(input)}.')
+        raise Exception(f"Unknown type {type(input)}.")
 
 
 def synchronize_stream(output, devices, streams):
@@ -155,8 +155,9 @@ def synchronize_stream(output, devices, streams):
         chunk_size = len(output) // len(devices)
         for i in range(len(devices)):
             for j in range(chunk_size):
-                synchronize_stream(output[i * chunk_size + j], [devices[i]],
-                                   [streams[i]])
+                synchronize_stream(
+                    output[i * chunk_size + j], [devices[i]], [streams[i]]
+                )
     elif isinstance(output, torch.Tensor):
         if output.numel() != 0:
             with torch.cuda.device(devices[0]):
@@ -164,7 +165,7 @@ def synchronize_stream(output, devices, streams):
                 main_stream.wait_stream(streams[0])
                 output.record_stream(main_stream)
     else:
-        raise Exception(f'Unknown type {type(output)}.')
+        raise Exception(f"Unknown type {type(output)}.")
 
 
 def get_input_device(input):
@@ -177,7 +178,7 @@ def get_input_device(input):
     elif isinstance(input, torch.Tensor):
         return input.get_device() if input.is_cuda else -1
     else:
-        raise Exception(f'Unknown type {type(input)}.')
+        raise Exception(f"Unknown type {type(input)}.")
 
 
 def scatter(inputs, target_gpus, dim=0):
@@ -290,17 +291,19 @@ class CustomDataParallel(DataParallel):
             inputs, kwargs = self.scatter(inputs, kwargs, [-1])
             return self.module.train_step(*inputs[0], **kwargs[0])
 
-        assert len(self.device_ids) == 1, \
-            ('CustomDataParallel only supports single GPU training, if you'
-             'need to train with multiple GPUs, please use'
-             'CustomDistributedDataParallel instead.')
+        assert len(self.device_ids) == 1, (
+            "CustomDataParallel only supports single GPU training, if you"
+            "need to train with multiple GPUs, please use"
+            "CustomDistributedDataParallel instead."
+        )
 
         for t in chain(self.module.parameters(), self.module.buffers()):
             if t.device != self.src_device_obj:
                 raise RuntimeError(
-                    'module must have its parameters and buffers '
-                    f'on device {self.src_device_obj} (device_ids[0]) but '
-                    f'found one of them on device: {t.device}')
+                    "module must have its parameters and buffers "
+                    f"on device {self.src_device_obj} (device_ids[0]) but "
+                    f"found one of them on device: {t.device}"
+                )
 
         inputs, kwargs = self.scatter(inputs, kwargs, self.device_ids)
         return self.module.train_step(*inputs[0], **kwargs[0])
@@ -312,17 +315,19 @@ class CustomDataParallel(DataParallel):
             inputs, kwargs = self.scatter(inputs, kwargs, [-1])
             return self.module.val_step(*inputs[0], **kwargs[0])
 
-        assert len(self.device_ids) == 1, \
-            ('CustomDataParallel only supports single GPU training, if you '
-             'need to train with multiple GPUs, please use '
-             'CustomDistributedDataParallel instead.')
+        assert len(self.device_ids) == 1, (
+            "CustomDataParallel only supports single GPU training, if you "
+            "need to train with multiple GPUs, please use "
+            "CustomDistributedDataParallel instead."
+        )
 
         for t in chain(self.module.parameters(), self.module.buffers()):
             if t.device != self.src_device_obj:
                 raise RuntimeError(
-                    'module must have its parameters and buffers '
-                    f'on device {self.src_device_obj} (device_ids[0]) but '
-                    f'found one of them on device: {t.device}')
+                    "module must have its parameters and buffers "
+                    f"on device {self.src_device_obj} (device_ids[0]) but "
+                    f"found one of them on device: {t.device}"
+                )
 
         inputs, kwargs = self.scatter(inputs, kwargs, self.device_ids)
         return self.module.val_step(*inputs[0], **kwargs[0])
@@ -335,6 +340,7 @@ class CustomDistributedDataParallel(DistributedDataParallel):
       flexible control of input data.
     - It implement two APIs ``train_step()`` and ``val_step()``.
     """
+
     def scatter(self, inputs, kwargs, device_ids):
         return scatter_kwargs(inputs, kwargs, device_ids, dim=self.dim)
 
@@ -345,7 +351,7 @@ class CustomDistributedDataParallel(DistributedDataParallel):
         ``self.module.forward()`` with ``self.module.train_step()``.
         It is compatible with PyTorch 1.1 - 1.5.
         """
-        if getattr(self, 'require_forward_param_sync', True):
+        if getattr(self, "require_forward_param_sync", True):
             self._sync_params()
         if self.device_ids:
             inputs, kwargs = self.scatter(inputs, kwargs, self.device_ids)
@@ -353,13 +359,15 @@ class CustomDistributedDataParallel(DistributedDataParallel):
                 output = self.module.train_step(*inputs[0], **kwargs[0])
             else:
                 outputs = self.parallel_apply(
-                    self._module_copies[:len(inputs)], inputs, kwargs)
+                    self._module_copies[: len(inputs)], inputs, kwargs
+                )
                 output = self.gather(outputs, self.output_device)
         else:
             output = self.module.train_step(*inputs, **kwargs)
 
         if torch.is_grad_enabled() and getattr(
-                self, 'require_backward_grad_sync', True):
+            self, "require_backward_grad_sync", True
+        ):
             if self.find_unused_parameters:
                 self.reducer.prepare_for_backward(list(_find_tensors(output)))
             else:
@@ -375,7 +383,7 @@ class CustomDistributedDataParallel(DistributedDataParallel):
         ``self.module.forward()`` with ``self.module.val_step()``.
         It is compatible with PyTorch 1.1 - 1.5.
         """
-        if getattr(self, 'require_forward_param_sync', True):
+        if getattr(self, "require_forward_param_sync", True):
             self._sync_params()
         if self.device_ids:
             inputs, kwargs = self.scatter(inputs, kwargs, self.device_ids)
@@ -383,13 +391,15 @@ class CustomDistributedDataParallel(DistributedDataParallel):
                 output = self.module.val_step(*inputs[0], **kwargs[0])
             else:
                 outputs = self.parallel_apply(
-                    self._module_copies[:len(inputs)], inputs, kwargs)
+                    self._module_copies[: len(inputs)], inputs, kwargs
+                )
                 output = self.gather(outputs, self.output_device)
         else:
             output = self.module.val_step(*inputs, **kwargs)
 
         if torch.is_grad_enabled() and getattr(
-                self, 'require_backward_grad_sync', True):
+            self, "require_backward_grad_sync", True
+        ):
             if self.find_unused_parameters:
                 self.reducer.prepare_for_backward(list(_find_tensors(output)))
             else:

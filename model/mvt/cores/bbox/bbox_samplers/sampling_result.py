@@ -6,8 +6,7 @@ from model.mvt.utils.misc_util import NiceRepr
 class SamplingResult(NiceRepr):
     """Bbox sampling result."""
 
-    def __init__(self, pos_inds, neg_inds, bboxes, gt_bboxes, assign_result,
-                 gt_flags):
+    def __init__(self, pos_inds, neg_inds, bboxes, gt_bboxes, assign_result, gt_flags):
         self.pos_inds = pos_inds
         self.neg_inds = neg_inds
         self.pos_bboxes = bboxes[pos_inds]
@@ -54,22 +53,21 @@ class SamplingResult(NiceRepr):
 
     def __nice__(self):
         data = self.info.copy()
-        data['pos_bboxes'] = data.pop('pos_bboxes').shape
-        data['neg_bboxes'] = data.pop('neg_bboxes').shape
+        data["pos_bboxes"] = data.pop("pos_bboxes").shape
+        data["neg_bboxes"] = data.pop("neg_bboxes").shape
         parts = [f"'{k}': {v!r}" for k, v in sorted(data.items())]
-        body = '    ' + ',\n    '.join(parts)
-        return '{\n' + body + '\n}'
+        body = "    " + ",\n    ".join(parts)
+        return "{\n" + body + "\n}"
 
     @property
     def info(self):
         """Returns a dictionary of info about the object."""
         return {
-            'pos_inds': self.pos_inds,
-            'neg_inds': self.neg_inds,
-            'pos_bboxes': self.pos_bboxes,
-            'neg_bboxes': self.neg_bboxes,
-            'pos_is_gt': self.pos_is_gt,
-            'num_gts': self.num_gts,
-            'pos_assigned_gt_inds': self.pos_assigned_gt_inds,
+            "pos_inds": self.pos_inds,
+            "neg_inds": self.neg_inds,
+            "pos_bboxes": self.pos_bboxes,
+            "neg_bboxes": self.neg_bboxes,
+            "pos_is_gt": self.pos_is_gt,
+            "num_gts": self.num_gts,
+            "pos_assigned_gt_inds": self.pos_assigned_gt_inds,
         }
-    

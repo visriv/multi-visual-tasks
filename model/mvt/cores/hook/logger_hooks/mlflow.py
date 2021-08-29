@@ -5,15 +5,16 @@ from .base import LoggerHook
 
 @HOOKS.register_module()
 class MlflowLoggerHook(LoggerHook):
-
-    def __init__(self,
-                 exp_name=None,
-                 tags=None,
-                 log_model=True,
-                 interval=10,
-                 ignore_last=True,
-                 reset_flag=True,
-                 by_epoch=True):
+    def __init__(
+        self,
+        exp_name=None,
+        tags=None,
+        log_model=True,
+        interval=10,
+        ignore_last=True,
+        reset_flag=True,
+        by_epoch=True,
+    ):
         """Class to log metrics and (optionally) a trained model to MLflow.
         It requires `MLflow`_ to be installed.
         Args:
@@ -37,8 +38,9 @@ class MlflowLoggerHook(LoggerHook):
         .. _MLflow:
             https://www.mlflow.org/docs/latest/index.html
         """
-        super(MlflowLoggerHook, self).__init__(interval, ignore_last,
-                                               reset_flag, by_epoch)
+        super(MlflowLoggerHook, self).__init__(
+            interval, ignore_last, reset_flag, by_epoch
+        )
         self.import_mlflow()
         self.exp_name = exp_name
         self.tags = tags
@@ -49,8 +51,7 @@ class MlflowLoggerHook(LoggerHook):
             import mlflow
             import mlflow.pytorch as mlflow_pytorch
         except ImportError:
-            raise ImportError(
-                'Please run "pip install mlflow" to install mlflow')
+            raise ImportError('Please run "pip install mlflow" to install mlflow')
         self.mlflow = mlflow
         self.mlflow_pytorch = mlflow_pytorch
 
@@ -70,4 +71,4 @@ class MlflowLoggerHook(LoggerHook):
     @master_only
     def after_run(self, runner):
         if self.log_model:
-            self.mlflow_pytorch.log_model(runner.model, 'models')
+            self.mlflow_pytorch.log_model(runner.model, "models")
