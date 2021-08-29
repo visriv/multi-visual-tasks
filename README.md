@@ -11,10 +11,9 @@
   - [Inference with Trained Models](#inference-with-trained-models)
     - [Evaluate a dataset](#evaluate-a-dataset)
     - [Test a dataset](#test-a-dataset)
+    - [Evaluate embedding](#evaluate-embedding)
     - [Run demos](#run-demos)
     - [Test Onnx Models](#test-onnx-models)
-  - [Tutorials](#tutorials)
-  - [Task Details](#task-details)
 - [useful Tools](#useful-tools)
   - [Loading json file](#loading-json-file)
   - [Convert json to xml](#convert-json-to-xml)
@@ -182,8 +181,7 @@ export PYTHONPATH=$(pwd):$PYTHONPATH
     python3 tools/model_evaluation/eval_embeddings.py meta/reference_embedding.pkl meta/qury_embedding.pkl
     ```
 
-### Create the json file for various object detection by positive object detection and embedding match
-    Create detection json file:
+    Create the json file for various object detection by positive object detection and embedding match
     ```shell
     python3 tools/model_evaluation/eval_with_json_labels.py tasks/detections/det_yolov4_retail_one.yaml \
         meta/train_infos/det_yolov4_retail_one/epoch_xxx.pth \
@@ -191,7 +189,7 @@ export PYTHONPATH=$(pwd):$PYTHONPATH
         --out-dir meta/test_a/
     ```
    
-    Get predicted labels and save final submition json file:
+    Get predicted labels and save final submition json file
     ```shell
     python3 tools/model_evaluation/pred_embedding_with_json_label.py tasks/embeddings/emb_resnet50_fc_retail.yaml \
         meta/train_infos/emb_resnet50_fc_retail/epoch_xxx.pth \
