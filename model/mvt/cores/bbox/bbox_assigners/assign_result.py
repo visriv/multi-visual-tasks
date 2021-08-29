@@ -1,6 +1,6 @@
 import torch
 
-from mvt.utils.misc_util import NiceRepr
+from model.mvt.utils.misc_util import NiceRepr
 
 
 class AssignResult(NiceRepr):

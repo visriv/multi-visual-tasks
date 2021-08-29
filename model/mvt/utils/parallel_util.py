@@ -10,7 +10,6 @@ from torch._utils import (_flatten_dense_tensors, _take_tensors,
                           _unflatten_dense_tensors)
 import os
 import functools
-import subprocess
 from itertools import chain
 from collections import OrderedDict
 

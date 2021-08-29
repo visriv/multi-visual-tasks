@@ -4,17 +4,18 @@ import numpy as np
 
 from .emb_base import EmbBaseDataset
 from ..data_builder import DATASETS
-from mvt.utils.io_util import file_load
-from mvt.utils.geometric_util import imcrop, imrotate
-from mvt.utils.bbox_util import get_rotated_bbox
-from mvt.utils.vis_util import imshow
+from model.mvt.utils.io_util import file_load
+from model.mvt.utils.geometric_util import imcrop, imrotate
+from model.mvt.utils.bbox_util import get_rotated_bbox
 
 
 @DATASETS.register_module()
 class EmbLocRetailDataset(EmbBaseDataset):
     """Clarity classification"""
 
-    CLASSES = (
+    CLASSES = None
+    """
+        (
         'asamu', 'baishikele', 'baokuangli', 'aoliao', 'bingqilinniunai', 'chapai', 
         'fenda', 'guolicheng', 'haoliyou', 'heweidao', 'hongniu', 'hongniu2', 
         'hongshaoniurou', 'kafei', 'kaomo_gali', 'kaomo_jiaoyan', 'kaomo_shaokao', 
@@ -35,6 +36,7 @@ class EmbLocRetailDataset(EmbBaseDataset):
         'dongpeng-b', 'xianxiayuban', 'niudufen', 'zaocanmofang', 'wanglaoji-c', 'mengniu', 
         'mengniuzaocan', 'guolicheng2', 'daofandian1', 'daofandian2', 'daofandian3', 
         'daofandian4', 'yingyingquqi', 'lefuqiu')
+    """
 
     def load_annotations(self):
         """Load data_infos"""

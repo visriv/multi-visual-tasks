@@ -68,8 +68,8 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   Examples:
 
     ```shell
-    python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_det/det_yolov4_cspdarknet_retail.yaml
-    python3 ./tools/train.py --work-dir meta/train_infos --no-test task_settings/img_emb/emb_resnet50_fc_retail.yaml
+    python3 ./tools/train.py --work-dir model_files/ --no-test model/task_settings/img_det/det_yolov4_9a_retail_one.yaml
+    python3 ./tools/train.py --work-dir model_files/ --no-test model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml
     ```
 
 ### Train with multiple GPUs
@@ -80,14 +80,14 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   or
 
   ```shell
-  python3 -m torch.distributed.launch --nproc_per_node=${GPU} --master_port=${PORT}  tools/train.py --load-from ${CHECKPOINT} --no-test --launcher pytorch ${CONFIG} 
+  python3 -m torch.distributed.launch --nproc_per_node=${GPU} --master_port=${PORT}  tools/train.py --work-dir ${WORK_DIR} --load-from ${CHECKPOINT} --no-test --launcher pytorch ${CONFIG} 
   ```
   Examples:
 
     Similar to training cases with a single GPU, here gives a few examples.
 
     ```shell
-    CUDA_VISIBLE_DEVICES=4,5,6,7 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29500  tools/train.py --no-test --launcher pytorch task_settings/img_det/det_yolov4_cspdarknet_retail.yaml
+    CUDA_VISIBLE_DEVICES=4,5,6,7 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29500  tools/train.py --work-dir model_files/ --no-test --launcher pytorch model/task_settings/img_det/det_yolov4_9a_retail_one.yaml
     ```
 
 ### Evaluate a dataset
@@ -122,58 +122,15 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   Examples:
 
     ```shell
-    python3 ./tools/test.py task_settings/img_det/det_faster_rcnn_r50_fpn_coco.yaml  meta/train_infos/det_faster_rcnn_r50_fpn_coco/epoch_24.pth --eval 'mAP' --out 'meta/test_infos/det_faster_rcnn_r50_fpn_coco_eval.pkl' --show-dir 'meta/test_infos/det_faster_rcnn_r50_fpn_coco_eval'
+    python3 ./tools/test.py task_settings/img_det/det_yolov4_9a_retail_one.yaml  model_files/det_yolov4_9a_retail_one/epoch_200.pth --eval 'mAP' --out 'model_files/det_yolov4_9a_retail_one_eval.pkl' --show-dir 'data/det_yolov4_9a_retail_one_eval'
     ```
 
-### Test a dataset
-
-  We also provide scripts to test with a dataloader.
-
-  Examples:
-
-    ```shell
-    python3 tools/model_evaluation/eval_with_json_labels.py task_settings/img_det/det_yolov4_cspdarknet_retail.yaml meta/train_infos/det_yolov4_cspdarknet_retail/epoch_100.pth --out-dir meta/test_infos/det_yolov4_cspdarknet_retail --json-path meta_test_infos/a_predictions.json
-    ```
-
-### Evaluate embedding
-    
-    Save reference embeddings and labels before evaluation:
-    
-    Examples:
-    ```shell
-    # set validation set by reference set in task config
-    python3 tools/model_evaluation/save_embeddings.py task_settings/img_emb/emb_resnet50_fc_retail.yaml meta/train_infos/emb_resnet50_fc_retail/epoch_500.pth --save-path meta/reference_embedding.pkl
-    # set validation set by query set in task config
-    python3 tools/model_evaluation/save_embeddings.py task_settings/img_emb/emb_resnet50_fc_retail.yaml meta/train_infos/emb_resnet50_fc_retail/epoch_500.pth --save-path meta/qury_embedding.pkl
-    # run evaluation
-    python3 tools/model_evaluation/eval_embeddings.py meta/reference_embedding.pkl meta/qury_embedding.pkl
-    ```
-
-### Create retail submision file
-    Create detection json file:
-    ```shell
-    python3 tools/model_evaluation/eval_with_json_labels.py task_settings/img_det/det_yolov4_retail_one.yaml \
-        meta/train_infos/det_yolov4_retail_one/epoch_200.pth \
-        --json-path data/test/a_det_annotations.json \
-        --out-dir meta/test_a/
-    ```
-   
-    Get predicted labels and save final submition json file:
-    ```shell
-    python3 tools/model_evaluation/pred_embedding_with_json_label.py task_settings/img_emb/emb_resnet50_fc_retail.yaml \
-        meta/train_infos/emb_resnet50_fc_retail/epoch_50.pth \
-        meta/reference_test_b_embedding.pkl \
-        --json-ori data/test/a_det_annotations.json \
-        --json-out submit/out.json
-    python3 tools/model_evaluation/pred_embedding_with_json_label.py task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml meta/train_infos/emb_resnet50_mlp_loc_retail/epoch_41.pth meta/reference_test_b_embedding.pkl --json-ori data/RetailDet/test/a_det_annotations.json --json-out submit/out.json
-    ```
-
-### Run demos
+### Run inference
 
   We also provide scripts to run demos.
 
   Examples:
 
     ```shell
-    python3 demos/det_infer_demo.py 
+    python3 inference.py 
     ```

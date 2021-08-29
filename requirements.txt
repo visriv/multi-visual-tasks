@@ -6,3 +6,4 @@ pycocotools
 terminaltables
 tensorboard
 yapf
+PyYAML

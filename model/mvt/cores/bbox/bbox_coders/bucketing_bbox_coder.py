@@ -2,9 +2,9 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from ...core_bbox import BBOX_CODERS
-from ..bbox_transforms import bbox_rescale
 from .base_bbox_coder import BaseBBoxCoder
+from ..bbox_transforms import bbox_rescale
+from ...core_bbox import BBOX_CODERS
 
 
 @BBOX_CODERS.register_module()

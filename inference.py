@@ -2,8 +2,9 @@ import json
 import os
 import pickle
 import sys
-from pathlib import Path
 from collections import Counter
+from pathlib import Path
+
 import numpy as np
 
 if 'MVT_ROOT' in os.environ:
@@ -16,24 +17,29 @@ else:
     sys.path.insert(0, MVT_ROOT)
     print('Add {} to PYTHONPATH'.format(MVT_ROOT))
 
+WORKERS_PER_DEVICE = 0
+
 import torch
 
-from configs import cfg
-from mvt.cores.metric_ops import LpDistance
-from mvt.datasets.data_builder import build_dataloader, build_dataset
-from mvt.models.model_builder import build_model
-from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.utils.config_util import get_dataset_global_args, get_task_cfg
-from mvt.utils.geometric_util import imresize
-from mvt.utils.misc_util import ProgressBar
-from mvt.utils.parallel_util import DataParallel
-from mvt.utils.photometric_util import tensor2imgs
+torch.multiprocessing.set_sharing_strategy('file_system')
+
+from model.configs import cfg
+from model.mvt.cores.metric_ops import LpDistance
+from model.mvt.datasets.data_builder import build_dataloader, build_dataset
+from model.mvt.models.model_builder import build_model
+from model.mvt.utils.checkpoint_util import load_checkpoint
+from model.mvt.utils.config_util import get_dataset_global_args, get_task_cfg
+from model.mvt.utils.geometric_util import imresize
+from model.mvt.utils.misc_util import ProgressBar
+from model.mvt.utils.parallel_util import DataParallel
+from model.mvt.utils.photometric_util import tensor2imgs
 
 
 def det_single_device_test(model, data_loader, score_thr=0.05):
     model.eval()
     results = []
     img_names = []
+    img_ids = []
     dataset = data_loader.dataset
     prog_bar = ProgressBar(len(dataset))
 
@@ -66,27 +72,36 @@ def det_single_device_test(model, data_loader, score_thr=0.05):
                 text_color='red', out_file=None, score_thr=score_thr)
 
             img_names.append(img_meta['ori_filename'])
+            img_ids.append(img_meta['img_id'])
             results.append(single_res)
 
         for _ in range(batch_size):
             prog_bar.update()
-    return {'img_names': img_names, 'detections': results}
+
+    outputs = {
+        'img_names': img_names,
+        'img_ids': img_ids,
+        'detections': results}
+    return outputs
 
 
-def save_det_json(img_names, det_results, json_path):
+def save_det_json(data_dict, json_path):
+    img_names = data_dict['img_names']
+    img_ids = data_dict['img_ids']
+    det_results = data_dict['detections']
 
     images = []
     annotations = []
     bbox_id = 0
     for i, det_result in enumerate(det_results):
-
+        img_id = img_ids[i]
         img_info = {
             "file_name": img_names[i],
-            "id": i}
+            "id": img_id}
         images.append(img_info)
         for j in range(len(det_result)):
             anno_info = {
-                "image_id": i,
+                "image_id": img_id,
                 "id": bbox_id,
                 "bbox": [
                     int(det_result[j, 0] + 0.5),
@@ -153,8 +168,8 @@ def emb_single_device_test(model, data_loader, with_label=False):
         outputs['bbox_ids'] = bbox_ids
         cache_path = '/tmp/emb_qry.pkl'
 
-    with open(cache_path, 'wb') as f:
-        pickle.dump(outputs, f)
+    # with open(cache_path, 'wb') as f:
+    #    pickle.dump(outputs, f)
 
     return outputs
 
@@ -170,8 +185,8 @@ def run_det_task(cfg_path, model_path, json_path, score_thr):
         det_cfg.DATA.TEST_DATA, det_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader = build_dataloader(
         dataset,
-        samples_per_device=det_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=det_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
+        samples_per_device=8,  # det_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
+        workers_per_device=WORKERS_PER_DEVICE,  # det_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
@@ -189,16 +204,17 @@ def run_det_task(cfg_path, model_path, json_path, score_thr):
     outputs = det_single_device_test(
         model, data_loader, score_thr=score_thr)
 
-    save_det_json(outputs['img_names'], outputs['detections'], json_path)
+    save_det_json(outputs, json_path)
 
 
-def infer_labels(qry_outputs, ref_outputs, rank_list):
+def infer_labels(qry_outputs, ref_outputs, label_mapping, rank_list):
     """
     Get predicted labels
 
     Args:
         qry_outputs (dict): query outputs
         ref_outputs (dict): reference outputs
+        label_mapping (dict): mapping from reference label to query label
     Returns:
         outputs: query bbox indices with assigned labels
     """
@@ -242,6 +258,8 @@ def infer_labels(qry_outputs, ref_outputs, rank_list):
             top_k = pred_labels[i, :k]
             votes = Counter(top_k)
             pred = votes.most_common(1)[0][0]
+            # convert to query label
+            pred = label_mapping[pred]
             pred_labels_top_k.append(pred)
 
         result['labels_top_{}'.format(k)] = np.array(pred_labels_top_k)
@@ -278,7 +296,7 @@ def save_submit_json(outputs, det_json_path, out_json_path, score_thr=0.1, top_k
 
 
 def run_emb_task(cfg_path, model_path, det_json_path,
-                 out_json_path, score_thr, top_k_list=[1]):
+                 out_json_path, label_mapping, score_thr, top_k_list=[1]):
     print('Running embedding task ...')
     emb_cfg = cfg.clone()
     get_task_cfg(emb_cfg, cfg_path)
@@ -290,8 +308,8 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         emb_cfg.DATA.VAL_DATA, emb_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader_ref = build_dataloader(
         dataset_ref,
-        samples_per_device=emb_cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=emb_cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
+        samples_per_device=32,  # emb_cfg.DATA.VAL_DATA.SAMPLES_PER_DEVICE,
+        workers_per_device=WORKERS_PER_DEVICE,  # emb_cfg.DATA.VAL_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
@@ -306,7 +324,7 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         model.CLASSES = dataset_ref.CLASSES
 
     model = DataParallel(model, device_ids=[0])
-
+    print('(1/3) computing reference embeddings ...')
     outputs_ref = emb_single_device_test(
         model, data_loader_ref, with_label=True)
 
@@ -314,27 +332,58 @@ def run_emb_task(cfg_path, model_path, det_json_path,
         emb_cfg.DATA.TEST_DATA, emb_cfg.DATA.TEST_TRANSFORMS, dataset_args)
     data_loader_qry = build_dataloader(
         dataset_qry,
-        samples_per_device=emb_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
-        workers_per_device=emb_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
+        samples_per_device=32,  # emb_cfg.DATA.TEST_DATA.SAMPLES_PER_DEVICE,
+        workers_per_device=WORKERS_PER_DEVICE,  # emb_cfg.DATA.TEST_DATA.WORKERS_PER_DEVICE,
         dist=False,
         shuffle=False)
 
+    print('(2/3) computing query embeddings ...')
     outputs_qry = emb_single_device_test(
         model, data_loader_qry, with_label=False)
 
-    outputs = infer_labels(outputs_qry, outputs_ref, top_k_list)
+    print('(3/3) inferring query labels ...')
+    outputs = infer_labels(outputs_qry, outputs_ref, label_mapping, top_k_list)
 
     save_submit_json(
         outputs, det_json_path, out_json_path, score_thr, top_k=1)
 
 
+def get_label_mapping(ref_json_path, qry_json_path):
+
+    with open(ref_json_path, 'r') as f:
+        ref_data = json.load(f)
+
+    with open(qry_json_path, 'r') as f:
+        qry_data = json.load(f)
+
+    ref_cat_list = ref_data['categories']
+    qry_cat_list = qry_data['categories']
+
+    qry_dict = {}
+    for qry_cat in qry_cat_list:
+        cid = int(qry_cat['id'])
+        name = qry_cat['name']
+        qry_dict[name] = cid
+
+    mapping_dict = {}
+    for ref_cat in ref_cat_list:
+        cid = int(ref_cat['id'])
+        name = ref_cat['name']
+        if name in qry_dict:
+            mapping_dict[cid] = qry_dict[name]
+        else:
+            mapping_dict[cid] = 0  # TODO: how to deal with this?
+
+    return mapping_dict
+
+
 def run():
     mvt_path = Path(MVT_ROOT)
-    det_cfg_path = mvt_path / 'task_settings/img_det/det_yolov4_9a_retail_one.yaml'
-    det_model_path = mvt_path / 'meta/train_infos/det_yolov4_9a_retail_one/epoch_200.pth'
+    det_cfg_path = mvt_path / 'model/task_settings/img_det/det_yolov4_9a_retail_one.yaml'
+    det_model_path = mvt_path / 'model_files/det_yolov4_9a_retail_one/epoch_200.pth'
 
-    #det_cfg_path = mvt_path / 'task_settings/img_det/det_yolov4_retail_one.yaml'
-    #det_model_path = mvt_path / 'meta/train_infos/det_yolov4_retail_one/epoch_200.pth'
+    #det_cfg_path = mvt_path / 'model/task_settings/img_det/det_yolov4_retail_one.yaml'
+    #det_model_path = mvt_path / 'model_files/det_yolov4_retail_one/epoch_200.pth'
 
     det_json_path = mvt_path / 'data/test/a_det_annotations.json'
     det_score_thr = 0.1
@@ -342,13 +391,23 @@ def run():
     run_det_task(str(det_cfg_path), str(det_model_path),
                  str(det_json_path), det_score_thr)
 
+<<<<<<< HEAD
     emb_cfg_path = mvt_path / 'task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
     emb_model_path = mvt_path / 'meta/train_infos/emb_resnet50_mlp_loc_retail/epoch_50.pth'
+=======
+    ref_json_path = mvt_path / 'data/test/b_annotations.json'
+    qry_json_path = mvt_path / 'data/test/a_annotations.json'
+    label_mapping = get_label_mapping(ref_json_path, qry_json_path)
+
+    emb_cfg_path = mvt_path / 'model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
+    emb_model_path = mvt_path / 'model_files/emb_resnet50_mlp_loc_retail/epoch_50.pth'
+>>>>>>> 2ab8d8a49e4e22bdc4b91cf7c9ef1b44e30e9c5d
     out_json_path = mvt_path / 'submit/output.json'
 
     run_emb_task(
         str(emb_cfg_path), str(emb_model_path),
         str(det_json_path), str(out_json_path),
+        label_mapping=label_mapping,
         score_thr=det_score_thr, top_k_list=[1])
 
 

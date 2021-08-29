@@ -3,8 +3,8 @@ import torch.nn as nn
 
 from .base_emb_head import BaseEmbHead
 from ..block_builder import HEADS, build_loss
-from mvt.utils.init_util import normal_init
-from mvt.cores.metric_ops.multi_similarity_miner import MultiSimilarityMiner
+from model.mvt.utils.init_util import normal_init
+from model.mvt.cores.metric_ops.multi_similarity_miner import MultiSimilarityMiner
 
 
 @HEADS.register_module()

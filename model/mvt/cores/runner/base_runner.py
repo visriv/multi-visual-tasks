@@ -1,20 +1,18 @@
 import logging
 import os.path as osp
-import warnings
 from abc import ABCMeta, abstractmethod
 import torch
 from torch.optim import Optimizer
 
-from ..core_module import is_module_wrapper
-from ..core_hook import HOOKS, Hook
-from ..hook import IterTimerHook
 from .log_buffer import LogBuffer
 from .priority import get_priority
-from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.utils.runtime_util import get_time_str
-from mvt.utils.misc_util import is_str, get_dist_info
-from mvt.utils.path_util import mkdir_or_exist
-from mvt.utils.reg_util import build_module_from_dict
+from ..core_hook import HOOKS, Hook
+from ..hook import IterTimerHook
+from model.mvt.utils.checkpoint_util import load_checkpoint
+from model.mvt.utils.runtime_util import get_time_str
+from model.mvt.utils.misc_util import is_str, get_dist_info
+from model.mvt.utils.path_util import mkdir_or_exist
+from model.mvt.utils.reg_util import build_module_from_dict
 
 
 class BaseRunner(metaclass=ABCMeta):

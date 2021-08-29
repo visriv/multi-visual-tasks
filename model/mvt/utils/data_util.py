@@ -3,18 +3,12 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-import warnings
 import functools
 import torch
 
 dataset_aliases = {
     'voc': ['VOCDataset'],
-    'coco': ['CocoDataset'],
-    'cityscapes': ['CityscapesDataset'],
-    'voc_seg': ['SegVOCDataset'],
-    'animal_det': ['DetAnimalDataset'],
-    'cdhead_det': ['CatDogHeadDataset'],
-    'multi_objdet': ['MultiObjectDataset'],
+    'coco': ['CocoDataset'],    
     'retail_det': ['DetRetailDataset'],
     'retail_one_det': ['DetRetailOneDataset']
 }
@@ -177,51 +171,6 @@ def coco_classes():
         'laptop', 'mouse', 'remote', 'keyboard', 'cell_phone', 'microwave',
         'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
         'scissors', 'teddy_bear', 'hair_drier', 'toothbrush'
-    ]
-
-
-def animal_det_classes():
-    return [
-        'golden-retriever', 'husky', 'teddy-dog', 'shiba-inu', 'samoyed',
-        'corgi', 'alaskan', 'labrador', 'hyena', 'german-shepherd',
-        'pomeranian', 'french-bulldog', 'bichon-frise', 'horse-dog',
-        'tibetan-mastiff', 'border-collie', 'pug', 'chow-chow', 
-        'pit-bull', 'chihuahua', 'rottweiler', 'doberman', 'bull-terrier', 
-        'english-bulldog', 'akita', 'dachshund', 'caucasian-dog', 'bully', 
-        'giant-poodle', 'great-dane', 'schnauzer', 'teacup-dogs', 'shar-pei', 
-        'beagles', 'boxer', 'orange-cat', 'lynx', 'doll-cat', 
-        'british-shorthair-cat', 'folds', 'hairless-cat', 'caracal-cat', 
-        'tabby-cat', 'siamese-cat', 'persian-cat', 'american-shorthair', 
-        'maine-coon', 'russian-blue-cat', 'cow-cat', 'bengal-cat', 
-        'squirrel', 'fox', 'kangaroo', 'deer', 'zebra', 'wildebeest', 
-        'honey-badger', 'rhinoceros', 'giraffe', 'african-wild-dog', 'seal', 
-        'hedgehog', 'groundhog', 'donkey', 'brown-bear', 'black-bear',
-        'polar-bear', 'grizzly-bear', 'raccoon', 'dinosaur', 'baboon', 
-        'warthog', 'camel', 'alpaca', 'koala', 'weasel', 'sloth', 'snow-leopard', 
-        'elk', 'rabbit', 'lion', 'giant-panda', 'tiger', 'monkey', 'elephant', 
-        'hamster', 'pig', 'cattle', 'sheep', 'horse', 'orangutan', 'antelope', 
-        'cheetah', 'wild-boar', 'fish', 'chickens', 'goose', 'penguin', 'hippo', 
-        'parrot', 'mouse', 'cathrow', 'longhair-cat', 'mini-doberman', 'garfield', 
-        'silver-gradient', 'short-footed-cat', 'otter', 'shetland', 'sika-deer'
-    ]
-
-
-def cdhead_det_classes():
-    return ['cat', 'dog']
-
-
-def multi_objdet_classes():
-    return [
-        'person', 'cartoon-person', 'game-role', 'cat', 'dog', 'snake',
-        'bird', 'fish', 'rabbit', 'monkey', 'horse', 'chicken', 'pig',
-        'cow', 'sheep', 'bicycle', 'tricycle', 'motorbike', 'tractor',
-        'car', 'bus', 'truck', 'excavator', 'crane', 'train', 'plane',
-        'tank', 'ship', 'villa', 'pavilion', 'tower', 'temple', 'palace', 
-        'chair', 'bed', 'table', 'sofa', 'bench', 'vase', 'potted-plant', 
-        'bag', 'umbrella', 'computer', 'television', 'lamp', 'mouse', 
-        'keyboard', 'cell-phone', 'dish', 'bowl', 'spoon', 'bottle', 'cup', 
-        'fork', 'pot', 'knife', 'basketball', 'skateboard', 'book', 'banana', 
-        'apple', 'orange', 'watermelon', 'pizza', 'cake'
     ]
 
 

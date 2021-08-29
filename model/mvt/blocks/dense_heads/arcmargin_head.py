@@ -6,8 +6,8 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn import Parameter
 
-from ..block_builder import HEADS, build_loss
 from .base_cls_head import BaseClsHead
+from ..block_builder import HEADS, build_loss
 
 
 @HEADS.register_module()

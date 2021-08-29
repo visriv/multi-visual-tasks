@@ -1,5 +1,5 @@
-from ..model_builder import DETECTORS
 from .base_detectors import SingleStageDetector
+from ..model_builder import DETECTORS
 
 
 @DETECTORS.register_module()

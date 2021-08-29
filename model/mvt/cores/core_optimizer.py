@@ -3,8 +3,8 @@ import inspect
 
 import torch
 
-from mvt.utils.reg_util import Registry, build_module_from_dict
-from mvt.utils.config_util import convert_to_dict
+from model.mvt.utils.reg_util import Registry, build_module_from_dict
+from model.mvt.utils.config_util import convert_to_dict
 
 OPTIMIZERS = Registry('optimizer')
 OPTIMIZER_BUILDERS = Registry('optimizer builder')

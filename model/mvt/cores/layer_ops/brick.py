@@ -2,6 +2,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 
 def yolo_init_weight(model):
@@ -98,8 +99,6 @@ class ResConv2dBatchLeaky(nn.Module):
             return x
 
 
-# yolov4专用
-# 有cuda加速实现
 class Mish(nn.Module):
     def __init__(self):
         super(Mish, self).__init__()
@@ -415,8 +414,6 @@ class Head(nn.Module):
         x = self.feature(data)
         return x
 
-
-import numpy as np
 
 
 class WeightLoader:

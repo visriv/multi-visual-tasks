@@ -1,9 +1,9 @@
 import torch
 from copy import deepcopy
 
-from ...core_bbox import BBOX_ASSIGNERS, build_iou_calculator
 from .assign_result import AssignResult
 from .base_assigner import BaseAssigner
+from ...core_bbox import BBOX_ASSIGNERS, build_iou_calculator
 
 
 @BBOX_ASSIGNERS.register_module()

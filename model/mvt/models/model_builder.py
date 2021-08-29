@@ -3,7 +3,7 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-from mvt.utils.reg_util import Registry, build_model_from_cfg
+from model.mvt.utils.reg_util import Registry, build_model_from_cfg
 
 
 # --------------------------------------------------------------------------- #

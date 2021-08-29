@@ -6,12 +6,12 @@ from yacs.config import CfgNode
 from ..block_builder import HEADS, build_loss
 from .base_det_head import BaseDetHead
 from .dense_test_mixins import BBoxTestMixin
-from mvt.utils.init_util import normal_init
-from mvt.cores.anchor import anchor_inside_flags, images_to_levels
-from mvt.cores.core_anchor import build_anchor_generator
-from mvt.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
-from mvt.utils.misc_util import multi_apply, unmap
-from mvt.cores.ops import multiclass_nms
+from model.mvt.utils.init_util import normal_init
+from model.mvt.cores.anchor import anchor_inside_flags, images_to_levels
+from model.mvt.cores.core_anchor import build_anchor_generator
+from model.mvt.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
+from model.mvt.utils.misc_util import multi_apply, unmap
+from model.mvt.cores.ops import multiclass_nms
 
 
 @HEADS.register_module()

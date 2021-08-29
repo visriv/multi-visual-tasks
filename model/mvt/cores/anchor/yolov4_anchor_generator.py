@@ -1,7 +1,7 @@
 import torch
 
-from ..core_anchor import ANCHOR_GENERATORS
 from .anchor_generator import YOLOAnchorGenerator
+from ..core_anchor import ANCHOR_GENERATORS
 
 
 @ANCHOR_GENERATORS.register_module()

@@ -1,8 +1,8 @@
 import torch
 
-from ...core_bbox import BBOX_ASSIGNERS
 from .assign_result import AssignResult
 from .base_assigner import BaseAssigner
+from ...core_bbox import BBOX_ASSIGNERS
 
 
 @BBOX_ASSIGNERS.register_module()

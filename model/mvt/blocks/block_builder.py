@@ -3,13 +3,11 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-import inspect
 from torch import nn
 from yacs.config import CfgNode
 
-from mvt.utils.reg_util import Registry, build_module_from_cfg
-from mvt.utils.reg_util import build_module_from_dict
-from mvt.utils.config_util import convert_to_dict
+from model.mvt.utils.reg_util import Registry, build_module_from_cfg
+from model.mvt.utils.reg_util import build_module_from_dict
 
 # --------------------------------------------------------------------------- #
 # Registries for blocks

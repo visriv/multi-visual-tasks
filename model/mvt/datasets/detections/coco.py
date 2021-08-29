@@ -7,11 +7,11 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from terminaltables import AsciiTable
 
-from mvt.datasets.data_wrapper import DATASETS
-from mvt.datasets.detections.det_base import DetBaseDataset
-from mvt.utils.io_util import obj_dump
-from mvt.cores.eval.common_eval import eval_recalls
-from mvt.utils.log_util import print_log
+from model.mvt.datasets.data_wrapper import DATASETS
+from model.mvt.datasets.detections.det_base import DetBaseDataset
+from model.mvt.utils.io_util import obj_dump
+from model.mvt.cores.eval.common_eval import eval_recalls
+from model.mvt.utils.log_util import print_log
 
 
 @DATASETS.register_module()

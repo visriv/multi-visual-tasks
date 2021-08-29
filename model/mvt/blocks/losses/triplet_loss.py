@@ -1,9 +1,9 @@
 import torch
 
-from mvt.cores.metric_ops.reducer import AvgNonZeroReducer
-from mvt.cores.metric_ops import loss_and_miner_utils as lmu
 from .base_metric_loss import BaseMetricLoss
 from ..block_builder import LOSSES
+from model.mvt.cores.metric_ops.reducer import AvgNonZeroReducer
+from model.mvt.cores.metric_ops import loss_and_miner_utils as lmu
 
 
 @LOSSES.register_module()

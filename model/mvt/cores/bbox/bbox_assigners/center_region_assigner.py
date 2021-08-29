@@ -1,8 +1,8 @@
 import torch
 
-from ...core_bbox import BBOX_ASSIGNERS, build_iou_calculator
 from .assign_result import AssignResult
 from .base_assigner import BaseAssigner
+from ...core_bbox import BBOX_ASSIGNERS, build_iou_calculator
 
 
 def scale_boxes(bboxes, scale):

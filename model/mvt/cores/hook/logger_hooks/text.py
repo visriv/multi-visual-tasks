@@ -8,7 +8,7 @@ import torch.distributed as dist
 
 from ...core_hook import HOOKS
 from .base import LoggerHook
-from mvt.utils.io_util import obj_dump
+from model.mvt.utils.io_util import obj_dump
 
 
 @HOOKS.register_module()

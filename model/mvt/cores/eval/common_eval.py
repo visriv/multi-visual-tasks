@@ -9,14 +9,14 @@ import numpy as np
 from terminaltables import AsciiTable
 from collections.abc import Sequence
 
-from mvt.utils.log_util import print_log
-from mvt.utils.data_util import get_classes
-from mvt.utils.metric_util import (cal_recalls, 
-                          tpfp_imagenet, 
-                          tpfp_default, 
-                          average_precision,
-                          total_intersect_and_union)
-from mvt.utils.bbox_util import bbox_overlaps_np
+from model.mvt.utils.log_util import print_log
+from model.mvt.utils.data_util import get_classes
+from model.mvt.utils.metric_util import (cal_recalls, 
+                                         tpfp_imagenet, 
+                                         tpfp_default, 
+                                         average_precision,
+                                         total_intersect_and_union)
+from model.mvt.utils.bbox_util import bbox_overlaps_np
 
 
 def get_cls_results(det_results, annotations, class_id):

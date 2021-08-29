@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..block_builder import LOSSES
-from mvt.utils.loss_util import weight_reduce_loss
+from model.mvt.utils.loss_util import weight_reduce_loss
 
 
 def mse_loss(pred,

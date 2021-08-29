@@ -1,21 +1,21 @@
 import random
 import numpy as np
 import torch
-
-from mvt.utils.parallel_util import CustomDataParallel
-from mvt.utils.parallel_util import CustomDistributedDataParallel
-from mvt.cores.core_hook import HOOKS
-from mvt.cores.hook import (DistSamplerSeedHook, 
-                            OptimizerHook,
-                            EvalHook, DistEvalHook)
-from mvt.cores.runner import EpochBasedRunner
-from mvt.cores.core_optimizer import build_optimizer
-from mvt.utils.log_util import get_root_logger
-from mvt.datasets.data_builder import build_dataloader, build_dataset
-from mvt.utils.data_util import replace_ImageToTensor
-from mvt.utils.reg_util import build_module_from_dict
 from yacs.config import CfgNode
-from mvt.utils.config_util import convert_to_dict
+
+from model.mvt.utils.parallel_util import CustomDataParallel
+from model.mvt.utils.parallel_util import CustomDistributedDataParallel
+from model.mvt.cores.core_hook import HOOKS
+from model.mvt.cores.hook import (DistSamplerSeedHook, 
+                                  OptimizerHook,
+                                  EvalHook, DistEvalHook)
+from model.mvt.cores.runner import EpochBasedRunner
+from model.mvt.cores.core_optimizer import build_optimizer
+from model.mvt.utils.log_util import get_root_logger
+from model.mvt.datasets.data_builder import build_dataloader
+from model.mvt.utils.data_util import replace_ImageToTensor
+from model.mvt.utils.reg_util import build_module_from_dict
+from model.mvt.utils.config_util import convert_to_dict
 
 
 def set_random_seed(seed, deterministic=False):

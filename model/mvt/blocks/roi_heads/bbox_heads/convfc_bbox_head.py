@@ -1,8 +1,8 @@
 import torch.nn as nn
-from mvt.cores.ops import ConvModule
 
-from mvt.blocks.block_builder import HEADS
 from .bbox_head import BBoxHead
+from model.mvt.blocks.block_builder import HEADS
+from model.mvt.cores.ops import ConvModule
 
 
 @HEADS.register_module()

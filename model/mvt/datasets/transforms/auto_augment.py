@@ -4,8 +4,8 @@ import numpy as np
 
 from .compose import Compose
 from ..data_wrapper import PIPELINES
-from mvt.utils.geometric_util import imshear, imrotate, imtranslate
-from mvt.utils.photometric_util import (adjust_brightness, adjust_color, 
+from model.mvt.utils.geometric_util import imshear, imrotate, imtranslate
+from model.mvt.utils.photometric_util import (adjust_brightness, adjust_color, 
                                         adjust_contrast, imequalize)
 
 _MAX_LEVEL = 10

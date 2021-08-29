@@ -12,8 +12,8 @@ sys.path.append("..")
 
 from model.configs import cfg
 from model.mvt.utils.config_util import (get_task_cfg, convert_to_dict, 
-                                   get_dataset_global_args,
-                                   get_dict_from_list)
+                                         get_dataset_global_args,
+                                         get_dict_from_list)
 from model.mvt.utils.parallel_util import init_dist
 from model.mvt.utils.log_util import get_root_logger
 from model.mvt.utils.runtime_util import collect_env

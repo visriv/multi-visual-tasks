@@ -4,8 +4,8 @@ from yacs.config import CfgNode
 
 from .base_detector import BaseDetector
 from ...model_builder import DETECTORS
-from mvt.blocks.block_builder import build_backbone, build_head, build_neck
-from mvt.utils.config_util import convert_to_dict
+from model.mvt.blocks.block_builder import build_backbone, build_head, build_neck
+from model.mvt.utils.config_util import convert_to_dict
 
 
 @DETECTORS.register_module()

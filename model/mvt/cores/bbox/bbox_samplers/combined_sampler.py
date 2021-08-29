@@ -1,5 +1,5 @@
-from ...core_bbox import BBOX_SAMPLERS, build_sampler
 from .base_sampler import BaseSampler
+from ...core_bbox import BBOX_SAMPLERS, build_sampler
 
 
 @BBOX_SAMPLERS.register_module()

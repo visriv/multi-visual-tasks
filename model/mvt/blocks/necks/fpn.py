@@ -2,8 +2,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..block_builder import NECKS
-from mvt.cores.ops import ConvModule
-from mvt.utils.init_util import xavier_init
+from model.mvt.cores.ops import ConvModule
+from model.mvt.utils.init_util import xavier_init
 
 
 @NECKS.register_module()

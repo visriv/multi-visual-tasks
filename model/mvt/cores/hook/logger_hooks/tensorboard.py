@@ -1,6 +1,6 @@
 import os.path as osp
 
-from mvt.utils.parallel_util import master_only
+from model.mvt.utils.parallel_util import master_only
 from ...core_hook import HOOKS
 from .base import LoggerHook
 

@@ -4,15 +4,14 @@ import random
 import math
 import cv2
 
+from .compose import Compose as PipelineCompose
 from ..data_wrapper import PIPELINES
-from mvt.utils.mask_util import PolygonMasks
-from mvt.utils.bbox_util import bbox_overlaps_np
-from mvt.utils.misc_util import is_list_of, is_str
-from mvt.utils.geometric_util import (imresize, imflip,
+from model.mvt.utils.bbox_util import bbox_overlaps_np
+from model.mvt.utils.misc_util import is_list_of, is_str
+from model.mvt.utils.geometric_util import (imresize, imflip,
                                       impad, impad_to_multiple,
                                       imrescale, imcrop)
-from mvt.utils.photometric_util import imnormalize, bgr2hsv, hsv2bgr, rgb2gray
-from .compose import Compose as PipelineCompose
+from model.mvt.utils.photometric_util import imnormalize, bgr2hsv, hsv2bgr, rgb2gray
 
 try:
     from imagecorruptions import corrupt
@@ -29,7 +28,7 @@ except ImportError:
 
 @PIPELINES.register_module()
 class JointResize(object):
-    """Resize images & bbox & mask.
+    """Resize images & bbox.
     This transform resizes the input image to some scale. Bboxes and masks are
     then resized with the same scale factor. If the input dict contains the key
     "scale", then the scale in the input dict is used, otherwise the specified
@@ -233,35 +232,6 @@ class JointResize(object):
             bboxes[:, 1::2] = np.clip(bboxes[:, 1::2], 0, img_shape[0])
             results[key] = bboxes
 
-    def _resize_masks(self, results):
-        """Resize masks with ``results['scale']``"""
-
-        for key in results.get('mask_fields', []):
-            if results[key] is None:
-                continue
-            if self.keep_ratio:
-                results[key] = results[key].rescale(results['scale'])
-            else:
-                results[key] = results[key].resize(results['img_shape'][:2])
-
-    def _resize_seg(self, results):
-        """Resize semantic segmentation map with ``results['scale']``."""
-
-        for key in results.get('seg_fields', []):
-            if self.keep_ratio:
-                gt_seg = imrescale(
-                    results[key],
-                    results['scale'],
-                    interpolation='nearest',
-                    backend=self.backend)
-            else:
-                gt_seg = imresize(
-                    results[key],
-                    results['scale'],
-                    interpolation='nearest',
-                    backend=self.backend)
-            results['gt_semantic_seg'] = gt_seg
-
     def __call__(self, results):
         """Call function to resize images, bounding boxes, masks, semantic
         segmentation map.
@@ -289,8 +259,6 @@ class JointResize(object):
 
         self._resize_img(results)
         self._resize_bboxes(results)
-        self._resize_masks(results)
-        self._resize_seg(results)
         return results
 
     def __repr__(self):
@@ -504,7 +472,7 @@ class RandomGrayscale():
 
 @PIPELINES.register_module()
 class JointRandomFlip():
-    """Flip the image & bbox & mask.
+    """Flip the image & bbox.
     If the input dict contains the key "flip", then the flag will be used,
     otherwise it will be randomly decided by a ratio specified in the init
     method.
@@ -929,79 +897,6 @@ class JointRandomCrop():
 
 
 @PIPELINES.register_module()
-class SegRandomCrop():
-    """Random crop the image & seg.
-
-    Args:
-        crop_size (tuple): Expected size after cropping, (h, w).
-        cat_max_ratio (float): The maximum ratio that single category could
-            occupy.
-    """
-
-    def __init__(self, crop_size, cat_max_ratio=1., ignore_index=255):
-        assert crop_size[0] > 0 and crop_size[1] > 0
-        self.crop_size = crop_size
-        self.cat_max_ratio = cat_max_ratio
-        self.ignore_index = ignore_index
-
-    def get_crop_bbox(self, img):
-        """Randomly get a crop bounding box."""
-        margin_h = max(img.shape[0] - self.crop_size[0], 0)
-        margin_w = max(img.shape[1] - self.crop_size[1], 0)
-        offset_h = np.random.randint(0, margin_h + 1)
-        offset_w = np.random.randint(0, margin_w + 1)
-        crop_y1, crop_y2 = offset_h, offset_h + self.crop_size[0]
-        crop_x1, crop_x2 = offset_w, offset_w + self.crop_size[1]
-
-        return crop_y1, crop_y2, crop_x1, crop_x2
-
-    def crop(self, img, crop_bbox):
-        """Crop from ``img``"""
-        crop_y1, crop_y2, crop_x1, crop_x2 = crop_bbox
-        img = img[crop_y1:crop_y2, crop_x1:crop_x2, ...]
-        return img
-
-    def __call__(self, results):
-        """Call function to randomly crop images, semantic segmentation maps.
-
-        Args:
-            results (dict): Result dict from loading pipeline.
-
-        Returns:
-            dict: Randomly cropped results, 'img_shape' key in result dict is
-                updated according to crop size.
-        """
-
-        img = results['img']
-        crop_bbox = self.get_crop_bbox(img)
-        if self.cat_max_ratio < 1.:
-            # Repeat 10 times
-            for _ in range(10):
-                seg_temp = self.crop(results['gt_semantic_seg'], crop_bbox)
-                labels, cnt = np.unique(seg_temp, return_counts=True)
-                cnt = cnt[labels != self.ignore_index]
-                if len(cnt) > 1 and np.max(cnt) / np.sum(
-                        cnt) < self.cat_max_ratio:
-                    break
-                crop_bbox = self.get_crop_bbox(img)
-
-        # crop the image
-        img = self.crop(img, crop_bbox)
-        img_shape = img.shape
-        results['img'] = img
-        results['img_shape'] = img_shape
-
-        # crop semantic seg
-        for key in results.get('seg_fields', []):
-            results[key] = self.crop(results[key], crop_bbox)
-
-        return results
-
-    def __repr__(self):
-        return self.__class__.__name__ + f'(crop_size={self.crop_size})'
-
-
-@PIPELINES.register_module()
 class ImgRandomCrop():
     """Crop the given Image at a random location."""
 
@@ -1296,148 +1191,6 @@ class ImgCenterCrop():
     def __repr__(self):
 
         return self.__class__.__name__ + f'(crop_size={self.crop_size})'
-
-
-@PIPELINES.register_module()
-class SegRescale():
-    """Rescale semantic segmentation maps."""
-
-    def __init__(self, scale_factor=1, backend='cv2'):
-        """Initialization of rescale for segmentation
-
-        Args:
-            scale_factor (float): The scale factor of the final output.
-            backend (str): Image rescale backend, choices are 'cv2' and 'pillow'.
-                These two backends generates slightly different results. Defaults
-                to 'cv2'.
-        """
-
-        self.scale_factor = scale_factor
-        self.backend = backend
-
-    def __call__(self, results):
-        """Call function to scale the semantic segmentation map.
-
-        Args:
-            results (dict): Result dict from loading pipeline.
-
-        Returns:
-            dict: Result dict with semantic segmentation map scaled.
-        """
-
-        for key in results.get('seg_fields', []):
-            if self.scale_factor != 1:
-                results[key] = imrescale(
-                    results[key],
-                    self.scale_factor,
-                    interpolation='nearest',
-                    backend=self.backend)
-        return results
-
-    def __repr__(self):
-        return self.__class__.__name__ + f'(scale_factor={self.scale_factor})'
-
-
-@PIPELINES.register_module()
-class GenerateHeatMap():
-    """Generate heat maps for segmentation."""
-
-    def __init__(self, sigma=3, range=20):
-        """Initialization of rescale for segmentation
-
-        Args:
-            sigma (float): The scale factor of the final output.
-            range (str): Image rescale backend, choices are 'cv2' and 'pillow'.
-                These two backends generates slightly different results. Defaults
-                to 'cv2'.
-        """
-
-        self.sigma = sigma
-        self.range = range
-
-    def __call__(self, results):
-        """Call function to scale the semantic segmentation map.
-
-        Args:
-            results (dict): Result dict from loading pipeline.
-
-        Returns:
-            dict: Result dict with semantic segmentation map scaled.
-        """
-        # 3-sigma rule
-        tmp_size = self.sigma * 3
-
-        num_class = 2
-
-        H = results['img_shape'][0]
-        W = results['img_shape'][1]
-
-        results['gt_semantic_seg'] = np.zeros((num_class, H, W), dtype=np.float32)
-        results['seg_fields'].append('gt_semantic_seg')
-
-        if results['ann_info']['concat_type'] == 0: # split with horizontal line
-
-            feat_stride = results['ori_shape'][0] / H
-            for concat_line in results['ann_info']['concat_lines']:
-                split_y = int(concat_line / feat_stride + 0.5)
-
-                if split_y < 0 or split_y >= H:
-                    continue
-
-                min_y = int(split_y - tmp_size)
-                max_y = int(split_y + tmp_size + 1)
-
-                size = 2 * tmp_size + 1
-                y = np.arange(0, size, 1, np.float32)
-                y0 = size // 2
-                # The gaussian is not normalized,
-                # we want the center value to equal 1
-                g = np.exp(-(y - y0)**2 / (2 * self.sigma**2))
-
-                # Usable gaussian range
-                g_y = max(0, -min_y), min(max_y, H) - min_y
-                # Image range
-                img_y = max(0, min_y), min(max_y, H)
-                
-                for i in range(W):
-                    results['gt_semantic_seg'][0, img_y[0]:img_y[1], i] += \
-                        g[g_y[0]:g_y[1]]
-
-        else: # split with vertical line
-            feat_stride = results['ori_shape'][1] / W
-
-            for concat_line in results['ann_info']['concat_lines']:
-                split_x = int(concat_line / feat_stride + 0.5)
-
-                if split_x < 0 or split_x >= W:
-                    continue
-
-                min_x = int(split_x - tmp_size)
-                max_x = int(split_x + tmp_size + 1)
-
-                size = 2 * tmp_size + 1
-                x = np.arange(0, size, 1, np.float32)
-                x0 = size // 2
-                # The gaussian is not normalized,
-                # we want the center value to equal 1
-                g = np.exp(-(x - x0)**2 / (2 * self.sigma**2))
-
-                # Usable gaussian range
-                g_x = max(0, -min_x), min(max_x, W) - min_x
-                # Image range
-                img_x = max(0, min_x), min(max_x, W)
-
-                for i in range(H):
-                    results['gt_semantic_seg'][1, i, img_x[0]:img_x[1]] += \
-                        g[g_x[0]:g_x[1]]
- 
-        return results
-
-    def __repr__(self):
-        repr_str = self.__class__.__name__ 
-        repr_str += f'(sigma={self.sigma})'
-        repr_str += f'(range={self.range})'
-        return repr_str
 
 
 @PIPELINES.register_module()

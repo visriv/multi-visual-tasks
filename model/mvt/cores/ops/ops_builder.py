@@ -3,8 +3,8 @@ import torch.nn as nn
 from torch.nn import SyncBatchNorm
 
 from .misc import infer_abbr
-from mvt.utils.reg_util import Registry
-from mvt.cores.layer_ops.brick import Mish
+from model.mvt.utils.reg_util import Registry
+from model.mvt.cores.layer_ops.brick import Mish
 
 
 CONV_LAYERS = Registry('conv layer')

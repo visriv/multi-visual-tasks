@@ -71,7 +71,7 @@ class EvalHook(Hook):
     def after_train_epoch(self, runner):
         if not self.evaluation_flag(runner):
             return
-        from mvt.engines.evaluator import single_device_test
+        from model.mvt.engines.evaluator import single_device_test
 
         results = single_device_test(
             runner.model, self.dataloader, model_type=self.eval_type, show=False)
@@ -122,7 +122,7 @@ class DistEvalHook(EvalHook):
     def after_train_epoch(self, runner):
         if not self.evaluation_flag(runner):
             return
-        from mvt.engines.evaluator import multi_device_det_test
+        from model.mvt.engines.evaluator import multi_device_det_test
         tmpdir = self.tmpdir
         if tmpdir is None:
             tmpdir = osp.join(runner.work_dir, '.eval_hook')
