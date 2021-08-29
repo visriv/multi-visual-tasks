@@ -1,6 +1,5 @@
 import json
 import os
-import pickle
 import sys
 from collections import Counter
 from pathlib import Path
@@ -379,11 +378,8 @@ def get_label_mapping(ref_json_path, qry_json_path):
 
 def run():
     mvt_path = Path(MVT_ROOT)
-    det_cfg_path = mvt_path / 'model/task_settings/img_det/det_yolov4_9a_retail_one.yaml'
+    det_cfg_path = mvt_path / 'model/tasks/detections/det_yolov4_9a_retail_one.yaml'
     det_model_path = mvt_path / 'model_files/det_yolov4_9a_retail_one/epoch_200.pth'
-
-    #det_cfg_path = mvt_path / 'model/task_settings/img_det/det_yolov4_retail_one.yaml'
-    #det_model_path = mvt_path / 'model_files/det_yolov4_retail_one/epoch_200.pth'
 
     det_json_path = mvt_path / 'data/test/a_det_annotations.json'
     det_score_thr = 0.1
@@ -391,17 +387,12 @@ def run():
     run_det_task(str(det_cfg_path), str(det_model_path),
                  str(det_json_path), det_score_thr)
 
-<<<<<<< HEAD
-    emb_cfg_path = mvt_path / 'task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
-    emb_model_path = mvt_path / 'meta/train_infos/emb_resnet50_mlp_loc_retail/epoch_50.pth'
-=======
     ref_json_path = mvt_path / 'data/test/b_annotations.json'
     qry_json_path = mvt_path / 'data/test/a_annotations.json'
     label_mapping = get_label_mapping(ref_json_path, qry_json_path)
 
-    emb_cfg_path = mvt_path / 'model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml'
+    emb_cfg_path = mvt_path / 'model/tasks/embeddings/emb_resnet50_mlp_loc_retail.yaml'
     emb_model_path = mvt_path / 'model_files/emb_resnet50_mlp_loc_retail/epoch_50.pth'
->>>>>>> 2ab8d8a49e4e22bdc4b91cf7c9ef1b44e30e9c5d
     out_json_path = mvt_path / 'submit/output.json'
 
     run_emb_task(

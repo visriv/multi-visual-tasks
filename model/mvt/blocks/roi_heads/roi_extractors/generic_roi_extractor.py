@@ -1,6 +1,6 @@
 from .base_roi_extractor import BaseRoIExtractor
-from mvt.cores.ops import build_plugin_layer
-from mvt.blocks.block_builder import ROI_EXTRACTORS
+from model.mvt.cores.ops import build_plugin_layer
+from model.mvt.blocks.block_builder import ROI_EXTRACTORS
 
 
 @ROI_EXTRACTORS.register_module()

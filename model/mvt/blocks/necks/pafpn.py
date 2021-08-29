@@ -3,7 +3,7 @@ import torch.nn.functional as F
 
 from .fpn import FPN
 from ..block_builder import NECKS
-from mvt.cores.ops import ConvModule
+from model.mvt.cores.ops import ConvModule
 
 
 @NECKS.register_module()

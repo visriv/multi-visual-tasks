@@ -4,14 +4,14 @@ from yacs.config import CfgNode
 
 from ..block_builder import HEADS, build_loss
 from .anchor import AnchorHead
-from mvt.utils.init_util import bias_init_with_prob, normal_init
-from mvt.cores.ops import ConvModule, Scale
-from mvt.cores.ops import multiclass_nms
-from mvt.cores.anchor import anchor_inside_flags, images_to_levels
-from mvt.cores.core_anchor import build_anchor_generator
-from mvt.cores.core_bbox import build_assigner, build_sampler
-from mvt.utils.misc_util import multi_apply, unmap
-from mvt.utils.parallel_util import reduce_mean
+from model.mvt.utils.init_util import bias_init_with_prob, normal_init
+from model.mvt.cores.ops import ConvModule, Scale
+from model.mvt.cores.ops import multiclass_nms
+from model.mvt.cores.anchor import anchor_inside_flags, images_to_levels
+from model.mvt.cores.core_anchor import build_anchor_generator
+from model.mvt.cores.core_bbox import build_assigner, build_sampler
+from model.mvt.utils.misc_util import multi_apply, unmap
+from model.mvt.utils.parallel_util import reduce_mean
 
 EPS = 1e-12
 

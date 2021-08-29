@@ -1,7 +1,7 @@
 import torch
 
 from .base_roi_extractor import BaseRoIExtractor
-from mvt.blocks.block_builder import ROI_EXTRACTORS
+from model.mvt.blocks.block_builder import ROI_EXTRACTORS
 
 
 @ROI_EXTRACTORS.register_module()

@@ -4,7 +4,7 @@ import torch
 import torch.distributed as dist
 import torch.nn as nn
 
-from mvt.utils.log_util import print_log
+from model.mvt.utils.log_util import print_log
 
 
 class BaseEmbedder(nn.Module, metaclass=ABCMeta):

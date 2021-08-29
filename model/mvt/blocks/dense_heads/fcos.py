@@ -4,10 +4,10 @@ import torch.nn.functional as F
 
 from ..block_builder import HEADS, build_loss
 from .anchor_free import AnchorFreeHead
-from mvt.cores.ops import Scale, multiclass_nms
-from mvt.utils.init_util import normal_init
-from mvt.cores.bbox import distance2bbox
-from mvt.utils.misc_util import multi_apply
+from model.mvt.cores.ops import Scale, multiclass_nms
+from model.mvt.utils.init_util import normal_init
+from model.mvt.cores.bbox import distance2bbox
+from model.mvt.utils.misc_util import multi_apply
 
 INF = 1e8
 

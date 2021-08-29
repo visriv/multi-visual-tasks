@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..block_builder import NECKS
-from mvt.cores.ops import ConvModule
-from mvt.cores.layer_ops.efficient_ops import SeparableConv2d, MemoryEfficientSwish
+from model.mvt.cores.ops import ConvModule
+from model.mvt.cores.layer_ops.efficient_ops import SeparableConv2d, MemoryEfficientSwish
 
 
 class WeightedMerge(nn.Module):

@@ -1,45 +1,28 @@
-## Introduction
+# Introduction
 
   MultipleVisualTasks (MVT) is an open-source toolbox for multiple vision tasks based on PyTorch, following the most advanced algorithm. Our repository is designed according to {MMDetection: https://github.com/open-mmlab/mmdetection} and {Detectron2: https://github.com/facebookresearch/detectron2}.
 
-### Major Features
+## Major Features
 
 - **Support multiple tasks**
 
-  Currently, We only support the vision task of image detection and embedding. 
+  Currently, We only support the vision task of image detection and embedding. This branch is used for competition of XinYe Technology Cup. 
 
 - **Well designed, tested and documented**
 
   We decompose MVT into different components and one can easily construct a customized vision task by combining different modules.
-  We provide detailed documentation and API reference.
 
 
 ## Installation
 
-### Requirements
-
-- Linux or macOS
-- Python 3.6+
-- PyTorch 1.5+
-- CUDA 9.2+
-- GCC 5+
-- and so on (seen in requirements)
-
-### Install
-
 pip3 install -r requirements.txt
 
-### Developing
+## Developing
 
 The train and test scripts already modify the `PYTHONPATH` to ensure the script in the current directory.
 
 ```shell
 export PYTHONPATH=$(pwd):$PYTHONPATH
-```
-or
-
-```shell
-PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
 ```
 
 ## Get Started
@@ -68,8 +51,8 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   Examples:
 
     ```shell
-    python3 ./tools/train.py --work-dir model_files/ --no-test model/task_settings/img_det/det_yolov4_9a_retail_one.yaml
-    python3 ./tools/train.py --work-dir model_files/ --no-test model/task_settings/img_emb/emb_resnet50_mlp_loc_retail.yaml
+    python3 ./tools/train.py --work-dir model_files/ --no-test model/tasks/detections/det_yolov4_9a_retail_one.yaml
+    python3 ./tools/train.py --work-dir model_files/ --no-test model/tasks/embeddings/emb_resnet50_mlp_loc_retail.yaml
     ```
 
 ### Train with multiple GPUs
@@ -87,7 +70,7 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
     Similar to training cases with a single GPU, here gives a few examples.
 
     ```shell
-    CUDA_VISIBLE_DEVICES=4,5,6,7 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29500  tools/train.py --work-dir model_files/ --no-test --launcher pytorch model/task_settings/img_det/det_yolov4_9a_retail_one.yaml
+    CUDA_VISIBLE_DEVICES=4,5,6,7 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29500  tools/train.py --work-dir model_files/ --no-test --launcher pytorch model/tasks/detections/det_yolov4_9a_retail_one.yaml
     ```
 
 ### Evaluate a dataset
@@ -122,7 +105,7 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
   Examples:
 
     ```shell
-    python3 ./tools/test.py task_settings/img_det/det_yolov4_9a_retail_one.yaml  model_files/det_yolov4_9a_retail_one/epoch_200.pth --eval 'mAP' --out 'model_files/det_yolov4_9a_retail_one_eval.pkl' --show-dir 'data/det_yolov4_9a_retail_one_eval'
+    python3 ./tools/test.py tasks/detections/det_yolov4_9a_retail_one.yaml  model_files/det_yolov4_9a_retail_one/epoch_200.pth --eval 'mAP' --out 'model_files/det_yolov4_9a_retail_one_eval.pkl' --show-dir 'data/det_yolov4_9a_retail_one_eval'
     ```
 
 ### Run inference

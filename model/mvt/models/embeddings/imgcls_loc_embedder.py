@@ -3,7 +3,7 @@ from torch import nn
 
 from .base_embedder import BaseEmbedder
 from ..model_builder import EMBEDDERS
-from mvt.blocks.block_builder import build_backbone, build_head, build_neck
+from model.mvt.blocks.block_builder import build_backbone, build_head, build_neck
 
 
 @EMBEDDERS.register_module()
