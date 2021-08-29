@@ -3,9 +3,6 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-import copy
-import platform
-import random
 from functools import partial
 from torch.utils.data import DataLoader, RandomSampler
 import numpy as np
@@ -131,7 +128,7 @@ def build_dataloader(
         batch_size=batch_size,
         sampler=sampler,
         num_workers=num_workers,
-        collate_fn=partial(collate, samples_per_device=samples_per_device),
+        collate_fn=collate,
         pin_memory=False,
         worker_init_fn=init_fn,
         **kwargs

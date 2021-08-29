@@ -57,8 +57,7 @@ export PYTHONPATH=$(pwd):$PYTHONPATH
 
 ## Train a model
 
-  MVT implements distributed training and non-distributed training,
-  which uses `CustomDistributedDataParallel` and `CustomDataParallel` respectively.
+  MVT implements distributed training and non-distributed training.
 
   All outputs (log files and checkpoints) will be saved to the working directory,
   which is specified by `work_dir` in the config file.

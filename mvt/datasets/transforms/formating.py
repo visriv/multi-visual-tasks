@@ -3,7 +3,6 @@ import numpy as np
 import torch
 
 from ..data_wrapper import PIPELINES
-from mvt.utils.data_util import DataContainer
 from mvt.utils.misc_util import is_str
 
 
@@ -142,14 +141,13 @@ class DefaultFormatBundle:
     It simplifies the pipeline of formatting common fields, including "img",
     "proposals", "gt_bboxes", "gt_labels", "gt_masks" and "gt_semantic_seg".
     These fields are formatted as follows.
-    - img: (1)transpose, (2)to tensor, (3)to DataContainer (stack=True)
-    - proposals: (1)to tensor, (2)to DataContainer
-    - gt_bboxes: (1)to tensor, (2)to DataContainer
-    - gt_bboxes_ignore: (1)to tensor, (2)to DataContainer
-    - gt_labels: (1)to tensor, (2)to DataContainer
-    - gt_masks: (1)to tensor, (2)to DataContainer (cpu_only=True)
-    - gt_semantic_seg: (1)unsqueeze dim-0 (2)to tensor, \
-                       (3)to DataContainer (stack=True)
+    - img: (1)transpose, (2)to tensor
+    - proposals: (1)to tensor
+    - gt_bboxes: (1)to tensor
+    - gt_bboxes_ignore: (1)to tensor
+    - gt_labels: (1)to tensor
+    - gt_masks: (1)to tensor
+    - gt_semantic_seg: (1)unsqueeze dim-0 (2)to tensor
     """
 
     def __call__(self, results):
@@ -170,7 +168,7 @@ class DefaultFormatBundle:
             if len(img.shape) < 3:
                 img = np.expand_dims(img, -1)
             img = np.ascontiguousarray(img.transpose(2, 0, 1))
-            results["img"] = DataContainer(to_tensor(img), stack=True)
+            results["img"] = to_tensor(img)
 
         # gt_label is for classfication
         for key in [
@@ -184,28 +182,23 @@ class DefaultFormatBundle:
         ]:
             if key not in results:
                 continue
-            results[key] = DataContainer(to_tensor(results[key]))
+            results[key] = to_tensor(results[key])
         if "gt_masks" in results:
-            results["gt_masks"] = DataContainer(results["gt_masks"], cpu_only=True)
+            results["gt_masks"] = results["gt_masks"]
         if "gt_semantic_seg" in results:
             if len(results["gt_semantic_seg"].shape) == 2:
-                results["gt_semantic_seg"] = DataContainer(
-                    to_tensor(
-                        np.ascontiguousarray(results["gt_semantic_seg"][None, ...])
-                    ),
-                    stack=True,
+                results["gt_semantic_seg"] = to_tensor(
+                    np.ascontiguousarray(results["gt_semantic_seg"][None, ...])
                 )
             else:
-                results["gt_semantic_seg"] = DataContainer(
-                    to_tensor(np.ascontiguousarray(results["gt_semantic_seg"])),
-                    stack=True,
+                results["gt_semantic_seg"] = to_tensor(
+                    np.ascontiguousarray(results["gt_semantic_seg"])
                 )
         if "target" in results:  # for pose
-            results["target"] = DataContainer(to_tensor(results["target"]), stack=True)
+            results["target"] = to_tensor(results["target"])
         if "target_weight" in results:  # for pose
-            results["target_weight"] = DataContainer(
-                to_tensor(results["target_weight"]), stack=True, pad_dims=1
-            )
+            results["target_weight"] = to_tensor(results["target_weight"])
+
         return results
 
     def _add_default_meta_keys(self, results):
@@ -263,8 +256,7 @@ class Collect:
 
     Args:
         keys (Sequence[str]): Keys of results to be collected in ``data``.
-        meta_keys (Sequence[str], optional): Meta keys to be converted to
-            ``DataContainer`` and collected in ``data[img_metas]``.
+        meta_keys (Sequence[str], optional): Meta keys to be collected in ``data[img_metas]``.
             Default: ``('filename', 'ori_filename', 'ori_shape', 'img_shape',
             'pad_shape', 'scale_factor', 'flip', 'flip_direction',
             'img_norm_cfg')``
@@ -291,7 +283,7 @@ class Collect:
 
     def __call__(self, results):
         """Call function to collect keys in results. The keys in ``meta_keys``
-        will be converted to :obj:DataContainer.
+        will be converted to :obj.
 
         Args:
             results (dict): Result dict contains the data to collect.
@@ -307,7 +299,7 @@ class Collect:
         for key in self.meta_keys:
             if key in results:
                 img_meta[key] = results[key]
-        data["img_metas"] = DataContainer(img_meta, cpu_only=True)
+        data["img_metas"] = img_meta
         for key in self.keys:
             data[key] = results[key]
         return data
@@ -355,7 +347,7 @@ class EmbCollect:
         for key, value in results.items():
             if key in self.meta_keys:
                 img_meta[key] = value
-        data["img_metas"] = DataContainer(img_meta, cpu_only=True)
+        data["img_metas"] = img_meta
         return data
 
     def __repr__(self):

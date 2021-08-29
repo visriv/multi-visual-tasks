@@ -56,7 +56,7 @@ export PYTHONPATH=$(pwd):$PYTHONPATH
 
 ## 训练一个模型
 
-  MVT 可以进行分布式和非分布式训练，分别使用了`CustomDistributedDataParallel`和`CustomDataParallel`。所有的输出结果（包括日志和模型）都会保存在`work_dir`所指定的工作目录中。缺省状态下每个训练周期完成后都会进行模型评估，但可以根据训练评估设置进行更改。
+  MVT 可以进行分布式和非分布式训练。所有的输出结果（包括日志和模型）都会保存在`work_dir`所指定的工作目录中。缺省状态下每个训练周期完成后都会进行模型评估，但可以根据训练评估设置进行更改。
 
 ### 单GPU训练
 

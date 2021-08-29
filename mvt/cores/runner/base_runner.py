@@ -52,7 +52,7 @@ class BaseRunner(metaclass=ABCMeta):
         max_epochs=None,
     ):
 
-        assert hasattr(model, "train_step")
+        assert hasattr(model.module, "train_step")
 
         # check the type of `optimizer`
         if isinstance(optimizer, dict):
@@ -80,6 +80,7 @@ class BaseRunner(metaclass=ABCMeta):
 
         self.fp16 = fp16
         self.model = model
+        self.module = model.module
         self.optimizer = optimizer
         self.logger = logger
         self.meta = meta

@@ -1,8 +1,5 @@
 import os.path as osp
-import platform
-import shutil
 import time
-import warnings
 
 import torch
 from .base_runner import BaseRunner
@@ -20,10 +17,21 @@ class EpochBasedRunner(BaseRunner):
     """
 
     def run_iter(self, data_batch, train_mode, **kwargs):
+        if torch.cuda.is_available():
+            model_device = next(self.module.parameters()).device
+            for key, value in data_batch.items():
+                if key == "img_metas":
+                    continue
+                if isinstance(value, list):
+                    data_batch[key] = [
+                        vd.cuda(model_device, non_blocking=True) for vd in value
+                    ]
+                else:
+                    data_batch[key] = value.cuda(model_device, non_blocking=True)
         if train_mode:
-            outputs = self.model.train_step(data_batch, self.optimizer, **kwargs)
+            outputs = self.module.train_step(data_batch, self.optimizer, **kwargs)
         else:
-            outputs = self.model.val_step(data_batch, self.optimizer, **kwargs)
+            outputs = self.module.val_step(data_batch, self.optimizer, **kwargs)
         if not isinstance(outputs, dict):
             raise TypeError(
                 '"batch_processor()" or "model.train_step()"'

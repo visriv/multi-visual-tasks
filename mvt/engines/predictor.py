@@ -138,13 +138,13 @@ def inference_detector(config, model, img):
     # build the data pipeline
     test_pipeline = Compose(pipeline_list)
     data = test_pipeline(data)
-    data = collate([data], samples_per_device=1)
+    data = collate([data])
 
     if next(model.parameters()).is_cuda:
         # scatter to specified GPU
         data = scatter(data, [device])[0]
     else:
-        # just get the actual data from DataContainer
+        # just get the actual data
         data["img_metas"] = data["img_metas"][0].data
 
     # forward the model

@@ -125,6 +125,7 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
                 DDP, it means the batch size on each GPU), which is used for
                 averaging the logs.
         """
+
         # with torch.cuda.amp.autocast():
         losses = self(**datas)
         loss, log_vars = self._parse_losses(losses)
@@ -140,8 +141,8 @@ class BaseEmbedder(nn.Module, metaclass=ABCMeta):
         during val epochs. Note that the evaluation after training epochs is
         not implemented with this method, but an evaluation hook.
         """
-        with torch.cuda.amp.autocast():
-            losses = self(**datas)
+
+        losses = self(**datas)
         loss, log_vars = self._parse_losses(losses)
 
         outputs = dict(loss=loss, log_vars=log_vars, num_samples=len(datas["img"].data))

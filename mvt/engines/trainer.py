@@ -1,18 +1,19 @@
 import random
 import numpy as np
 import torch
+from torch.nn.parallel import DataParallel
+from torch.nn.parallel.distributed import DistributedDataParallel
+from yacs.config import CfgNode
 
-from mvt.utils.parallel_util import CustomDataParallel
-from mvt.utils.parallel_util import CustomDistributedDataParallel
+
 from mvt.cores.core_hook import HOOKS
 from mvt.cores.hook import DistSamplerSeedHook, OptimizerHook, EvalHook, DistEvalHook
 from mvt.cores.runner import EpochBasedRunner
 from mvt.cores.core_optimizer import build_optimizer
 from mvt.utils.log_util import get_root_logger
-from mvt.datasets.data_builder import build_dataloader, build_dataset
+from mvt.datasets.data_builder import build_dataloader
 from mvt.utils.data_util import replace_ImageToTensor
 from mvt.utils.reg_util import build_module_from_dict
-from yacs.config import CfgNode
 from mvt.utils.config_util import convert_to_dict
 
 
@@ -84,7 +85,7 @@ def train_processor(
         # Sets the `find_unused_parameters` parameter in
         # torch.nn.parallel.DistributedDataParallel
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model.cuda())
-        model = CustomDistributedDataParallel(
+        model = DistributedDataParallel(
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False,
@@ -92,11 +93,11 @@ def train_processor(
         )
     else:
         if cfg.RUNTIME.GPU_IDS != "":
-            model = CustomDataParallel(
+            model = DataParallel(
                 model.cuda(cfg.RUNTIME.GPU_IDS[0]), device_ids=cfg.RUNTIME.GPU_IDS
             )
         else:
-            model = CustomDataParallel(model, device_ids=None)
+            model = DataParallel(model, device_ids=None)
 
     # build runner
     optimizer = build_optimizer(model, cfg.SCHEDULE.OPTIMIZER)
