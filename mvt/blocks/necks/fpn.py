@@ -4,7 +4,6 @@ import torch.nn.functional as F
 from ..block_builder import NECKS
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import xavier_init
-from mvt.utils.fp16_util import auto_fp16
 
 
 @NECKS.register_module()
@@ -84,7 +83,6 @@ class FPN(nn.Module):
         self.num_outs = num_outs
         self.relu_before_extra_convs = relu_before_extra_convs
         self.no_norm_on_lateral = no_norm_on_lateral
-        self.fp16_enabled = False
         self.upsample_cfg = upsample_cfg.copy()
 
         if end_level == -1:
@@ -162,7 +160,6 @@ class FPN(nn.Module):
             if isinstance(m, nn.Conv2d):
                 xavier_init(m, distribution='uniform')
 
-    @auto_fp16()
     def forward(self, inputs):
         """Forward function."""
         if not isinstance(inputs, tuple):

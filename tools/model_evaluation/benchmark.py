@@ -6,7 +6,6 @@ from mvt.cores.ops import fuse_conv_bn
 from mvt.utils.config_util import get_task_cfg
 from mvt.utils.parallel_util import DataParallel
 from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.utils.fp16_util import wrap_fp16_model
 from mvt.datasets.data_builder import build_dataloader, build_dataset
 from mvt.utils.data_util import replace_ImageToTensor
 from mvt.models.model_builder import build_model
@@ -52,9 +51,7 @@ def main():
 
     # build the model and load checkpoint
     model = build_model(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
-    fp16_cfg = cfg.get('fp16', None)
-    if fp16_cfg is not None:
-        wrap_fp16_model(model)
+
     load_checkpoint(model, args.checkpoint, map_location='cpu')
     if args.fuse_conv_bn:
         model = fuse_conv_bn(model)

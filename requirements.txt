@@ -12,3 +12,4 @@ terminaltables
 tensorboard
 albumentations
 imagecorruptions
+onnx

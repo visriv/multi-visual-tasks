@@ -1,6 +1,5 @@
 from .base_roi_extractor import BaseRoIExtractor
 from mvt.cores.ops import build_plugin_layer
-from mvt.utils.fp16_util import force_fp32
 from mvt.blocks.block_builder import ROI_EXTRACTORS
 
 
@@ -36,7 +35,6 @@ class GenericRoIExtractor(BaseRoIExtractor):
         if self.with_pre:
             self.pre_module = build_plugin_layer(pre_cfg, '_pre_module')[1]
 
-    @force_fp32(apply_to=('feats', ), out_fp16=True)
     def forward(self, feats, rois, roi_scale_factor=None):
         """Forward function."""
         if len(feats) == 1:

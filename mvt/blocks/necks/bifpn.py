@@ -3,8 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..block_builder import NECKS
-from mvt.utils.init_util import xavier_init
-from mvt.utils.fp16_util import auto_fp16
 from mvt.cores.ops import ConvModule
 from mvt.cores.layer_ops.efficient_ops import SeparableConv2d, MemoryEfficientSwish
 
@@ -134,7 +132,6 @@ class BiFPN(nn.Module):
         self.num_ins = len(in_channels)
         self.stack = stack
         self.num_outs = num_outs
-        self.fp16_enabled = False
 
         if end_level == -1:
             self.backbone_end_level = self.num_ins
@@ -172,7 +169,6 @@ class BiFPN(nn.Module):
             if isinstance(m, SeparableConv2d):
                 m.init_weights()
 
-    @auto_fp16()
     def forward(self, inputs):
         outs = list(inputs)
         for _, extra_op in enumerate(self.extra_ops):

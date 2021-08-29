@@ -3,7 +3,7 @@ import pickle
 
 import numpy as np
 import torch
-from mvt.cores.metric_ops import CosineSimilarity, LpDistance
+from mvt.cores.metric_ops import LpDistance
 
 
 def parse_args():

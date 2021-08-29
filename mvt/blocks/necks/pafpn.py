@@ -4,7 +4,6 @@ import torch.nn.functional as F
 from .fpn import FPN
 from ..block_builder import NECKS
 from mvt.cores.ops import ConvModule
-from mvt.utils.fp16_util import auto_fp16
 
 
 @NECKS.register_module()
@@ -79,7 +78,6 @@ class PAFPN(FPN):
             self.downsample_convs.append(d_conv)
             self.pafpn_convs.append(pafpn_conv)
 
-    @auto_fp16()
     def forward(self, inputs):
         """Forward function."""
         assert len(inputs) == len(self.in_channels)

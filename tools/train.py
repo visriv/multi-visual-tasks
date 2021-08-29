@@ -15,7 +15,7 @@ from mvt.utils.config_util import (get_task_cfg, convert_to_dict,
                                    get_dataset_global_args,
                                    get_dict_from_list)
 from mvt.utils.parallel_util import init_dist
-from mvt.utils.log_util import get_root_logger, get_git_hash
+from mvt.utils.log_util import get_root_logger
 from mvt.utils.runtime_util import collect_env
 from mvt.utils.runtime_util import set_random_seed
 from mvt.models.model_builder import build_model

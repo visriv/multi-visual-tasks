@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.utils import _pair
 
-from mvt.utils.fp16_util import auto_fp16, force_fp32
 from mvt.cores.core_bbox import build_bbox_coder
 from mvt.utils.misc_util import multi_apply
 from mvt.cores.ops import multiclass_nms
@@ -46,7 +45,6 @@ class BBoxHead(nn.Module):
         self.num_classes = num_classes
         self.reg_class_agnostic = reg_class_agnostic
         self.reg_decoded_bbox = reg_decoded_bbox
-        self.fp16_enabled = False
 
         self.bbox_coder = build_bbox_coder(bbox_coder)
         self.loss_cls = build_loss(loss_cls)
@@ -74,7 +72,6 @@ class BBoxHead(nn.Module):
             nn.init.normal_(self.fc_reg.weight, 0, 0.001)
             nn.init.constant_(self.fc_reg.bias, 0)
 
-    @auto_fp16()
     def forward(self, x):
         if self.with_avg_pool:
             x = self.avg_pool(x)
@@ -139,7 +136,6 @@ class BBoxHead(nn.Module):
             bbox_weights = torch.cat(bbox_weights, 0)
         return labels, label_weights, bbox_targets, bbox_weights
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred'))
     def loss(self,
              cls_score,
              bbox_pred,
@@ -186,7 +182,6 @@ class BBoxHead(nn.Module):
                 losses['loss_bbox'] = bbox_pred[pos_inds].sum()
         return losses
 
-    @force_fp32(apply_to=('cls_score', 'bbox_pred'))
     def get_bboxes(self,
                    rois,
                    cls_score,
@@ -225,7 +220,6 @@ class BBoxHead(nn.Module):
 
             return det_bboxes, det_labels
 
-    @force_fp32(apply_to=('bbox_preds', ))
     def refine_bboxes(self, rois, labels, bbox_preds, pos_is_gts, img_metas):
         """Refine bboxes during training.
 
@@ -303,7 +297,6 @@ class BBoxHead(nn.Module):
 
         return bboxes_list
 
-    @force_fp32(apply_to=('bbox_pred', ))
     def regress_by_class(self, rois, label, bbox_pred, img_meta):
         """Regress the bbox for the predicted class. Used in Cascade R-CNN.
 

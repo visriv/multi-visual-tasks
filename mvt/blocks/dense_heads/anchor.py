@@ -7,7 +7,6 @@ from ..block_builder import HEADS, build_loss
 from .base_det_head import BaseDetHead
 from .dense_test_mixins import BBoxTestMixin
 from mvt.utils.init_util import normal_init
-from mvt.utils.fp16_util import force_fp32
 from mvt.cores.anchor import anchor_inside_flags, images_to_levels
 from mvt.cores.core_anchor import build_anchor_generator
 from mvt.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
@@ -95,7 +94,6 @@ class AnchorHead(BaseDetHead, BBoxTestMixin):
                     sampler_cfg = dict(type='PseudoSampler')
                     
             self.sampler = build_sampler(sampler_cfg, context=self)
-        self.fp16_enabled = False
 
         self.anchor_generator = build_anchor_generator(anchor_generator)
         # usually the numbers of anchors for each level are the same
@@ -428,7 +426,6 @@ class AnchorHead(BaseDetHead, BBoxTestMixin):
             raise ValueError('Error number of samples with: ', num_total_samples)
         return loss_cls, loss_bbox
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -498,7 +495,6 @@ class AnchorHead(BaseDetHead, BBoxTestMixin):
             num_total_samples=num_total_samples)
         return dict(loss_cls=losses_cls, loss_bbox=losses_bbox)
 
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

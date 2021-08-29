@@ -6,7 +6,6 @@ import torch
 import torch.distributed as dist
 import torch.nn as nn
 
-from mvt.utils.fp16_util import auto_fp16
 from mvt.utils.log_util import print_log, get_root_logger
 from mvt.utils.io_util import imread
 from mvt.utils.misc_util import concat_list
@@ -19,7 +18,6 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
     def __init__(self):
 
         super(BaseDetector, self).__init__()
-        self.fp16_enabled = False
 
     @property
     def with_neck(self):
@@ -168,7 +166,6 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             assert 'proposals' not in kwargs
             return self.aug_test(imgs, img_metas, **kwargs)
 
-    @auto_fp16(apply_to=('img', ))
     def forward(self, img, img_metas, return_loss=True, **kwargs):
         """Calls either :func:`forward_train` or :func:`forward_test` depending
         on whether ``return_loss`` is ``True``.

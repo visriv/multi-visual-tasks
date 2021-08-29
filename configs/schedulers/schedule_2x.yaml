@@ -5,6 +5,9 @@ SCHEDULE:
     lr: 0.02
     momentum: 0.9
     weight_decay: 0.0001
+  OPTIMIZER_CONFIG:
+    grad_clip: ""
+    fp16: True
   LR_POLICY:
     policy: "step"
     warmup: "linear"

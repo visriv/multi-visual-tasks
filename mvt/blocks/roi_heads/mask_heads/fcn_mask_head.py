@@ -5,7 +5,6 @@ import torch.nn.functional as F
 from torch.nn.modules.utils import _pair
 
 from mvt.cores.ops import ConvModule, build_upsample_layer
-from mvt.utils.fp16_util import auto_fp16, force_fp32
 from mvt.utils.mask_util import mask_target
 from mvt.blocks.block_builder import HEADS, build_loss
 
@@ -50,7 +49,6 @@ class FCNMaskHead(nn.Module):
         self.class_agnostic = class_agnostic
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
-        self.fp16_enabled = False
         self.loss_mask = build_loss(loss_mask)
 
         self.convs = nn.ModuleList()
@@ -109,7 +107,6 @@ class FCNMaskHead(nn.Module):
                     m.weight, mode='fan_out', nonlinearity='relu')
                 nn.init.constant_(m.bias, 0)
 
-    @auto_fp16()
     def forward(self, x):
         for conv in self.convs:
             x = conv(x)
@@ -129,7 +126,6 @@ class FCNMaskHead(nn.Module):
                                    gt_masks, rcnn_train_cfg)
         return mask_targets
 
-    @force_fp32(apply_to=('mask_pred', ))
     def loss(self, mask_pred, mask_targets, labels):
         loss = dict()
         if mask_pred.size(0) == 0:

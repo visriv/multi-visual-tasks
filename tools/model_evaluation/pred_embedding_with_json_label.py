@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
 import json
-import os.path as osp
 import pickle
 from collections import Counter
 
@@ -9,7 +8,7 @@ import numpy as np
 import torch
 
 from configs import cfg
-from mvt.cores.metric_ops import CosineSimilarity, LpDistance
+from mvt.cores.metric_ops import LpDistance
 from mvt.datasets.data_builder import build_dataloader, build_dataset
 from mvt.models.model_builder import build_model
 from mvt.utils.checkpoint_util import load_checkpoint

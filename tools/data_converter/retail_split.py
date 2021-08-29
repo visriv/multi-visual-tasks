@@ -2,8 +2,8 @@
 Split retail training data a into train/val subset
 """
 import json
-import random
 from pathlib import Path
+
 
 subset = 'a'
 data_dir = Path('data/train/')

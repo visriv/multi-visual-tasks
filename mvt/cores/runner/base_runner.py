@@ -1,11 +1,9 @@
 import logging
 import os.path as osp
-import warnings
 from abc import ABCMeta, abstractmethod
 import torch
 from torch.optim import Optimizer
 
-from ..core_module import is_module_wrapper
 from ..core_hook import HOOKS, Hook
 from ..hook import IterTimerHook
 from .log_buffer import LogBuffer
@@ -44,6 +42,7 @@ class BaseRunner(metaclass=ABCMeta):
 
     def __init__(self,
                  model,
+                 fp16=False,
                  optimizer=None,
                  work_dir=None,
                  logger=None,
@@ -75,6 +74,7 @@ class BaseRunner(metaclass=ABCMeta):
             raise TypeError(
                 f'meta must be a dict or None, but got {type(meta)}')
 
+        self.fp16 = fp16
         self.model = model
         self.optimizer = optimizer
         self.logger = logger

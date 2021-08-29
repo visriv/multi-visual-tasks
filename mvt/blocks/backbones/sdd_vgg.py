@@ -29,7 +29,7 @@ class L2Norm(nn.Module):
 
     def forward(self, x):
         """Forward function."""
-        # normalization layer convert to FP32 in FP16 training
+
         x_float = x.float()
         norm = x_float.pow(2).sum(1, keepdim=True).sqrt() + self.eps
         return (self.weight[None, :, None, None].float().expand_as(x_float) *

@@ -3,7 +3,6 @@ import torch.nn.functional as F
 
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import kaiming_init
-from mvt.utils.fp16_util import auto_fp16, force_fp32
 from mvt.blocks.block_builder import HEADS
 
 
@@ -44,7 +43,6 @@ class FusedSemanticHead(nn.Module):
         self.loss_weight = loss_weight
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
-        self.fp16_enabled = False
 
         self.lateral_convs = nn.ModuleList()
         for i in range(self.num_ins):
@@ -81,7 +79,6 @@ class FusedSemanticHead(nn.Module):
     def init_weights(self):
         kaiming_init(self.conv_logits)
 
-    @auto_fp16()
     def forward(self, feats):
         x = self.lateral_convs[self.fusion_level](feats[self.fusion_level])
         fused_size = tuple(x.shape[-2:])
@@ -98,7 +95,6 @@ class FusedSemanticHead(nn.Module):
         x = self.conv_embedding(x)
         return mask_pred, x
 
-    @force_fp32(apply_to=('mask_pred', ))
     def loss(self, mask_pred, labels):
         labels = labels.squeeze(1).long()
         loss_semantic_seg = self.criterion(mask_pred, labels)

@@ -7,7 +7,6 @@ from .base_det_head import BaseDetHead
 from .dense_test_mixins import BBoxTestMixin
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import bias_init_with_prob, normal_init
-from mvt.utils.fp16_util import force_fp32
 from mvt.utils.misc_util import multi_apply
 
 
@@ -72,7 +71,6 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         self.test_cfg = test_cfg
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
-        self.fp16_enabled = False
 
         self._init_layers()
 
@@ -220,7 +218,6 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         return cls_score, bbox_pred, cls_feat, reg_feat
 
     @abstractmethod
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def loss(self,
              cls_scores,
              bbox_preds,
@@ -249,7 +246,6 @@ class AnchorFreeHead(BaseDetHead, BBoxTestMixin):
         raise NotImplementedError
 
     @abstractmethod
-    @force_fp32(apply_to=('cls_scores', 'bbox_preds'))
     def get_bboxes(self,
                    cls_scores,
                    bbox_preds,

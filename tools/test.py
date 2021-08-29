@@ -14,7 +14,6 @@ from mvt.utils.parallel_util import (
     DataParallel, DistributedDataParallel, init_dist)
 from mvt.utils.misc_util import get_dist_info
 from mvt.utils.checkpoint_util import load_checkpoint
-from mvt.utils.fp16_util import wrap_fp16_model
 from mvt.engines.evaluator import multi_device_test, single_device_test
 from mvt.datasets.data_builder import build_dataloader, build_dataset
 from mvt.models.model_builder import build_model
@@ -118,10 +117,6 @@ def main():
 
     # build the model and load checkpoint
     model = build_model(cfg.MODEL)
-    if "FP16" in cfg.SCHEDULE:
-        if isinstance(cfg.SCHEDULE.FP16, CfgNode): 
-            # fp16_cfg = convert_to_dict(cfg.SCHEDULE.FP16)
-            wrap_fp16_model(model)
 
     print('Loading checkpoint from: ', args.checkpoint)    
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')

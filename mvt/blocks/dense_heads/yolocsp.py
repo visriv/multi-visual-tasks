@@ -8,7 +8,6 @@ from .dense_test_mixins import BBoxTestMixin
 from ..block_builder import HEADS, build_loss
 from mvt.utils.loss_util import reduce_loss
 from mvt.utils.misc_util import multi_apply
-from mvt.utils.fp16_util import force_fp32
 from mvt.utils.init_util import normal_init
 from mvt.cores.ops import multiclass_nms
 from mvt.cores.core_anchor import build_anchor_generator
@@ -125,7 +124,6 @@ class YOLOCSPHead(BaseDetHead, BBoxTestMixin):
 
         self.num_anchors = self.anchor_generator.num_base_anchors
         self._init_layers()
-        self.fp16_enabled = False
 
     @property
     def num_levels(self):
@@ -343,7 +341,6 @@ class YOLOCSPHead(BaseDetHead, BBoxTestMixin):
             return torch.cat((bbox_pred, class_score[:, None]),
                              dim=-1), class_id
 
-    @force_fp32(apply_to=('pred_maps', ))
     def loss(self,
              pred_maps,
              gt_bboxes,

@@ -302,7 +302,6 @@ class YOLOV4Neck(nn.Module):
 
         self.num_ins = len(in_channels)
         self.num_outs = num_outs
-        self.fp16_enabled = False
         self.upsample_cfg = upsample_cfg.copy()
 
         if end_level == -1:
@@ -529,7 +528,6 @@ class YOLOV5Neck(nn.Module):
 
         self.num_ins = len(in_channels)
         self.num_outs = num_outs
-        self.fp16_enabled = False
         self.upsample_cfg = upsample_cfg.copy()
 
         if end_level == -1:

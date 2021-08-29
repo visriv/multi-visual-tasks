@@ -89,7 +89,6 @@ class SSDHead(AnchorHead):
             # SSD sampling=False so use PseudoSampler
             sampler_cfg = dict(type='PseudoSampler')
             self.sampler = build_sampler(sampler_cfg, context=self)
-        self.fp16_enabled = False
 
     def init_weights(self):
         """Initialize weights of the head."""

@@ -5,6 +5,7 @@ SCHEDULE:
     lr: 0.0005
   OPTIMIZER_CONFIG:
     grad_clip: ""
+    fp16: True
   LR_POLICY:
     policy: 'step'
     warmup: 'linear'

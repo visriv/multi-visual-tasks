@@ -13,6 +13,7 @@ SCHEDULE:
     grad_clip: {
       max_norm: 35,
       norm_type: 2}
+    fp16: True
   LR_POLICY:
     policy: "CosineAnnealing"
     min_lr_ratio: 0.2
