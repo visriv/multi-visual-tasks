@@ -1,0 +1,23 @@
+SCHEDULE:
+  TOTAL_EPOCHS: 24
+  OPTIMIZER:
+    type: "AdamW"
+    lr: 0.001
+    betas: [0.9, 0.999]
+    weight_decay: 0.05
+    PARAMWISE_CFG:
+      custom_keys: [{
+        'norm': { lr_mult: 1, decay_mult: 0.}
+      }]
+  OPTIMIZER_CONFIG:
+    grad_clip: ""
+    fp16: True
+  LR_POLICY:
+    policy: "CosineAnnealing"
+    # min_lr: 0.
+    min_lr_ratio: 0.001
+    warmup: "linear"
+    warmup_iters: 1000
+    warmup_ratio: 0.001
+    # policy: "step"
+    # step: [16, 22]

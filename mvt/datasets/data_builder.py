@@ -3,14 +3,15 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
+import os
+import glob
+import resource
 from functools import partial
 from torch.utils.data import DataLoader, RandomSampler
-import numpy as np
-import resource
 
 from .data_sampler import DistributedGroupSampler, DistributedSampler, GroupSampler
 from .data_wrapper import ConcatDataset, RepeatDataset, ClassBalancedDataset, DATASETS
-from mvt.utils.reg_util import Registry, build_data_from_cfg
+from mvt.utils.reg_util import build_data_from_cfg
 from mvt.utils.runtime_util import worker_init_fn, collate
 from mvt.utils.misc_util import get_dist_info
 
@@ -55,6 +56,21 @@ def build_dataset(data_cfg, pipeline_cfg, default_args, sel_index=0):
             build_dataset(cfg_opt, pipeline_cfg, default_args, sel_index), data_cfg.FLAG
         )
     else:
+        relative_path_list = []
+        for relative_path in data_cfg.DATA_INFO[sel_index]:
+            if "*" in relative_path:
+                extend_list = glob.glob(
+                    os.path.join(default_args["root_path"], relative_path)
+                )
+                len_root_path = len(default_args["root_path"])
+                for extend_global_path in extend_list:
+                    re_path = extend_global_path[len_root_path:]
+                    if re_path.startswith("/"):
+                        re_path = re_path[1:]
+                    relative_path_list.append(re_path)
+            else:
+                relative_path_list.append(relative_path)
+        data_cfg.DATA_INFO[sel_index] = relative_path_list
         dataset = build_data_from_cfg(
             data_cfg, pipeline_cfg, default_args, DATASETS, sel_index
         )

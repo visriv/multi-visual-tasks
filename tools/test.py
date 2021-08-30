@@ -6,11 +6,13 @@
 import argparse
 import os
 import torch
-from yacs.config import CfgNode
+from torch.nn.parallel import DataParallel
+from torch.nn.parallel.distributed import DistributedDataParallel
+
 
 from configs import cfg
 from mvt.cores.ops import fuse_conv_bn
-from mvt.utils.parallel_util import DataParallel, DistributedDataParallel, init_dist
+from mvt.utils.parallel_util import init_dist
 from mvt.utils.misc_util import get_dist_info
 from mvt.utils.checkpoint_util import load_checkpoint
 from mvt.engines.evaluator import multi_device_test, single_device_test
