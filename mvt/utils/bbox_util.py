@@ -352,14 +352,17 @@ def get_rotated_bbox(bbox, rot_matrix, w, h):
     )  # [4, 3]
     rotated_coords = np.matmul(rot_matrix, coordinates[..., np.newaxis])  # [4, 2, 1]
     rotated_coords = rotated_coords[..., 0]  # [4, 2]
-    min_x, min_y = np.min(rotated_coords[:, 0], axis=0), np.min(
-        rotated_coords[:, 1], axis=0
+    min_x, min_y = (
+        np.min(rotated_coords[:, 0], axis=0),
+        np.min(rotated_coords[:, 1], axis=0),
     )
-    max_x, max_y = np.max(rotated_coords[:, 0], axis=0), np.max(
-        rotated_coords[:, 1], axis=0
+    max_x, max_y = (
+        np.max(rotated_coords[:, 0], axis=0),
+        np.max(rotated_coords[:, 1], axis=0),
     )
     min_x, min_y = np.clip(min_x, a_min=0, a_max=w), np.clip(min_y, a_min=0, a_max=h)
-    max_x, max_y = np.clip(max_x, a_min=min_x, a_max=w), np.clip(
-        max_y, a_min=min_y, a_max=h
+    max_x, max_y = (
+        np.clip(max_x, a_min=min_x, a_max=w),
+        np.clip(max_y, a_min=min_y, a_max=h),
     )
     return np.array([min_x, min_y, max_x, max_y])

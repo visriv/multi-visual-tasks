@@ -165,21 +165,18 @@ export PYTHONPATH=$(pwd):$PYTHONPATH
     
     该脚本在评估之前保存推理的Embeedings和labels。
     
-    示例:
+    示例流程:
     ```shell
     # 在任务配置中进行评估设置
-    python3 tools/model_evaluation/save_embeddings.py tasks/embeddings/emb_resnet50_fc_retail.yaml meta/train_infos/emb_resnet50_fc_retail/epoch_500.pth --save-path meta/reference_embedding.pkl
-
-    # 在任务设置中进行查询设置
-    python3 tools/model_evaluation/save_embeddings.py tasks/embeddings/emb_resnet50_fc_retail.yaml meta/train_infos/emb_resnet50_fc_retail/epoch_500.pth --save-path meta/qury_embedding.pkl
+    python3 demos/det_retail_demos/save_embeddings.py tasks/embeddings/emb_resnet50_mlp_retail.yaml meta/train_infos/emb_resnet50_mlp_retail/epoch_100.pth --save-path meta/reference_embedding.pkl
 
     # 执行评估
-    python3 tools/model_evaluation/eval_embeddings.py meta/reference_embedding.pkl meta/qury_embedding.pkl
+    python3 demos/det_retail_demos/eval_embeddings.py meta/reference_embedding.pkl meta/qury_embedding.pkl
     ```
 
     创建前景目标检测和特征匹配的json文件
     ```shell
-    python3 tools/model_evaluation/eval_with_json_labels.py tasks/detections/det_yolov4_retail_one.yaml \
+    python3 demos/det_retail_demos/eval_with_json_labels.py tasks/detections/det_yolov4_retail_one.yaml \
         meta/train_infos/det_yolov4_retail_one/epoch_xxx.pth \
         --json-path data/test/a_det_annotations.json \
         --out-dir meta/test_a/
@@ -187,13 +184,11 @@ export PYTHONPATH=$(pwd):$PYTHONPATH
    
     获得预测标签的json文件
     ```shell
-    python3 tools/model_evaluation/pred_embedding_with_json_label.py tasks/embeddings/emb_resnet50_fc_retail.yaml \
+    python3 demos/det_retail_demos/pred_embedding_with_json_label.py tasks/embeddings/emb_resnet50_fc_retail.yaml \
         meta/train_infos/emb_resnet50_fc_retail/epoch_xxx.pth \
         meta/reference_test_b_embedding.pkl \
         --json-ori data/test/a_det_annotations.json \
         --json-out submit/out.json
-
-    python3 tools/model_evaluation/pred_embedding_with_json_label.py tasks/embeddings/emb_resnet50_mlp_loc_retail.yaml meta/train_infos/emb_resnet50_mlp_loc_retail/epoch_xxx.pth meta/reference_test_b_embedding.pkl --json-ori data/RetailDet/test/a_det_annotations.json --json-out meta/test/output.json
     ```
 
 ### 运行测试示例

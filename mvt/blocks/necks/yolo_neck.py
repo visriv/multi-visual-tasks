@@ -156,11 +156,7 @@ class DarkNeck(nn.Module):
                 ]
             ),
             # layer 4
-            OrderedDict(
-                [
-                    ("trans_1", vn_layer.Transition(input_channels * (2 ** 4))),
-                ]
-            ),
+            OrderedDict([("trans_1", vn_layer.Transition(input_channels * (2 ** 4))),]),
             # layer 5
             # output second scale
             OrderedDict(
@@ -172,11 +168,7 @@ class DarkNeck(nn.Module):
                 ]
             ),
             # layer 6
-            OrderedDict(
-                [
-                    ("trans_2", vn_layer.Transition(input_channels * (2 ** 3))),
-                ]
-            ),
+            OrderedDict([("trans_2", vn_layer.Transition(input_channels * (2 ** 3))),]),
             # layer 7
             # output first scale, smallest
             OrderedDict(
