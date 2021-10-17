@@ -8,7 +8,7 @@ from pycocotools.cocoeval import COCOeval
 from terminaltables import AsciiTable
 
 from mvt.datasets.data_wrapper import DATASETS
-from mvt.datasets.detections.det_base import DetBaseDataset
+from mvt.datasets.detection2ds.det_base import DetBaseDataset
 from mvt.utils.io_util import obj_dump
 from mvt.cores.eval.common_eval import eval_recalls
 from mvt.utils.log_util import print_log
