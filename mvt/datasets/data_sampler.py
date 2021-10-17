@@ -4,13 +4,10 @@
 # @Email   : zhimingqian@tencent.com
 
 from __future__ import division
-
 import torch
-import copy
 import torch
 import math
 import numpy as np
-from torch import distributed as dist
 from torch.utils.data import Sampler
 from torch.utils.data import DistributedSampler as _DistributedSampler
 

@@ -9,11 +9,11 @@ import resource
 from functools import partial
 from torch.utils.data import DataLoader, RandomSampler
 
-from .data_sampler import DistributedGroupSampler, DistributedSampler, GroupSampler
-from .data_wrapper import ConcatDataset, RepeatDataset, ClassBalancedDataset, DATASETS
 from mvt.utils.reg_util import build_data_from_cfg
 from mvt.utils.runtime_util import worker_init_fn, collate
 from mvt.utils.misc_util import get_dist_info
+from .data_sampler import DistributedGroupSampler, DistributedSampler, GroupSampler
+from .data_wrapper import ConcatDataset, RepeatDataset, ClassBalancedDataset, DATASETS
 
 
 # --------------------------------------------------------------------------- #

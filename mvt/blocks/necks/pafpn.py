@@ -1,9 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .fpn import FPN
-from ..block_builder import NECKS
 from mvt.cores.ops import ConvModule
+from ..block_builder import NECKS
+from .fpn import FPN
 
 
 @NECKS.register_module()

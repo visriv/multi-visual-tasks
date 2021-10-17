@@ -1,5 +1,3 @@
-import sys
-
 from mvt.utils.bbox_util import merge_aug_proposals
 
 

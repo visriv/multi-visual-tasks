@@ -1,8 +1,8 @@
 import torch.nn as nn
 
-from ..block_builder import NECKS
 from mvt.cores.ops import ConvModule, GlobalPoolingCell, SumCell
 from mvt.utils.init_util import caffe2_xavier_init
+from ..block_builder import NECKS
 
 
 @NECKS.register_module()

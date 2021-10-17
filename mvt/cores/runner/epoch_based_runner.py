@@ -1,13 +1,13 @@
 import os.path as osp
 import time
-
 import torch
-from .base_runner import BaseRunner
-from ..core_runner import RUNNERS
+
 from mvt.utils.checkpoint_util import save_checkpoint
 from mvt.utils.runtime_util import get_host_info
 from mvt.utils.misc_util import is_list_of
 from mvt.utils.path_util import symlink
+from ..core_runner import RUNNERS
+from .base_runner import BaseRunner
 
 
 @RUNNERS.register_module()

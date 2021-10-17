@@ -2,8 +2,6 @@ import copy
 import cv2
 import numpy as np
 
-from .compose import Compose
-from ..data_wrapper import PIPELINES
 from mvt.utils.geometric_util import imshear, imrotate, imtranslate
 from mvt.utils.photometric_util import (
     adjust_brightness,
@@ -11,6 +9,8 @@ from mvt.utils.photometric_util import (
     adjust_contrast,
     imequalize,
 )
+from ..data_wrapper import PIPELINES
+from .compose import Compose
 
 _MAX_LEVEL = 10
 

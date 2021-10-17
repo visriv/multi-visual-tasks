@@ -3,8 +3,7 @@ from .core_anchor import build_anchor_generator, ANCHOR_GENERATORS
 from .core_optimizer import (
     OPTIMIZERS,
     OPTIMIZER_BUILDERS,
-    build_optimizer,
-    register_torch_optimizers,
+    build_optimizer
 )
 
 

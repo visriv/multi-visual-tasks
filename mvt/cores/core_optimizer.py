@@ -1,6 +1,4 @@
-import copy
 import inspect
-
 import torch
 
 from mvt.utils.reg_util import Registry, build_module_from_dict

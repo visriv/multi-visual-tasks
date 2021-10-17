@@ -70,7 +70,7 @@ DATA:
     TYPE: "RepeatDataset" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 2
     #IMAGE_SIZE: [300, 300]
-    DATA_INFO: ["annotations/instances_train2017.json"]
+    DATA_INFO: [["annotations/instances_train2017.json"]]
     DATA_PREFIX: ["train2017/"]
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
@@ -78,7 +78,7 @@ DATA:
     TYPE: "Normal"
     FLAG: 1
     #MIN_SIZE: 100
-    DATA_INFO: ["annotations/instances_val2017.json"]
+    DATA_INFO: [["annotations/instances_val2017.json"]]
     DATA_PREFIX: ["val2017/"]
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 4
@@ -87,7 +87,7 @@ DATA:
     TYPE: "Normal"
     FLAG: 1
     #MIN_SIZE: 100
-    DATA_INFO: ["annotations/instances_val2017.json"]
+    DATA_INFO: [["annotations/instances_val2017.json"]]
     DATA_PREFIX: ["val2017/"]
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 4

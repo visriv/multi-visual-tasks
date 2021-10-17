@@ -2,7 +2,6 @@ import numpy as np
 import torch
 from yacs.config import CfgNode
 
-from mvt.utils.parallel_util import scatter
 from mvt.utils.runtime_util import collate
 from mvt.utils.io_util import imread
 from mvt.utils.checkpoint_util import load_checkpoint
@@ -141,8 +140,7 @@ def inference_detector(config, model, img):
     data = collate([data])
 
     if next(model.parameters()).is_cuda:
-        # scatter to specified GPU
-        data = scatter(data, [device])[0]
+        data["img"] = data["img"].to(device)
     else:
         # just get the actual data
         data["img_metas"] = data["img_metas"][0].data

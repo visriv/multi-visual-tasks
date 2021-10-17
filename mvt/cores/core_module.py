@@ -1,5 +1,3 @@
-from functools import partial
-
 import torch
 
 TORCH_VERSION = torch.__version__

@@ -37,7 +37,7 @@ function step_1 {
 
 # Check validation set in $emb_cfg before running following script
 # VAL_DATA:
-#   DATA_INFO: ["test/b_annotations.json"]
+#   DATA_INFO: [["test/b_annotations.json"]]
 #   DATA_PREFIX: ["test/b_images/"]
 function step_2 {
     echo -e "Step 2: Saving reference embeddings ..."

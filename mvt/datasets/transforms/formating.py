@@ -2,8 +2,8 @@ from collections.abc import Sequence
 import numpy as np
 import torch
 
-from ..data_wrapper import PIPELINES
 from mvt.utils.misc_util import is_str
+from ..data_wrapper import PIPELINES
 
 
 def to_tensor(data):

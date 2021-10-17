@@ -3,7 +3,6 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-import warnings
 import functools
 import torch
 

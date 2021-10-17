@@ -1,8 +1,8 @@
 from torch import nn
 
-from .base_embedder import BaseEmbedder
-from ..model_builder import EMBEDDERS
 from mvt.blocks.block_builder import build_backbone, build_head, build_neck
+from ..model_builder import EMBEDDERS
+from .base_embedder import BaseEmbedder
 
 
 @EMBEDDERS.register_module()

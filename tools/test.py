@@ -9,7 +9,6 @@ import torch
 from torch.nn.parallel import DataParallel
 from torch.nn.parallel.distributed import DistributedDataParallel
 
-
 from configs import cfg
 from mvt.cores.ops import fuse_conv_bn
 from mvt.utils.parallel_util import init_dist

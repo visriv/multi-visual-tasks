@@ -42,7 +42,7 @@ Data:
   TRAIN_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: ["kitti_infos_train.pkl"]
+    DATA_INFO: [["kitti_infos_train.pkl"]]
     DATA_PREFIX: ["train/"]
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
@@ -56,7 +56,7 @@ Data:
       used_feature_list: ['x', 'y', 'z', 'intensity'],
       src_feature_list: ['x', 'y', 'z', 'intensity'],
     }
-    DATA_INFO: ["kitti_infos_val.pkl"]
+    DATA_INFO: [["kitti_infos_val.pkl"]]
     DATA_PREFIX: ["val/"]
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 4
@@ -64,7 +64,7 @@ Data:
   TEST_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: ["annotations/instances_val2017.json"]
+    DATA_INFO: [["annotations/instances_val2017.json"]]
     DATA_PREFIX: ["val2017/"]
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 4

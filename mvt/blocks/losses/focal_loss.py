@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from ..block_builder import LOSSES
 from mvt.utils.loss_util import weight_reduce_loss
+from ..block_builder import LOSSES
 
 
 # This method is for debugging

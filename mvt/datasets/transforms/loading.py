@@ -2,10 +2,10 @@ import os.path as osp
 import numpy as np
 import pycocotools.mask as maskUtils
 
-from ..data_wrapper import PIPELINES
 from mvt.utils.io_util import imfrombytes
 from mvt.utils.io_util import FileClient
 from mvt.utils.mask_util import BitmapMasks, PolygonMasks
+from ..data_wrapper import PIPELINES
 
 
 @PIPELINES.register_module()

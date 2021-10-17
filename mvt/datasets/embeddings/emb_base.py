@@ -5,8 +5,8 @@ from os import path as osp
 from torch.utils.data import Dataset
 from yacs.config import CfgNode
 
-from ..transforms import Compose
 from mvt.utils.io_util import list_from_file
+from ..transforms import Compose
 
 
 class EmbBaseDataset(Dataset, metaclass=ABCMeta):
@@ -59,6 +59,8 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         else:
             self.data_prefix = None
 
+        # only use ann_file[0]
+        self.ann_file = self.ann_file[0]
         # join paths if data_root is specified
         if not osp.isabs(self.ann_file):
             self.ann_file = osp.join(self.data_root, self.ann_file)

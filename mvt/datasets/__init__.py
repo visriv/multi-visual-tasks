@@ -3,17 +3,9 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-from .detections import *
+from .detection2ds import *
 from .embeddings import *
 from .transforms import *
-from .data_wrapper import (
-    ConcatDataset,
-    RepeatDataset,
-    ClassBalancedDataset
-)
+from .data_wrapper import ConcatDataset, RepeatDataset, ClassBalancedDataset
 
-__all__ = [
-    "ConcatDataset",
-    "RepeatDataset",
-    "ClassBalancedDataset"
-]
+__all__ = ["ConcatDataset", "RepeatDataset", "ClassBalancedDataset"]

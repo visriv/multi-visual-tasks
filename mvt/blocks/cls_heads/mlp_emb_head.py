@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
 
-from .base_cls_head import BaseClsHead
-from ..block_builder import HEADS, build_loss
 from mvt.utils.init_util import normal_init
 from mvt.cores.metric_ops.multi_similarity_miner import MultiSimilarityMiner
+from ..block_builder import HEADS, build_loss
+from .base_cls_head import BaseClsHead
 
 
 @HEADS.register_module()

@@ -1,9 +1,7 @@
 from .roi_align import RoIAlign, roi_align
 from .roi_pool import RoIPool, roi_pool
-
 from .nms import common_nms, batched_nms, multiclass_nms
 from .point_sample import SimpleRoIAlign, point_sample, rel_roi_point_to_rel_img_point
-
 from .cnn_layer import ConvModule, ConvWS2d, ConvAWS2d, conv_ws_2d, fuse_conv_bn
 from .scale_layer import Scale
 from .nonlocal_layer import NonLocal1d, NonLocal2d, NonLocal3d

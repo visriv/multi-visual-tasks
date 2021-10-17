@@ -4,7 +4,6 @@ import random
 import math
 import cv2
 
-from ..data_wrapper import PIPELINES
 from mvt.utils.mask_util import PolygonMasks
 from mvt.utils.bbox_util import bbox_overlaps_np
 from mvt.utils.misc_util import is_list_of, is_str
@@ -17,6 +16,7 @@ from mvt.utils.geometric_util import (
     imcrop,
 )
 from mvt.utils.photometric_util import imnormalize, bgr2hsv, hsv2bgr, rgb2gray
+from ..data_wrapper import PIPELINES
 from .compose import Compose as PipelineCompose
 
 try:

@@ -2,12 +2,12 @@ from abc import abstractmethod
 import torch
 import torch.nn as nn
 
-from ..block_builder import HEADS, build_loss
-from .base_det_head import BaseDetHead
-from .dense_test_mixins import BBoxTestMixin
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import bias_init_with_prob, normal_init
 from mvt.utils.misc_util import multi_apply
+from ..block_builder import HEADS, build_loss
+from .base_det_head import BaseDetHead
+from .dense_test_mixins import BBoxTestMixin
 
 
 @HEADS.register_module()

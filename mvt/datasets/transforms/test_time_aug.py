@@ -1,8 +1,8 @@
 import warnings
 
+from mvt.utils.misc_util import is_list_of
 from ..data_wrapper import PIPELINES
 from .compose import Compose
-from mvt.utils.misc_util import is_list_of
 
 
 @PIPELINES.register_module()

@@ -1,10 +1,10 @@
 import numpy as np
 import torch
 
-from ..block_builder import HEADS
-from .standard_roi_head import StandardRoIHead
 from mvt.cores.bbox import bbox2roi
 from mvt.blocks.losses import SmoothL1Loss
+from ..block_builder import HEADS
+from .standard_roi_head import StandardRoIHead
 
 
 @HEADS.register_module()

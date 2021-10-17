@@ -2,12 +2,11 @@ import os.path as osp
 from PIL import Image
 import numpy as np
 
-from .emb_base import EmbBaseDataset
-from ..data_builder import DATASETS
 from mvt.utils.io_util import file_load
 from mvt.utils.geometric_util import imcrop, imrotate
 from mvt.utils.bbox_util import get_rotated_bbox
-from mvt.utils.vis_util import imshow
+from ..data_builder import DATASETS
+from .emb_base import EmbBaseDataset
 
 
 @DATASETS.register_module()

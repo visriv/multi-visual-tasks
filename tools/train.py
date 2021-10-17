@@ -7,9 +7,6 @@ import argparse
 import os
 import os.path as osp
 import time
-import sys
-
-sys.path.append("..")
 
 from configs import cfg
 from mvt.utils.config_util import (

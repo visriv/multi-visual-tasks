@@ -1,9 +1,9 @@
 import torch.nn as nn
 
-from .fcn_mask_head import FCNMaskHead
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import constant_init, xavier_init
 from mvt.blocks.block_builder import HEADS
+from .fcn_mask_head import FCNMaskHead
 
 
 @HEADS.register_module()

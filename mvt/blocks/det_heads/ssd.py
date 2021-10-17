@@ -3,13 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from yacs.config import CfgNode
 
-from ..block_builder import HEADS
-from ..losses import smooth_l1_loss
-from .anchor import AnchorHead
 from mvt.utils.init_util import xavier_init
 from mvt.cores.core_anchor import build_anchor_generator
 from mvt.cores.core_bbox import build_assigner, build_bbox_coder, build_sampler
 from mvt.utils.misc_util import multi_apply
+from ..block_builder import HEADS
+from ..losses import smooth_l1_loss
+from .anchor import AnchorHead
 
 
 @HEADS.register_module()

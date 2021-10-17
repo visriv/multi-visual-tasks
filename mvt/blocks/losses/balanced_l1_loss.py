@@ -2,8 +2,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from ..block_builder import LOSSES
 from mvt.utils.loss_util import weighted_loss
+from ..block_builder import LOSSES
 
 
 @weighted_loss

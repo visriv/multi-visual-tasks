@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .vgg import VGG
-from ..block_builder import BACKBONES
 from mvt.utils.init_util import constant_init, kaiming_init, normal_init, xavier_init
 from mvt.utils.checkpoint_util import load_checkpoint
 from mvt.utils.log_util import get_root_logger
+from ..block_builder import BACKBONES
+from .vgg import VGG
 
 
 class L2Norm(nn.Module):

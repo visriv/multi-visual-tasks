@@ -6,10 +6,10 @@
 import bisect
 import math
 from collections import defaultdict
-from mvt.utils.reg_util import Registry
-
 import numpy as np
 from torch.utils.data.dataset import ConcatDataset as _ConcatDataset
+
+from mvt.utils.reg_util import Registry
 from mvt.utils.log_util import print_log
 
 

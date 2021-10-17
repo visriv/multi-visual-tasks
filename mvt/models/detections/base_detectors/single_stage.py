@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 
 from mvt.cores.bbox import bbox2result
-from ...model_builder import DETECTORS
 from mvt.blocks.block_builder import build_backbone, build_head, build_neck
-from .base_detector import BaseDetector
 from mvt.utils.config_util import convert_to_dict
+from ...model_builder import DETECTORS
+from .base_detector import BaseDetector
 
 
 @DETECTORS.register_module()

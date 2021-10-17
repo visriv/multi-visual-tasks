@@ -2,9 +2,9 @@ import inspect
 import torch.nn as nn
 from torch.nn import SyncBatchNorm
 
-from .misc import infer_abbr
 from mvt.utils.reg_util import Registry
 from mvt.cores.layer_ops.brick import Mish
+from .misc import infer_abbr
 
 
 CONV_LAYERS = Registry("conv layer")

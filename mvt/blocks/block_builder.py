@@ -3,7 +3,6 @@
 # @Author  : zhiming.qian
 # @Email   : zhimingqian@tencent.com
 
-import inspect
 from torch import nn
 from yacs.config import CfgNode
 

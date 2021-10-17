@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from mvt.utils.init_util import normal_init
+from mvt.cores.ops import batched_nms
 from ..block_builder import HEADS
 from .anchor import AnchorHead
 from .rpn_test_mixin import RPNTestMixin
-from mvt.utils.init_util import normal_init
-from mvt.cores.ops import batched_nms
 
 
 @HEADS.register_module()

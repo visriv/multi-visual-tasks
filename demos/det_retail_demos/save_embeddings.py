@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-import os.path as osp
 import pickle
 from torch.nn.parallel import DataParallel
 import numpy as np

@@ -5,6 +5,7 @@ from abc import ABCMeta, abstractmethod
 from torch.nn.modules.utils import _pair
 import pycocotools.mask as mask_util
 import pycocotools.mask as maskUtils
+
 from mvt.cores.ops import roi_align
 from mvt.utils.misc_util import slice_list
 from mvt.utils.geometric_util import rescale_size, imrescale, imresize

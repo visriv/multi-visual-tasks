@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..block_builder import LOSSES
 from mvt.utils.loss_util import weight_reduce_loss
+from ..block_builder import LOSSES
 
 
 def cross_entropy(

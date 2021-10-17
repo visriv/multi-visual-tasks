@@ -1,10 +1,7 @@
 import os.path as osp
-import warnings
-import struct
 import numpy as np
 from torch.utils.data import Dataset
 from yacs.config import CfgNode
-from threading import local
 
 from mvt.cores.eval.common_eval import eval_map, eval_recalls
 from mvt.datasets.data_wrapper import DATASETS
@@ -98,6 +95,8 @@ class DetBaseDataset(Dataset):
         else:
             self.proposals = None
 
+        # only use ann_file[0]
+        self.ann_file = self.ann_file[0]
         if not osp.isabs(self.ann_file):
             self.ann_file = osp.join(self.data_root, self.ann_file)
         self.data_infos = self.load_annotations(self.ann_file)
