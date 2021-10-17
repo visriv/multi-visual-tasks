@@ -3,7 +3,7 @@ import torch.nn as nn
 from .bbox_head import BBoxHead
 from mvt.cores.ops import ConvModule
 from mvt.utils.init_util import normal_init, xavier_init
-from mvt.blocks.backbones import Bottleneck
+from mvt.blocks.backbones.resnet import Bottleneck
 from mvt.blocks.block_builder import HEADS
 
 
