@@ -1,10 +1,10 @@
 MODEL:
-  BASE: "models/detections/det_ssd_300_vgg.yaml"
+  BASE: "models/detection2ds/det_ssd_300_vgg.yaml"
   PRETRAINED_MODEL_PATH: ""
   BBOX_HEAD:
     num_classes: 80
 DATA:
-  BASE: "datasets/detections/det_coco.yaml"
+  BASE: "datasets/detection2ds/det_coco.yaml"
   TRAIN_DATA:
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4

@@ -1,9 +1,9 @@
 MODEL:
-  BASE: "models/detections/det_efficientdet_d7.yaml"
+  BASE: "models/detection2ds/det_efficientdet_d7.yaml"
   BBOX_HEAD:
     num_classes: 116
 DATA:
-  BASE: "datasets/detections/det_retail_mosaic.yaml"
+  BASE: "datasets/detection2ds/det_retail_mosaic.yaml"
   TRAIN_TRANSFORMS:
     MosaicPipeline: {
       individual_pipeline: {
