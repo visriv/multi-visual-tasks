@@ -20,4 +20,4 @@ SCHEDULE:
   OPTIMIZER: 
     lr: 0.002
 RUNTIME:
-  BASE: "runtimes/local_runtime.yaml"
+  BASE: "runtimes/runtime_local.yaml"

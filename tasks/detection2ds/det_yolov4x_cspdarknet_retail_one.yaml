@@ -67,7 +67,7 @@ SCHEDULE:
     policy: "CosineAnnealing"
     min_lr_ratio: 0.2
 RUNTIME:
-  BASE: "runtimes/local_runtime.yaml"
+  BASE: "runtimes/runtime_local.yaml"
   CHECKPOINT_CONFIG:
     interval: 2
   LOG_CONFIG:

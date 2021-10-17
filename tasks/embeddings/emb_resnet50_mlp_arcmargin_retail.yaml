@@ -32,5 +32,5 @@ DATA:
 SCHEDULE:
   BASE: "schedulers/schedule_efficient.yaml"
 RUNTIME:
-  BASE: "runtimes/local_runtime.yaml"
+  BASE: "runtimes/runtime_local.yaml"
   
