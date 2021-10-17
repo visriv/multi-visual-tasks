@@ -1,6 +1,6 @@
 DATA:
   NAME: "DetRetailOneDataset"
-  ROOT_PATH: "datasets/DetRetailDataset"
+  ROOT_PATH: "datasets/DetRetail"
   TRAIN_TRANSFORMS:
     LoadImageFromFile: {to_float32: True}
     LoadAnnotations: {with_bbox: True}

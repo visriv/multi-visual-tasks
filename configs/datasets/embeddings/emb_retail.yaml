@@ -1,6 +1,6 @@
 DATA:
   NAME: "EmbRetailDataset"
-  ROOT_PATH: "datasets/DetRetailDataset"
+  ROOT_PATH: "data/objdet-datasets/RetailDet"
   TRAIN_TRANSFORMS:
     ImgResize: {size: 128}
     PhotoMetricDistortion: {

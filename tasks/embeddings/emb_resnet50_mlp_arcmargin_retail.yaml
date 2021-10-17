@@ -2,7 +2,6 @@ MODEL:
   BASE: "models/embeddings/emb_resnet50_mlp_arcmargin.yaml"  
 DATA:
   BASE: "datasets/embeddings/emb_retail.yaml"
-  ROOT_PATH: "data/"
   TRAIN_TRANSFORMS:
     ImgResize: {size: 224}    
   TEST_TRANSFORMS:

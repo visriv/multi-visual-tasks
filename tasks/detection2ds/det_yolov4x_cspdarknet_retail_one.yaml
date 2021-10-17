@@ -35,7 +35,6 @@ MODEL:
     max_per_img: 300
 DATA:
   BASE: "datasets/detections/det_retail_one_yolo.yaml"
-  ROOT_PATH: "data/RetailDet"
   TRAIN_DATA:
     TYPE: "Concat" # "Normal" "Concat" "Repeat" "Balanced"
     FLAG: 1

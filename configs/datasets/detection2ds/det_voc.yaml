@@ -1,6 +1,6 @@
 DATA:
   NAME: "VOCDataset"
-  ROOT_PATH: "datasets/VOCDataset"
+  ROOT_PATH: "data/objdet-datasets/VOC"
   TRAIN_TRANSFORMS:
     LoadImageFromFile: {to_float32: True}
     LoadAnnotations: {with_bbox: True}

@@ -1,6 +1,6 @@
 DATA:
   NAME: "CocoDataset"
-  ROOT_PATH: "datasets/CocoDataset"
+  ROOT_PATH: "data/objdet-datasets/COCO"
   TRAIN_TRANSFORMS:
     LoadImageFromFile: {
       to_float32: True,
