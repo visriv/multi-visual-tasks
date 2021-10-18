@@ -10,7 +10,7 @@ from mvt.utils.io_util import file_load, list_from_file
 
 
 @DATASETS.register_module()
-class DetBaseDataset(Dataset):
+class D3dBaseDataset(Dataset):
     """Base dataset for detection."""
 
     class_names = None

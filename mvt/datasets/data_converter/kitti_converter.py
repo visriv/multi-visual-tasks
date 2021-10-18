@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 from pathlib import Path
 
-from mvt.cores.bbox import box_np_ops
+from mvt.cores.bbox import bbox_np_ops
 from .kitti_data_utils import get_kitti_image_info
 
 kitti_categories = ('Pedestrian', 'Cyclist', 'Car')
@@ -33,7 +33,7 @@ def _calculate_num_points_in_gt(data_path,
         Trv2c = calib['Tr_velo_to_cam']
         P2 = calib['P2']
         if remove_outside:
-            points_v = box_np_ops.remove_outside_points(
+            points_v = bbox_np_ops.remove_outside_points(
                 points_v, rect, Trv2c, P2, image_info['image_shape'])
 
         # points_v = points_v[points_v[:, 0] > 0]
@@ -45,9 +45,9 @@ def _calculate_num_points_in_gt(data_path,
         rots = annos['rotation_y'][:num_obj]
         gt_boxes_camera = np.concatenate([loc, dims, rots[..., np.newaxis]],
                                          axis=1)
-        gt_boxes_lidar = box_np_ops.box_camera_to_lidar(
+        gt_boxes_lidar = bbox_np_ops.box_camera_to_lidar(
             gt_boxes_camera, rect, Trv2c)
-        indices = box_np_ops.points_in_rbbox(points_v[:, :3], gt_boxes_lidar)
+        indices = bbox_np_ops.points_in_rbbox(points_v[:, :3], gt_boxes_lidar)
         num_points_in_gt = indices.sum(0)
         num_ignored = len(annos['dimensions']) - num_obj
         num_points_in_gt = np.concatenate(
@@ -160,8 +160,8 @@ def _create_reduced_point_cloud(data_path,
         # then remove outside.
         if back:
             points_v[:, 0] = -points_v[:, 0]
-        points_v = box_np_ops.remove_outside_points(points_v, rect, Trv2c, P2,
-                                                    image_info['image_shape'])
+        points_v = bbox_np_ops.remove_outside_points(
+            points_v, rect, Trv2c, P2, image_info['image_shape'])
         if save_path is None:
             save_dir = v_path.parent.parent / (v_path.parent.stem + '_reduced')
             if not save_dir.exists():

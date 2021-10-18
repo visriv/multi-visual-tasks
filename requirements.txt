@@ -13,3 +13,4 @@ tensorboard
 albumentations
 imagecorruptions
 onnx
+nuscenes-devkit

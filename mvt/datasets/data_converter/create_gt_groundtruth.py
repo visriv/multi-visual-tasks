@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pickle
 
-from mvt.cores.bbox import bbox_np_ops as bbox_np_ops
+from mvt.cores.bbox import bbox_np_ops
 from mvt.datasets.data_builder import build_dataset
 
 
@@ -13,8 +13,7 @@ def create_kitti_groundtruth_database(
     info_path=None,
     used_classes=None,
     database_save_path=None,
-    db_info_save_path=None,
-    with_mask=False
+    db_info_save_path=None
 ):
     """Given the raw data, generate the ground truth database.
 
@@ -41,8 +40,7 @@ def create_kitti_groundtruth_database(
         modality=dict(
             use_lidar=True,
             use_depth=False,
-            use_lidar_intensity=True,
-            use_camera=with_mask,
+            use_lidar_intensity=True
         ),
         pipeline=[
             dict(

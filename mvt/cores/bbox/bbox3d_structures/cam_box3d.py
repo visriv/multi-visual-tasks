@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 
-from mmdet3d.core.points import BasePoints
+from mvt.cores.points import BasePoints
 from .base_box3d import BaseInstance3DBoxes
 from mvt.utils.bbox3d_util import limit_period, rotation_3d_in_axis
 
