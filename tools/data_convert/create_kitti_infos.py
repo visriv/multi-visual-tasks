@@ -11,7 +11,13 @@ from mvt.datasets.data_converter.kitti_converter import (
     convert_cam_to_lidar_info
 )
 
-def create_kitti_info_file(data_path, save_path=None, relative_path=True):
+
+def create_kitti_info_file(
+    data_path, 
+    data_info_path, 
+    save_path=None, 
+    relative_path=True
+):
     """
     create the file of dataset info
     :param data_path: the root path of dataset
@@ -19,7 +25,7 @@ def create_kitti_info_file(data_path, save_path=None, relative_path=True):
     :param relative_path: whether using relative path
     :return:
     """
-    dataset_folder = Path(__file__).resolve().parent / "kitti_dataset"
+    dataset_folder = Path(data_info_path)
     train_ids = read_dataset_file(str(dataset_folder / "train.txt"))
     val_ids = read_dataset_file(str(dataset_folder / "val.txt"))
     test_ids = read_dataset_file(str(dataset_folder / "test.txt"))
@@ -73,7 +79,6 @@ def create_kitti_info_file(data_path, save_path=None, relative_path=True):
     print(f"Kitti info test file is saved to {filename}")
     with open(filename, 'wb') as f:
         pickle.dump(kitti_infos_test, f)
-
 
 
 def create_kitti_lidar_info_file(data_path, save_path=None):
@@ -130,12 +135,17 @@ def arg_parser():
     parser.add_argument(
         '--root-path',
         type=str,
-        default='./data/kitti',
+        default='data/other-datasets/Kitti/Object3D/',
+        help='specify the root path of dataset')
+    parser.add_argument(
+        '--data-info-path',
+        type=str,
+        default='data/kitti_dataset/',
         help='specify the root path of dataset')
     parser.add_argument(
         '--out-dir',
         type=str,
-        default='./data/kitti',
+        default='data/other-datasets/Kitti/Object3D/',
         help='specify the output path')
     args = parser.parse_args()
     return args
@@ -143,4 +153,12 @@ def arg_parser():
 
 if __name__ == '__main__':
     args = arg_parser()
-    kitti_data_prep(root_path=args.root_path)
+    create_kitti_lidar_info_file(
+        data_path=args.root_path,
+        data_info_path=args.data_info_path,
+        save_path=args.out_dir
+    )
+    create_kitti_lidar_info_file(
+        data_path=args.root_path,
+        save_path=args.out_dir
+    )
