@@ -131,7 +131,6 @@ def create_kitti_lidar_info_file(data_path, save_path=None):
 
 def arg_parser():
     parser = argparse.ArgumentParser(description='Data converter arg parser')
-    parser.add_argument('dataset', metavar='kitti', help='name of the dataset')
     parser.add_argument(
         '--root-path',
         type=str,
@@ -153,7 +152,7 @@ def arg_parser():
 
 if __name__ == '__main__':
     args = arg_parser()
-    create_kitti_lidar_info_file(
+    create_kitti_info_file(
         data_path=args.root_path,
         data_info_path=args.data_info_path,
         save_path=args.out_dir
