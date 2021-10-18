@@ -13,7 +13,7 @@ from mvt.utils.io_util import list_from_file
 class VOCDataset(DetBaseDataset):
     """Data interface for the VOC dataset"""
 
-    CLASSES = (
+    class_names = (
         "aeroplane",
         "bicycle",
         "bird",
@@ -41,7 +41,7 @@ class VOCDataset(DetBaseDataset):
 
         super(VOCDataset, self).__init__(data_cfg, pipeline_cfg, root_path, sel_index)
 
-        self.cat2label = {cat: i for i, cat in enumerate(self.CLASSES)}
+        self.cat2label = {cat: i for i, cat in enumerate(self.class_names)}
 
         if "MIN_SIZE" in data_cfg:
             self.min_size = data_cfg.MIN_SIZE
@@ -102,7 +102,7 @@ class VOCDataset(DetBaseDataset):
                 root = tree.getroot()
                 for obj in root.findall("object"):
                     name = obj.find("name").text
-                    if name in self.CLASSES:
+                    if name in self.class_names:
                         valid_inds.append(i)
                         break
             else:
@@ -129,7 +129,7 @@ class VOCDataset(DetBaseDataset):
         labels_ignore = []
         for obj in root.findall("object"):
             name = obj.find("name").text
-            if name not in self.CLASSES:
+            if name not in self.class_names:
                 continue
             label = self.cat2label[name]
             difficult = int(obj.find("difficult").text)
@@ -192,7 +192,7 @@ class VOCDataset(DetBaseDataset):
         root = tree.getroot()
         for obj in root.findall("object"):
             name = obj.find("name").text
-            if name not in self.CLASSES:
+            if name not in self.class_names:
                 continue
             label = self.cat2label[name]
             cat_ids.append(label)
@@ -243,7 +243,7 @@ class VOCDataset(DetBaseDataset):
             if self.year == 2007:
                 ds_name = "voc07"
             else:
-                ds_name = self.CLASSES
+                ds_name = self.class_names
             mean_ap, _ = eval_map(
                 results,
                 annotations,

@@ -97,10 +97,10 @@ def get_detector(config, checkpoint=None, device="cuda:0"):
     if checkpoint is not None:
         map_loc = "cpu" if device == "cpu" else None
         checkpoint = load_checkpoint(model, checkpoint, map_location=map_loc)
-        if "CLASSES" in checkpoint["meta"]:
-            model.CLASSES = checkpoint["meta"]["CLASSES"]
+        if "class_names" in checkpoint["meta"]:
+            model.class_names = checkpoint["meta"]["class_names"]
         else:
-            model.CLASSES = get_classes(config.DATA.NAME)
+            model.class_names = get_classes(config.DATA.NAME)
 
     model.cfg = config  # save the config in the model for convenience
     model.to(device)

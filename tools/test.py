@@ -133,11 +133,11 @@ def main():
         model = fuse_conv_bn(model)
 
     # this walkaround is for backward compatibility
-    if "CLASSES" in checkpoint["meta"]:
-        model.CLASSES = checkpoint["meta"]["CLASSES"]
+    if "class_names" in checkpoint["meta"]:
+        model.class_names = checkpoint["meta"]["class_names"]
     else:
-        if "CLASSES" in dataset:
-            model.CLASSES = dataset.CLASSES
+        if "class_names" in dataset:
+            model.class_names = dataset.class_names
 
     if not distributed:
         model = DataParallel(model, device_ids=[0])

@@ -158,10 +158,10 @@ def main():
 
     checkpoint = load_checkpoint(model, args.checkpoint, map_location="cpu")
 
-    if "CLASSES" in checkpoint["meta"]:
-        model.CLASSES = checkpoint["meta"]["CLASSES"]
+    if "class_names" in checkpoint["meta"]:
+        model.class_names = checkpoint["meta"]["class_names"]
     else:
-        model.CLASSES = dataset.CLASSES
+        model.class_names = dataset.class_names
 
     model = DataParallel(model, device_ids=[0])
     outputs = single_device_test_vis(

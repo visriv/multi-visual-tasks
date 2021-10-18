@@ -12,7 +12,7 @@ from ..transforms import Compose
 class EmbBaseDataset(Dataset, metaclass=ABCMeta):
     """Base dataset for embedding with defined classes."""
 
-    CLASSES = None
+    class_names = None
 
     def __init__(self, data_cfg, pipeline_cfg, root_path, sel_index=0):
         """Initialization for dataset construction.
@@ -44,10 +44,10 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
         else:
             self.test_mode = False
 
-        if "CLASSES" in data_cfg:
-            self.CLASSES = self.get_classes(data_cfg.CLASSES)
+        if "CLASS_NAMES" in data_cfg:
+            self.class_names = self.get_classes(data_cfg.CLASS_NAMES)
         else:
-            self.CLASSES = self.get_classes()
+            self.class_names = self.get_classes()
 
         # processing pipeline
         self.pipeline_cfg = pipeline_cfg
@@ -118,7 +118,7 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
             dict: mapping from class name to class index.
         """
 
-        return {_class: i for i, _class in enumerate(self.CLASSES)}
+        return {_class: i for i, _class in enumerate(self.class_names)}
 
     def get_gt_labels(self):
         """Get all ground-truth labels (categories).
@@ -173,16 +173,16 @@ class EmbBaseDataset(Dataset, metaclass=ABCMeta):
 
         Args:
             classes (Sequence[str] | str | None): If classes is None, use
-                default CLASSES defined by builtin dataset. If classes is a
+                default class_names defined by builtin dataset. If classes is a
                 string, take it as a file name. The file contains the name of
                 classes where each line contains one class name. If classes is
-                a tuple or list, override the CLASSES defined by the dataset.
+                a tuple or list, override the class_names defined by the dataset.
 
         Returns:
             tuple[str] or list[str]: Names of categories of the dataset.
         """
         if classes is None:
-            return cls.CLASSES
+            return cls.class_names
 
         if isinstance(classes, str):
             # take it as a file path

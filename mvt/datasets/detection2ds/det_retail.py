@@ -9,7 +9,7 @@ from mvt.cores.eval.common_eval import eval_map, eval_recalls
 @DATASETS.register_module()
 class DetRetailDataset(DetBaseDataset):
 
-    CLASSES = (
+    class_names = (
         "asamu",
         "baishikele",
         "baokuangli",
@@ -135,7 +135,7 @@ class DetRetailDataset(DetBaseDataset):
             data_cfg, pipeline_cfg, root_path, sel_index
         )
 
-        self.cat2label = {cat: i for i, cat in enumerate(self.CLASSES)}
+        self.cat2label = {cat: i for i, cat in enumerate(self.class_names)}
 
     def load_annotations(self, ann_file):
 
@@ -282,7 +282,7 @@ class DetRetailDataset(DetBaseDataset):
             if self.year == 2007:
                 ds_name = "voc07"
             else:
-                ds_name = self.CLASSES
+                ds_name = self.class_names
             mean_ap, _ = eval_map(
                 results,
                 annotations,

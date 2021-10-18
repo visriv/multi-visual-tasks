@@ -350,7 +350,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             img,
             bboxes,
             labels,
-            class_names=self.CLASSES,
+            class_names=self.class_names,
             score_thr=score_thr,
             bbox_color=bbox_color,
             text_color=text_color,

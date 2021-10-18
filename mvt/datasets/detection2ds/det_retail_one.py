@@ -9,7 +9,7 @@ from mvt.cores.eval.common_eval import eval_map, eval_recalls
 @DATASETS.register_module()
 class DetRetailOneDataset(DetBaseDataset):
 
-    CLASSES = "retail"
+    class_names = "retail"
 
     def __init__(self, data_cfg, pipeline_cfg, root_path, sel_index=0):
         """Same as base detection dataset"""
@@ -18,7 +18,7 @@ class DetRetailOneDataset(DetBaseDataset):
             data_cfg, pipeline_cfg, root_path, sel_index
         )
 
-        self.cat2label = {cat: i for i, cat in enumerate(self.CLASSES)}
+        self.cat2label = {cat: i for i, cat in enumerate(self.class_names)}
         self.ORI_CLASSES = (
             "asamu",
             "baishikele",
@@ -297,7 +297,7 @@ class DetRetailOneDataset(DetBaseDataset):
 
         if metric == "mAP":
             assert isinstance(iou_thr, float)
-            ds_name = list(self.CLASSES)
+            ds_name = list(self.class_names)
             mean_ap, _ = eval_map(
                 results,
                 annotations,

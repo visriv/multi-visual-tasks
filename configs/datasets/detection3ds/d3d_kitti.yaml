@@ -1,6 +1,6 @@
 Data:
   NAME: 'KittiDataset'
-  ROOT_PATH: 'data/objdet-datasets/Kitti'
+  ROOT_PATH: 'data/other-datasets/Kitti'
   TRAIN_TRANSFORMS:
     DATA_AUGMENTOR:
       DISABLE_AUG_LIST: ['placeholder']

@@ -32,7 +32,7 @@ class ConcatDataset(_ConcatDataset):
 
     def __init__(self, datasets, separate_eval=True):
         super(ConcatDataset, self).__init__(datasets)
-        self.CLASSES = datasets[0].CLASSES
+        self.class_names = datasets[0].class_names
         self.separate_eval = separate_eval
         if not separate_eval:
             if len(set([type(ds) for ds in datasets])) != 1:
@@ -142,7 +142,7 @@ class RepeatDataset(object):
     def __init__(self, dataset, times):
         self.dataset = dataset
         self.times = times
-        self.CLASSES = dataset.CLASSES
+        self.class_names = dataset.class_names
         if hasattr(self.dataset, "flag"):
             self.flag = np.tile(self.dataset.flag, times)
 
@@ -204,9 +204,9 @@ class ClassBalancedDataset(object):
         self.oversample_thr = oversample_thr
         self.filter_empty_gt = filter_empty_gt
         if hasattr(self.dataset, "ORI_CLASSES"):
-            self.CLASSES = dataset.ORI_CLASSES
+            self.class_names = dataset.ORI_CLASSES
         else:
-            self.CLASSES = dataset.CLASSES
+            self.class_names = dataset.class_names
 
         repeat_factors = self._get_repeat_factors(dataset, oversample_thr)
         repeat_indices = []
@@ -240,7 +240,7 @@ class ClassBalancedDataset(object):
         for idx in range(num_images):
             cat_ids = set(self.dataset.get_cat_ids(idx))
             if len(cat_ids) == 0 and not self.filter_empty_gt:
-                cat_ids = set([len(self.CLASSES)])
+                cat_ids = set([len(self.class_names)])
             for cat_id in cat_ids:
                 category_freq[cat_id] += 1
         for k, v in category_freq.items():
@@ -259,7 +259,7 @@ class ClassBalancedDataset(object):
         for idx in range(num_images):
             cat_ids = set(self.dataset.get_cat_ids(idx))
             if len(cat_ids) == 0 and not self.filter_empty_gt:
-                cat_ids = set([len(self.CLASSES)])
+                cat_ids = set([len(self.class_names)])
             repeat_factor = 1
             if len(cat_ids) > 0:
                 repeat_factor = max({category_repeat[cat_id] for cat_id in cat_ids})

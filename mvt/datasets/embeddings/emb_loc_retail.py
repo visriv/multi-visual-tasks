@@ -13,7 +13,7 @@ from .emb_base import EmbBaseDataset
 class EmbLocRetailDataset(EmbBaseDataset):
     """Clarity classification"""
 
-    CLASSES = (
+    class_names = (
         "asamu",
         "baishikele",
         "baokuangli",

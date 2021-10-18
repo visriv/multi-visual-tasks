@@ -17,7 +17,7 @@ from mvt.utils.log_util import print_log
 @DATASETS.register_module()
 class CocoDataset(DetBaseDataset):
 
-    CLASSES = (
+    class_names = (
         "person",
         "bicycle",
         "car",
@@ -111,7 +111,7 @@ class CocoDataset(DetBaseDataset):
         """
 
         self.coco = COCO(ann_file)
-        self.cat_ids = self.coco.getCatIds(catNms=self.CLASSES)
+        self.cat_ids = self.coco.getCatIds(catNms=self.class_names)
         self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
         self.img_ids = self.coco.getImgIds()
         data_infos = []

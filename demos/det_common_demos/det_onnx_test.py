@@ -15,7 +15,7 @@ from mvt.utils.vis_util import imshow_det_bboxes
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-CLASSES = (
+class_names = (
     "person",
     "bicycle",
     "car",
@@ -273,7 +273,7 @@ if __name__ == "__main__":
         score_factors=ml_conf_scores,
     )
     # only compare a part of result
-    bbox_results = bbox2result(det_bboxes, det_labels, len(CLASSES))
+    bbox_results = bbox2result(det_bboxes, det_labels, len(class_names))
     # print('bbox_results:', bbox_results)
 
     bboxes = np.vstack(bbox_results)
@@ -301,4 +301,4 @@ if __name__ == "__main__":
     print("bboxes:", bboxes)
     print("labels:", labels)
 
-    imshow_det_bboxes(args.input_img, bboxes, labels, class_names=CLASSES)
+    imshow_det_bboxes(args.input_img, bboxes, labels, class_names=class_names)
