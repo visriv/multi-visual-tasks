@@ -1,71 +1,83 @@
 Data:
   NAME: 'KittiDataset'
-  ROOT_PATH: 'data/other-datasets/Kitti'
+  ROOT_PATH: 'data/other-datasets/Kitti/Object3D'
   TRAIN_TRANSFORMS:
-    DATA_AUGMENTOR:
-      DISABLE_AUG_LIST: ['placeholder']
-      AUG_CONFIG_LIST:
-        - NAME: gt_sampling
-          USE_ROAD_PLANE: True
-          DB_INFO_PATH:
-              - kitti_dbinfos_train.pkl
-          PREPARE: {
-             filter_by_min_points: ['Car:5', 'Pedestrian:5', 'Cyclist:5'],
-             filter_by_difficulty: [-1],
-          }
-          SAMPLE_GROUPS: ['Car:20','Pedestrian:15', 'Cyclist:15']
-          NUM_POINT_FEATURES: 4
-          DATABASE_WITH_FAKELIDAR: False
-          REMOVE_EXTRA_WIDTH: [0.0, 0.0, 0.0]
-          LIMIT_WHOLE_SCENE: True
-        - NAME: random_world_flip
-          ALONG_AXIS_LIST: ['x']
-        - NAME: random_world_rotation
-          WORLD_ROT_ANGLE: [-0.78539816, 0.78539816]
-        - NAME: random_world_scaling
-          WORLD_SCALE_RANGE: [0.95, 1.05]
-    DATA_PROCESSOR:
-      - NAME: mask_points_and_boxes_outside_range
-        REMOVE_OUTSIDE_BOXES: True
-      - NAME: shuffle_points
-        SHUFFLE_ENABLED: {
-          'train': True,
-          'test': False
-        }
-      - NAME: transform_points_to_voxels
-        VOXEL_SIZE: [0.05, 0.05, 0.1]
-        MAX_POINTS_PER_VOXEL: 5
-        MAX_NUMBER_OF_VOXELS: {
-          'train': 16000,
-          'test': 40000
-        }
+    PointCloudAlbu: {
+      max_points_per_voxel: 100,
+      max_voxels: 20000,
+      create_gt: True,
+      shuffle_points: True,
+      gt_rotation_noise: [-0.78539816, 0.78539816],
+      gt_loc_noise_std: [0.5, 0.5, 0.5],
+      global_rotation_noise: [-0.78539816, 0.78539816],
+      global_scaling_noise: [0.95, 1.05],
+      min_points_in_gt: 10,
+      random_flip_x: True,
+      random_flip_y: True
+    }
+    D3DDefaultFormatBundle: {}
+    D3DCollect: {keys: [
+      "voxels",
+      "num_points",
+      "coordinates",
+      "num_voxels",
+      "metrics",
+      "anchors",
+      "labels",
+      "reg_targets"
+    ]}
+  TEST_TRANSFORMS:
+    PointCloudAlbu: {
+      max_points_per_voxel: 100,
+      max_voxels: 20000,
+      create_gt: True,
+      shuffle_points: False,
+      gt_rotation_noise: [0, 0],
+      gt_loc_noise_std: [0, 0, 0],
+      global_rotation_noise: [0, 0],
+      global_scaling_noise: [1, 1],
+      min_points_in_gt: 10,
+      random_flip_x: False,
+      random_flip_y: False
+    }
+    D3DDefaultFormatBundle: {}
+    D3DCollect: {keys: [
+      "voxels",
+      "num_points",
+      "coordinates",
+      "num_voxels",
+      "metrics",
+      "anchors"
+    ]}
   TRAIN_DATA:
     TYPE: "Normal"
     FLAG: 1
     DATA_INFO: [["kitti_infos_train.pkl"]]
     DATA_PREFIX: ["train/"]
+    RPN_STRIDES: 2
+    VOXEL_SIZE: [0.2, 0.2, 4]
+    POINT_CLOUD_RANGE: [0., -40., -3.0, 70.4, 40., 1.0]
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
   VAL_DATA:
     TYPE: "Normal"
     FLAG: 1
-    POINT_CLOUD_RANGE: [0, -40, -3, 70.4, 40, 1]
-    FOV_POINTS_ONLY: True
-    POINT_FEATURE_ENCODING: {
-      encoding_type: absolute_coordinates_encoding,
-      used_feature_list: ['x', 'y', 'z', 'intensity'],
-      src_feature_list: ['x', 'y', 'z', 'intensity'],
-    }
     DATA_INFO: [["kitti_infos_val.pkl"]]
     DATA_PREFIX: ["val/"]
+    RPN_STRIDES: 2
+    VOXEL_SIZE: [0.2, 0.2, 4]
+    POINT_CLOUD_RANGE: [0., -40., -3.0, 70.4, 40., 1.0]
     TEST_MODE: False
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4
   TEST_DATA:
     TYPE: "Normal"
     FLAG: 1
-    DATA_INFO: [["annotations/instances_val2017.json"]]
-    DATA_PREFIX: ["val2017/"]
+    DATA_INFO: [["kitti_infos_test.pkl"]]
+    DATA_PREFIX: ["test/"]
+    RPN_STRIDES: 2
+    VOXEL_SIZE: [0.2, 0.2, 4]
+    POINT_CLOUD_RANGE: [0., -40., -3.0, 70.4, 40., 1.0]
     TEST_MODE: True
     SAMPLES_PER_DEVICE: 4
     WORKERS_PER_DEVICE: 4

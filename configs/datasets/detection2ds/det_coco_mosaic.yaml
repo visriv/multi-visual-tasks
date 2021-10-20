@@ -4,7 +4,11 @@ DATA:
   TRAIN_TRANSFORMS:
     MosaicPipeline: {
       individual_pipeline: {
-        LoadImageFromFile: {backend: 'pillow'},
+        LoadImageFromFile: {
+          to_float32: True,
+          backend: 'pillow',
+          channel_order: 'rgb'
+        },
         LoadAnnotations: {with_bbox: True},
         JointResize: {img_scale: [640, 640], keep_ratio: True}
       }, pad_val: 114}
@@ -47,11 +51,15 @@ DATA:
     Normalize: {
       mean: [114, 114, 114],
       std: [255, 255, 255],
-      to_rgb: True}
+      to_rgb: False}
     DefaultFormatBundle: {}
     Collect: {keys: ['img', 'gt_bboxes', 'gt_labels']}
   TEST_TRANSFORMS:
-    LoadImageFromFile: {}
+    LoadImageFromFile: {
+      to_float32: True,
+      backend: 'pillow',
+      channel_order: 'rgb'
+    }
     MultiScaleFlipAug: {
       img_scale: [640, 640],
       flip: False,
@@ -61,7 +69,7 @@ DATA:
         Normalize: {
           mean: [114, 114, 114],
           std: [255, 255, 255],
-          to_rgb: True},
+          to_rgb: False},
         ImageToTensor: {keys: ['img']},
         Collect: {keys: ['img']}
         }

@@ -26,7 +26,7 @@
 
   English | [简体中文](README_CN.md)
 
-  Multi-Visual-Tasks (MVT) is an open-source toolbox for multiple vision tasks based on PyTorch, following the most advanced algorithms, such as YoloV4/5, EfficientDet, Swin-Transformer, and so on. Our repository is designed according to {MMDetection: https://github.com/open-mmlab/mmdetection} and {Detectron2: https://github.com/facebookresearch/detectron2}.
+  Multi-Visual-Tasks (MVT) is an open-source toolbox for multiple vision tasks based on PyTorch, following the most advanced algorithms, such as YoloV4/5, EfficientDet, Swin-Transformer, and so on. Besides, we support 2D/3D detection, classification, embedding and multiple vision tasks. Our repository is designed according to {MMDetection: https://github.com/open-mmlab/mmdetection} and {Detectron2: https://github.com/facebookresearch/detectron2}.
 
 ## Major Features
 

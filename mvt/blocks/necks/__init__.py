@@ -12,6 +12,7 @@ from .yolo_neck import (
     YOLOV5Neck,
 )
 from .global_pooling import GlobalAveragePooling
+from .voxel_scatter import VoxelScatter
 
 __all__ = [
     "BFP",
@@ -26,4 +27,5 @@ __all__ = [
     "GlobalAveragePooling",
     "YOLOV4Neck",
     "YOLOV5Neck",
+    "VoxelScatter"
 ]

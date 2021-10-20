@@ -4,7 +4,8 @@ DATA:
   TRAIN_TRANSFORMS:
     LoadImageFromFile: {
       to_float32: True,
-      backend: 'pillow'}
+      backend: 'pillow',
+      channel_order: 'rgb'}
     LoadAnnotations: {with_bbox: True}
     PhotoMetricDistortion: {}
     JointResize: {
@@ -16,12 +17,16 @@ DATA:
     Normalize: {
       mean: [123.675, 116.28, 103.53],
       std: [58.395, 57.12, 57.375],
-      to_rgb: True}
+      to_rgb: False}
     Pad: {size: [224, 224]}
     DefaultFormatBundle: {}
     Collect: {keys: ['img', 'gt_bboxes', 'gt_labels']}
   TEST_TRANSFORMS:
-    LoadImageFromFile: {}
+    LoadImageFromFile: {
+      to_float32: True,
+      backend: 'pillow',
+      channel_order: 'rgb'
+    }
     MultiScaleFlipAug: {
       img_scale: [224, 224],
       flip: False,
@@ -30,7 +35,7 @@ DATA:
         Normalize: {
           mean: [123.675, 116.28, 103.53],
           std: [58.395, 57.12, 57.375],
-          to_rgb: True},
+          to_rgb: False},
         Pad: {size: [224, 224]},
         ImageToTensor: {keys: ['img']},
         Collect: {keys: ['img']}

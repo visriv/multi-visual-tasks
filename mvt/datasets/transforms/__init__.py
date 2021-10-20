@@ -49,6 +49,10 @@ from .transforms import (
     ImgRandomResizedCrop,
     SegRandomCrop,
 )
+from .transform3ds import (
+    D3DDefaultFormatBundle,
+    D3DCollect
+)
 
 __all__ = [
     "Compose",
@@ -94,4 +98,6 @@ __all__ = [
     "ImgCenterCrop",
     "ImgRandomCrop",
     "ImgRandomResizedCrop",
+    "D3DDefaultFormatBundle",
+    "D3DCollect"
 ]

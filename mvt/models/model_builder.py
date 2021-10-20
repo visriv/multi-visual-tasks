@@ -25,6 +25,8 @@ def build_model(cfg):
         return build_model_from_cfg(cfg, CLASSIFIERS)
     elif model_type == "det":
         return build_model_from_cfg(cfg, DETECTORS)
+    elif model_type == "d3d":
+        return build_model_from_cfg(cfg, DETECTORS)
     elif model_type == "emb":
         return build_model_from_cfg(cfg, EMBEDDERS)
     else:

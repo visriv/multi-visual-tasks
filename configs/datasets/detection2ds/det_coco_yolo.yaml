@@ -2,12 +2,15 @@ DATA:
   NAME: "CocoDataset"
   ROOT_PATH: "data/objdet-datasets/COCO"
   TRAIN_TRANSFORMS:
-    LoadImageFromFile: {to_float32: True}
+    LoadImageFromFile: {
+      to_float32: True,
+      backend: 'pillow',
+      channel_order: 'rgb'}
     LoadAnnotations: {with_bbox: True}
     PhotoMetricDistortion: {}
     Expand: {
       mean: [0, 0, 0],
-      to_rgb: True,
+      to_rgb: False,
       ratio_range: [1, 2]}
     MinIoURandomCrop: {
       min_ious: [0.1, 0.3, 0.5, 0.7, 0.9],
@@ -19,12 +22,15 @@ DATA:
     Normalize: {
       mean: [0, 0, 0],
       std: [255, 255, 255],
-      to_rgb: True}
+      to_rgb: False}
     Pad: {size_divisor: 32}
     DefaultFormatBundle: {}
     Collect: {keys: ['img', 'gt_bboxes', 'gt_labels']}
   TEST_TRANSFORMS:
-    LoadImageFromFile: {}
+    LoadImageFromFile: {
+      to_float32: True,
+      backend: 'pillow',
+      channel_order: 'rgb'}
     MultiScaleFlipAug: {
       img_scale: [416, 416],
       flip: False,
@@ -33,7 +39,7 @@ DATA:
         Normalize: {
           mean: [0, 0, 0],
           std: [255, 255, 255],
-          to_rgb: True},
+          to_rgb: False},
         Pad: {size_divisor: 32},
         ImageToTensor: {keys: ['img']},
         Collect: {keys: ['img']}}}

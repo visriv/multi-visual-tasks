@@ -141,9 +141,6 @@ def inference_detector(config, model, img):
 
     if next(model.parameters()).is_cuda:
         data["img"] = data["img"].to(device)
-    else:
-        # just get the actual data
-        data["img_metas"] = data["img_metas"][0].data
 
     # forward the model
     with torch.no_grad():

@@ -26,7 +26,7 @@
 
   简体中文 | [English](README.md)
 
-  Multi-Visual-Tasks (MVT) 是一个基于Pytorch开发的多视觉任务开源框架。该框架开发了多种现有最先进的视觉方法，例如YoloV4/5, EfficientDet, Swin-Transformer等等。该框架在{MMDetection: https://github.com/open-mmlab/mmdetection}和{Detectron2: https://github.com/facebookresearch/detectron2}等最流行的开源框架基础上进行设计，并不断更新最新视觉领域的科研成果。
+  Multi-Visual-Tasks (MVT) 是一个基于Pytorch开发的多视觉任务开源框架。该框架开发了多种现有最先进的视觉方法，例如YoloV4/5, EfficientDet, Swin-Transformer等等。此外，该框架支持2D/3D目标检测、分类、向量特征表示等多种视觉任务。该框架在{MMDetection: https://github.com/open-mmlab/mmdetection}和{Detectron2: https://github.com/facebookresearch/detectron2}等最流行的开源框架基础上进行设计，并不断更新最新视觉领域的科研成果。
 
 ## 主要特点
 

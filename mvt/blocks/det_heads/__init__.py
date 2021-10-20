@@ -6,6 +6,8 @@ from .rpn import RPNHead
 from .ssd import SSDHead
 from .retina_sepconv_head import RetinaSepConvHead
 from .yolocsp import YOLOCSPHead
+from .efficient_rpn import EfficientRPN, EfficientLightRPN
+from .rpn_target_assigner import RPNTargetAssigner
 
 __all__ = [
     "AnchorFreeHead",
@@ -16,4 +18,7 @@ __all__ = [
     "FCOSHead",
     "RetinaSepConvHead",
     "YOLOCSPHead",
+    "EfficientRPN",
+    "EfficientLightRPN",
+    "RPNTargetAssigner"
 ]

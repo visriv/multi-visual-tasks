@@ -1,0 +1,85 @@
+
+MODEL:
+  TYPE: "det"
+  NAME: "PillarRPN"
+  BACKBONE:
+    type: "VoxelMeanVFE"
+    num_input_features: 4
+    num_filters: [64]
+    voxel_size: [0.2, 0.2, 4]
+    pc_range: [0., -40., -3.0, 70.4, 40., 1.0]
+  NECK:
+    type: "VoxelScatter"
+    output_shape: [1, 400, 352]
+    numb_bev_features: 64
+  RPN_HEAD:
+    type: "EfficientLightRPN"
+    num_classes: 3
+    num_input_features: 64
+    rpn_strides: 2
+    layer_nums: [3, 5, 5, 5]
+    layer_strides: [2, 2, 2, 2]
+    upsample_strides: [2, 2, 2]
+    num_filters: [256, 256, 256]
+    num_upsample_filters: [256, 256, 256]
+    num_anchor_per_loc: 2
+    box_code_size: 7
+    num_direction_bins: 2    
+  LOSS:
+    type: "VoxelRPNLoss"
+    classification_loss: {
+      type: "weighted_sigmoid_focal",
+      alpha: 0.25,
+      gamma: 2.0
+    }
+    localization_loss: {
+      type: "weighted_smooth_l1",
+      sigma: 3.0
+    }
+    cls_weight: 1.0
+    loc_weight: 2.0
+    dir_weight: 0.2
+    box_coder_size: 7
+    num_classes: 3
+  EXTEND:
+    nms_pre_max_size: 1000
+    nms_post_max_size: 200
+    nms_iou_threshold: 0.1
+    num_direction_bins: 2
+    det_score_threshold: 0.3
+    num_point_features: 4
+    post_center_limit_range: [0.2, -39.8, -2.8, 70.2, 39.8, 0.8]
+    class_settings: {
+      obj_params_0: {
+        class_name: "Car"
+      },
+      obj_params_1: {
+        class_name: "Cyclist"
+      },
+      obj_params_2: {
+        class_name: "Pedestrian"
+      }
+    }
+    anchor_settings: {
+      size_0: {
+        anchor_sizes": [3.9, 1.6, 1.56], # lwh
+        anchor_ranges": [0.2, -39.8, -1.0, 70.2, 39.8, -1.0],
+        anchor_rotations": [0, 1.57],
+        matched_threshold": 0.6,
+        unmatched_threshold": 0.45
+      },
+      size_1: {
+        anchor_sizes: [1.76, 0.6, 1.73],  # lwh
+        anchor_ranges: [0.2, -39.8, -0.6, 70.2, 39.8, -0.6],
+        anchor_rotations: [0, 1.57],
+        matched_threshold: 0.5,
+        unmatched_threshold: 0.35
+      },
+      size_2: {
+        anchor_sizes: [0.8, 0.6, 1.73],  # lwh
+        anchor_ranges: [0.2, -39.8, -0.6, 70.2, 39.8, -0.6],
+        anchor_rotations: [0, 1.57],
+        matched_threshold: 0.5,
+        unmatched_threshold: 0.35
+      }
+    }

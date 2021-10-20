@@ -728,20 +728,6 @@ def anno_to_rbboxes(anno):
     return rbboxes
 
 
-def _dict_select(dict_, inds):
-    """
-    select key-values in dictionary
-    :param dict_: dictionary
-    :param inds: selected indices
-    :return:
-    """
-    for k, v in dict_.items():
-        if isinstance(v, dict):
-            _dict_select(v, inds)
-        else:
-            dict_[k] = v[inds]
-
-
 def get_start_result_anno():
     """
     :return: the empty result of label annotation

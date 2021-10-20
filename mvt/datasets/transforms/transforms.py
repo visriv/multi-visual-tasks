@@ -15,7 +15,12 @@ from mvt.utils.geometric_util import (
     imrescale,
     imcrop,
 )
-from mvt.utils.photometric_util import imnormalize, bgr2hsv, hsv2bgr, rgb2gray
+from mvt.utils.photometric_util import (
+    imnormalize,
+    bgr2hsv,
+    hsv2bgr,
+    rgb2gray
+)
 from ..data_wrapper import PIPELINES
 from .compose import Compose as PipelineCompose
 

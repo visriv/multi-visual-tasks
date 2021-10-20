@@ -131,7 +131,10 @@ def build_data_from_cfg(data_cfg, pipeline_cfg, default_args, registry, sel_inde
     if "root_path" not in default_args:
         raise KeyError("args must have a root path to find the dataset")
 
-    return data_cls(data_cfg, pipeline_cfg, default_args["root_path"], sel_index)
+    if "net" in default_args:
+        return data_cls(data_cfg, pipeline_cfg, default_args["root_path"], default_args["net"], sel_index)
+    else:
+        return data_cls(data_cfg, pipeline_cfg, default_args["root_path"], sel_index)
 
 
 def build_model_from_cfg(cfg, registry):

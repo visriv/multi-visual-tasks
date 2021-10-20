@@ -22,11 +22,11 @@ def single_device_emb_test(model, data_loader, save_path=None):
     prog_bar = ProgressBar(len(dataset))
 
     for _, data in enumerate(data_loader):
-        data["img_metas"] = data["img_metas"].data[0]
-        data["img"] = data["img"].data[0]
-        data["label"] = data["label"].data[0]
+        data["img_metas"] = data["img_metas"]
+        data["img"] = data["img"]
+        data["label"] = data["label"]
         if "bbox" in data:
-            data["bbox"] = data["bbox"].data[0]
+            data["bbox"] = data["bbox"]
 
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)

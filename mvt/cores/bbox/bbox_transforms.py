@@ -187,3 +187,8 @@ def bbox_rescale(bboxes, scale_factor=1.0):
     else:
         rescaled_bboxes = torch.stack([x1, y1, x2, y2], dim=-1)
     return rescaled_bboxes
+
+
+def limit_period_torch(val, offset=0.5, period=np.pi):
+    """get the limited value within period"""
+    return val - torch.floor(val / period + offset) * period

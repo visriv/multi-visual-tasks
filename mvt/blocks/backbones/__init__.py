@@ -3,6 +3,7 @@ from .sdd_vgg import SSDVGG
 from .efficient import EfficientNet
 from .swin_transformer import SwinTransformer
 from .darknetcsp import DarknetCSP
+from .voxel_vfe import VoxelMeanVFE, VoxelCenterVFE
 
 
 __all__ = [
@@ -13,4 +14,6 @@ __all__ = [
     "EfficientNet",
     "SwinTransformer",
     "DarknetCSP",
+    "VoxelMeanVFE",
+    "VoxelCenterVFE"
 ]

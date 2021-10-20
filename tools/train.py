@@ -197,6 +197,8 @@ def main():
     model = build_model(cfg.MODEL)
 
     dataset_args = get_dataset_global_args(cfg.DATA)
+    if cfg.MODEL.TYPE == "d3d":
+        dataset_args["net"] = model
 
     train_dataset = build_dataset(
         cfg.DATA.TRAIN_DATA, cfg.DATA.TRAIN_TRANSFORMS, dataset_args

@@ -30,15 +30,12 @@ def single_device_det_test(
     prog_bar = ProgressBar(len(dataset))
     for _, data in enumerate(data_loader):
         for i in range(len(data["img_metas"])):
-            data["img_metas"][i] = data["img_metas"][i].data[0]
+            data["img_metas"][i] = data["img_metas"][i]
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
         batch_size = len(result)
         if show or out_dir:
-            if batch_size == 1 and isinstance(data["img"][0], torch.Tensor):
-                img_tensor = data["img"][0]
-            else:
-                img_tensor = data["img"][0].data
+            img_tensor = data["img"]
             img_metas = data["img_metas"][0]
             imgs = tensor2imgs(img_tensor, **img_metas[0]["img_norm_cfg"])
             assert len(imgs) == len(img_metas)
@@ -85,9 +82,6 @@ def single_device_emb_test(model, data_loader):
     dataset = data_loader.dataset
     prog_bar = ProgressBar(len(dataset))
     for _, data in enumerate(data_loader):
-        data["img_metas"] = data["img_metas"].data[0]
-        data["img"] = data["img"].data[0]
-        data["label"] = data["label"].data[0]
 
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
@@ -127,8 +121,6 @@ def multi_device_det_test(model, data_loader, tmpdir=None, gpu_collect=False):
     time.sleep(2)  # This line can prevent deadlock problem in some cases.
     for i, data in enumerate(data_loader):
         with torch.no_grad():
-            for i in range(len(data["img_metas"])):
-                data["img_metas"][i] = data["img_metas"][i].data[0]
             result = model(return_loss=False, rescale=True, **data)
             # encode mask results
             if isinstance(result[0], tuple):

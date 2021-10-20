@@ -30,7 +30,7 @@ def single_device_det_test(
 
     for _, data in enumerate(data_loader):
         for i in range(len(data["img_metas"])):
-            data["img_metas"][i] = data["img_metas"][i].data[0]
+            data["img_metas"][i] = data["img_metas"][i]
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
 
@@ -39,7 +39,7 @@ def single_device_det_test(
         if batch_size == 1 and isinstance(data["img"][0], torch.Tensor):
             img_tensor = data["img"][0]
         else:
-            img_tensor = data["img"][0].data
+            img_tensor = data["img"][0]
         img_metas = data["img_metas"][0]
         imgs = tensor2imgs(img_tensor, **img_metas[0]["img_norm_cfg"])
         assert len(imgs) == len(img_metas)

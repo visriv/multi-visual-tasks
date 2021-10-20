@@ -9,9 +9,9 @@ DATA:
       saturation_range: [0.5, 1.5],
       hue_delta: 18}
     Normalize: {
-      mean: [125.307, 122.961, 113.8575], 
-      std: [51.5865, 50.847, 51.255], 
-      to_rgb: True
+      mean: [123.675, 116.28, 103.53], 
+      std: [58.395, 57.12, 57.375], 
+      to_rgb: False
       }
     DefaultFormatBundle: {}
     EmbCollect: {
@@ -20,9 +20,9 @@ DATA:
   TEST_TRANSFORMS:
     ImgResize: {size: 128}
     Normalize: {
-      mean: [125.307, 122.961, 113.8575], 
-      std: [51.5865, 50.847, 51.255], 
-      to_rgb: True
+      mean: [123.675, 116.28, 103.53], 
+      std: [58.395, 57.12, 57.375], 
+      to_rgb: False
       }
     DefaultFormatBundle: {}
     EmbCollect: {

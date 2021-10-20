@@ -125,6 +125,26 @@ def det_pth2onnx(
         cfg, checkpoint_path, input_config
     )
 
+    # roll implementation
+    def roll(input, shifts, dims):
+        if isinstance(shifts, int):
+            shifts = [shifts]
+        if isinstance(dims, int):
+            dims = [dims]
+        assert len(shifts) == len(dims)
+        for shift, dim in zip(shifts, dims):
+            dim_len = input.shape[dim]
+            shift = torch.tensor(shift)
+            if shift > 0:
+                shift = dim_len - shift % dim_len
+            else:
+                shift = -shift
+            inds = (torch.arange(dim_len) + shift) % dim_len
+            input = torch.index_select(input, dim, inds)
+        return input
+    
+    torch.roll = roll
+
     torch.onnx.export(
         model,
         tensor_data,

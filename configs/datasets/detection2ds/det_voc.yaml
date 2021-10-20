@@ -2,7 +2,10 @@ DATA:
   NAME: "VOCDataset"
   ROOT_PATH: "data/objdet-datasets/VOC"
   TRAIN_TRANSFORMS:
-    LoadImageFromFile: {to_float32: True}
+    LoadImageFromFile: {
+      to_float32: True,
+      backend: 'pillow',
+      channel_order: 'rgb'}
     LoadAnnotations: {with_bbox: True}
     PhotoMetricDistortion: {
       brightness_delta: 32,
@@ -11,7 +14,7 @@ DATA:
       hue_delta: 18}
     Expand: {
       mean: [123.675, 116.28, 103.53],
-      to_rgb: True,
+      to_rgb: False,
       ratio_range: [1, 4]}
     MinIoURandomCrop: {
       min_ious: [0.1, 0.3, 0.5, 0.7, 0.9],
@@ -23,11 +26,14 @@ DATA:
     Normalize: {
       mean: [123.675, 116.28, 103.53], 
       std: [1, 1, 1], 
-      to_rgb: True}
+      to_rgb: False}
     DefaultFormatBundle: {}
     Collect: {keys: ['img', 'gt_bboxes', 'gt_labels']}
   TEST_TRANSFORMS:
-    LoadImageFromFile: {}
+    LoadImageFromFile: {
+      to_float32: True,
+      backend: 'pillow',
+      channel_order: 'rgb'}
     MultiScaleFlipAug: {
       img_scale: [300, 300],
       flip: False,
@@ -36,7 +42,7 @@ DATA:
         Normalize: {
           mean: [123.675, 116.28, 103.53],
           std: [1, 1, 1],
-          to_rgb: True},
+          to_rgb: False},
         ImageToTensor: {keys: ['img']},
         Collect: {keys: ['img']}
         }

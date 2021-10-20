@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.utils.checkpoint as checkpoint
 from collections import OrderedDict
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+from torch.nn.modules.batchnorm import _BatchNorm
 
 from mvt.utils.checkpoint_util import load_checkpoint
 from mvt.utils.init_util import constant_init, kaiming_init

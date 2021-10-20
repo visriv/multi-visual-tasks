@@ -15,7 +15,7 @@ class D3dBaseDataset(Dataset):
 
     class_names = None
 
-    def __init__(self, data_cfg, pipeline_cfg, root_path, sel_index=0):
+    def __init__(self, data_cfg, pipeline_cfg, root_path, net=None, sel_index=0):
         """Initialization for dataset construction
 
         Args:
@@ -39,6 +39,7 @@ class D3dBaseDataset(Dataset):
         self.data_root = root_path
         self.data_cfg = data_cfg
         self.ann_file = data_cfg.DATA_INFO[sel_index]
+        self.net = net
 
         # set group flag for the sampler
         if not self.test_mode:
@@ -140,29 +141,6 @@ class D3dBaseDataset(Dataset):
 
         return self.data_infos[index]
 
-    def get_ann_info(self, idx):
-        """Get annotation by index.
-
-        Args:
-            idx (int): Index of data.
-
-        Returns:
-            dict: Annotation info of specified index.
-        """
-
-        return self.getitem_info(idx)["ann"]
-
-    def pre_pipeline(self, results):
-        """Prepare results dict for pipeline."""
-
-        results["img_prefix"] = self.data_prefix
-        results["seg_prefix"] = self.seg_prefix
-        results["proposal_file"] = self.proposal_file
-        results["bbox_fields"] = []
-        results["mask_fields"] = []
-        results["seg_fields"] = []
-        results["dataset"] = self
-
     def __getitem__(self, idx):
         """Get training/test data after pipeline.
 
@@ -183,6 +161,9 @@ class D3dBaseDataset(Dataset):
                 continue
             return data
 
+    def get_sensor_data(self, idx):
+        raise NotImplementedError("This function should be overrided")
+
     def prepare_train_img(self, idx):
         """Get training data and annotations after pipeline.
 
@@ -194,10 +175,8 @@ class D3dBaseDataset(Dataset):
                 introduced by pipeline.
         """
 
-        img_info = self.getitem_info(idx)
-        ann_info = self.get_ann_info(idx)
-        results = dict(img_info=img_info, ann_info=ann_info, _idx=idx)
-        self.pre_pipeline(results)
+        data_info = self.getitem_info(idx)
+        results = self.get_sensor_data(data_info)
         return self.pipeline(results)
 
     def prepare_test_img(self, idx):
@@ -211,11 +190,9 @@ class D3dBaseDataset(Dataset):
                 piepline.
         """
 
-        img_info = self.getitem_info(idx)
-        results = dict(img_info=img_info)
-        if self.proposals is not None:
-            results["proposals"] = self.proposals[idx]
-        self.pre_pipeline(results)
+        data_info = self.getitem_info(idx)
+        results = self.get_sensor_data(data_info)
+        results["net"] = self.net
         return self.pipeline(results)
 
     @classmethod
@@ -246,69 +223,12 @@ class D3dBaseDataset(Dataset):
 
         return class_names
 
-    def format_results(self, results, **kwargs):
-        """Place holder to format result to dataset specific output."""
-
-        pass
-
     def evaluate(
         self,
         results,
         metric="mAP",
         logger=None,
-        proposal_nums=(100, 300, 1000),
         iou_thr=0.5,
         scale_ranges=None,
     ):
-        """Evaluate the dataset.
-
-        Args:
-            results (list): Testing results of the dataset.
-            metric (str | list[str]): Metrics to be evaluated.
-            logger (logging.Logger | None | str): Logger used for printing
-                related information during evaluation. Default: None.
-            proposal_nums (Sequence[int]): Proposal number used for evaluating
-                recalls, such as recall@100, recall@1000.
-                Default: (100, 300, 1000).
-            iou_thr (float | list[float]): IoU threshold. It must be a float
-                when evaluating mAP, and can be a list when evaluating recall.
-                Default: 0.5.
-            scale_ranges (list[tuple] | None): Scale ranges for evaluating mAP.
-                Default: None.
-        """
-
-        if not isinstance(metric, str):
-            assert len(metric) == 1
-            metric = metric[0]
-        allowed_metrics = ["mAP", "recall"]
-        if metric not in allowed_metrics:
-            raise KeyError(f"metric {metric} is not supported")
-        annotations = [self.get_ann_info(i) for i in range(len(self))]
-        eval_results = {}
-        if metric == "mAP":
-            assert isinstance(iou_thr, float)
-            mean_ap, _ = eval_map(
-                results,
-                annotations,
-                scale_ranges=scale_ranges,
-                iou_thr=iou_thr,
-                dataset=self.class_names,
-                logger=logger,
-            )
-            eval_results["mAP"] = mean_ap
-        elif metric == "recall":
-            gt_bboxes = [ann["bboxes"] for ann in annotations]
-            if isinstance(iou_thr, float):
-                iou_thr = [iou_thr]
-            recalls = eval_recalls(
-                gt_bboxes, results, proposal_nums, iou_thr, logger=logger
-            )
-            for i, num in enumerate(proposal_nums):
-                for j, iou in enumerate(iou_thr):
-                    eval_results[f"recall@{num}@{iou}"] = recalls[i, j]
-            if recalls.shape[1] > 1:
-                ar = recalls.mean(axis=1)
-                for i, num in enumerate(proposal_nums):
-                    eval_results[f"AR@{num}"] = ar[i]
-
-        return eval_results
+        pass
